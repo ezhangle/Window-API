@@ -20,6 +20,7 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 	m_Resolution[0] = a_Width;
 	m_Resolution[1] = a_Height;
 
+<<<<<<< HEAD
 	//Foundation_WindowManager::GetInstance()->AddWindow(this);	
 
 	if (a_ShouldCreateTerminal)
@@ -31,6 +32,8 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 
 }
 
+=======
+>>>>>>> 2e0397aa3527a8f258506bd46c0cd142b195a066
 void Foundation_Window::PollForEvents()
 {
 #ifdef _MSC_VER
@@ -212,8 +215,201 @@ void Foundation_Window::InitializePixelFormat()
 
 #endif
 
+<<<<<<< HEAD
 #ifdef _MSC_VER
 void Foundation_Window::Win32TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeyState)
+=======
+void Foundation_Window::Initialize(const char* a_WindowName, GLuint a_Width, GLuint a_Height, GLuint a_ColourBits,
+	GLuint a_DepthBits, GLuint a_StencilBits, bool a_ShouldCreateTerminal) 
+{
+	m_Resolution[0] = a_Width;
+	m_Resolution[1] = a_Height;
+	m_WindowName = a_WindowName;
+	m_ColourBits = a_ColourBits;
+	m_DepthBits = a_DepthBits;
+	m_StencilBits = a_StencilBits;
+
+	if (a_ShouldCreateTerminal)
+	{
+		CreateTerminal();
+	}
+
+#ifdef _MSC_VER
+	InitializeWin32();
+#endif
+
+#ifdef __linux__ || __GNUG__ || __GNUC__ || __clang__
+
+	m_Attributes = new GLuint[5]{GLX_RGBA, GLX_DEPTH_SIZE, m_DepthBits, GLX_DOUBLEBUFFER, None};
+	
+	m_Display = XOpenDisplay(0);
+	
+	if(!m_Display)
+	{
+		printf("Cannot Connect to X Server \n");
+		exit(0);
+	}
+
+	for(int i = 0; i < 5; i++)
+	{
+		printf("%i\n", m_Attributes[i]);
+	}
+
+	m_VisualInfo = glXChooseVisual(m_Display, 0,
+		m_Attributes);
+
+	if (!m_VisualInfo)
+	{
+		printf("No appropriate visual found\n");
+		exit(0);
+	}
+
+	m_SetAttributes.colormap = XCreateColormap(m_Display,
+		DefaultRootWindow(m_Display), 
+		m_VisualInfo->visual, AllocNone);
+
+	m_SetAttributes.event_mask = ExposureMask | KeyPressMask;
+
+	m_Window = XCreateWindow(m_Display,
+		DefaultRootWindow(m_Display), 0, 0, 
+		m_Resolution[0], m_Resolution[1],
+		0, m_VisualInfo->depth, InputOutput, 
+		m_VisualInfo->visual, CWColormap | CWEventMask, 
+		&m_SetAttributes);
+
+	XMapWindow(m_Display, m_Window);
+	XStoreName(m_Display, m_Window,
+		m_WindowName);
+
+	m_Context = glXCreateContext(
+		m_Display, m_VisualInfo,
+		0, GL_TRUE);
+
+	glXMakeCurrent(m_Display,
+		m_Window, m_Context);
+
+	XWindowAttributes l_WindowAttributes;
+
+	XGetWindowAttributes(m_Display, m_Window, &l_WindowAttributes);
+	m_WindowPosition[0] = l_WindowAttributes.x;
+	m_WindowPosition[1] = l_WindowAttributes.y;
+#endif
+
+}
+#ifdef _MSC_VER
+LRESULT CALLBACK Foundation_Window::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPARAM a_WordParam, LPARAM a_LongParam)
+{
+	if(m_WindowHandle == a_WindowHandle)
+	{
+		printf("It's AliVe!!!");
+	}
+
+	switch (a_Message)
+	{
+	case WM_CREATE:
+	{
+		m_DeviceContextHandle = GetDC(m_WindowHandle);
+		InitializePixelFormat();
+		m_GLRenderingcontextHandle = wglCreateContext(m_DeviceContextHandle);
+		wglMakeCurrent(m_DeviceContextHandle, m_GLRenderingcontextHandle);
+		InitializeGL();
+		break;
+	}
+	case WM_DESTROY:
+	{
+		/* finish OpenGL rendering */
+		ShutDownWindow();
+		break;
+	}
+
+	case WM_SIZE:
+	{
+		if (m_GLRenderingcontextHandle)
+		{	
+			Resize((unsigned int)LOWORD(m_LongParam), (unsigned int)HIWORD(m_LongParam));
+			break;
+		}
+		break;
+	}
+
+	case WM_SIZING:
+	{
+		if (m_GLRenderingcontextHandle)
+		{
+			Resize((unsigned int)LOWORD(m_LongParam), (unsigned int)HIWORD(m_LongParam));
+			break;
+		}
+		break;
+	}
+
+	case WM_KEYDOWN:
+	{
+		TranslateKey(m_WordParam, m_LongParam, KEYSTATE_DOWN);
+		break;
+	}
+
+	case WM_KEYUP:
+	{
+		TranslateKey(a_WordParam, a_LongParam, KEYSTATE_UP);
+		break;
+	}
+
+	case WM_LBUTTONDOWN:
+	{
+		m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONDOWN;
+		break;
+	}
+
+	case WM_LBUTTONUP:
+	{
+		m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
+		break;
+	}
+
+	case WM_RBUTTONDOWN:
+	{
+		m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
+		break;
+	}
+
+	case WM_RBUTTONUP:
+	{
+		m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
+		break;
+	}
+
+	case WM_MBUTTONDOWN:
+	{
+		m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
+		break;
+	}
+
+	case WM_MBUTTONUP:
+	{
+		m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONUP;
+		break;
+	}
+
+	default:
+	{
+		return DefWindowProc(m_WindowHandle, a_Message, m_WordParam, m_LongParam);
+	}
+	}
+	return 0;
+}
+
+#endif
+
+#ifdef _MSC_VER
+LRESULT CALLBACK Foundation_Window::StaticWindowProcedure(HWND a_WindowHandle, UINT a_Message, WPARAM a_WordParam, LPARAM a_LongParam)
+{
+	return WindowProcedure(a_WindowHandle, a_Message, a_WordParam, a_LongParam);
+}
+#endif
+
+#ifdef _MSC_VER
+void Foundation_Window::TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeyState)
+>>>>>>> 2e0397aa3527a8f258506bd46c0cd142b195a066
 {
 	switch (a_WordParam)
 	{
@@ -554,10 +750,18 @@ void Foundation_Window::InitializeWin32(LPCSTR a_MenuName,
 	HINSTANCE a_Instance /* = GetModuleHandle(0) */,
 	HICON a_Icon /* = LoadIcon(0 , IDI_APPLICATION)*/, 
 	HCURSOR a_Cursor /* = LoadCursor(0 , IDC_ARROW)*/,
+<<<<<<< HEAD
 	HBRUSH a_Brush /* = (HBRUSH)BLACK_BRUSH */)
 {
 	m_WindowClass.style = a_Style;
 	m_WindowClass.lpfnWndProc = Foundation_WindowManager::StaticWindowProcedure;
+=======
+	HBRUSH a_Brush /* = (HBRUSH)BLACK_BRUSH */, LPCSTR a_MenuName /* = m_WindowName */, 
+	LPCSTR a_ClassName /* = m_WindowName */)
+{
+	m_WindowClass.style = a_Style;
+	m_WindowClass.lpfnWndProc = a_WindowProcedure;
+>>>>>>> 2e0397aa3527a8f258506bd46c0cd142b195a066
 	m_WindowClass.cbClsExtra = 0;
 	m_WindowClass.cbWndExtra = 0;
 	m_WindowClass.hInstance = a_Instance;
@@ -565,6 +769,7 @@ void Foundation_Window::InitializeWin32(LPCSTR a_MenuName,
 	m_WindowClass.hCursor = a_Cursor;
 	m_WindowClass.hbrBackground = a_Brush;
 	m_WindowClass.lpszMenuName = a_MenuName;
+<<<<<<< HEAD
 	m_WindowClass.lpszClassName = a_MenuName;
 	RegisterClass(&m_WindowClass);
 
@@ -572,6 +777,15 @@ void Foundation_Window::InitializeWin32(LPCSTR a_MenuName,
 		CreateWindow(a_MenuName, a_MenuName, a_Style, 0,
 		0, m_Resolution[0],
 		m_Resolution[1],
+=======
+	m_WindowClass.lpszClassName = a_ClassName;
+	RegisterClass(&m_WindowClass);
+
+	m_WindowHandle =
+		CreateWindow(a_ClassName, a_MenuName, a_Style, 0,
+		0, Foundation_Window::m_Resolution.x,
+		Foundation_Window::m_Resolution.y,
+>>>>>>> 2e0397aa3527a8f258506bd46c0cd142b195a066
 		0, 0, 0, 0);
 
 	ShowWindow(m_WindowHandle, true);

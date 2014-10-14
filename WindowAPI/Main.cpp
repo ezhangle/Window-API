@@ -3,6 +3,7 @@
 
 int main()
 {
+<<<<<<< HEAD
 	//Foundation_Window* l_Window = new Foundation_Window("Blarg");
 	Foundation_WindowManager::AddWindow(new Foundation_Window("Blarg"))->
 		AddWindow(new Foundation_Window("Penish"));
@@ -23,5 +24,8 @@ int main()
 		}
 	}
 
+=======
+	
+>>>>>>> 2e0397aa3527a8f258506bd46c0cd142b195a066
 	return 0;
 }
