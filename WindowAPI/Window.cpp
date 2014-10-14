@@ -11,7 +11,7 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 	GLuint a_ColourBits /* = 32 */, 
 	GLuint a_DepthBits /* = 8 */,
 	GLuint a_StencilBits /* = 8 */, 
-	bool a_ShouldCreateTerminal /* = true */) : 
+	bool a_ShouldCreateTerminal /* = true */) :
 	m_WindowName(a_WindowName),
 	m_ColourBits(a_ColourBits),
 	m_DepthBits(a_DepthBits),
@@ -20,20 +20,13 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 	m_Resolution[0] = a_Width;
 	m_Resolution[1] = a_Height;
 
-<<<<<<< HEAD
-	//Foundation_WindowManager::GetInstance()->AddWindow(this);	
-
 	if (a_ShouldCreateTerminal)
 	{
 		CreateTerminal();
 	}
 
-	//Initialize();
-
 }
 
-=======
->>>>>>> 2e0397aa3527a8f258506bd46c0cd142b195a066
 void Foundation_Window::PollForEvents()
 {
 #ifdef _MSC_VER
@@ -65,7 +58,6 @@ void Foundation_Window::PollForEvents()
 			char* CurrentlyPressedKey;
 			KeySym l_KeySym;
 			XLookupString(&m_Event.xkey, CurrentlyPressedKey, sizeof(CurrentlyPressedKey), &l_KeySym, 1);
-			//printf("%i\n", CurrentlyPressedKey[0]);
 
 			GLuint l_FunctionKeysym = XKeycodeToKeysym(m_Display, m_Event.xkey.keycode, 1);
 			
@@ -215,10 +207,6 @@ void Foundation_Window::InitializePixelFormat()
 
 #endif
 
-<<<<<<< HEAD
-#ifdef _MSC_VER
-void Foundation_Window::Win32TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeyState)
-=======
 void Foundation_Window::Initialize(const char* a_WindowName, GLuint a_Width, GLuint a_Height, GLuint a_ColourBits,
 	GLuint a_DepthBits, GLuint a_StencilBits, bool a_ShouldCreateTerminal) 
 {
@@ -409,7 +397,6 @@ LRESULT CALLBACK Foundation_Window::StaticWindowProcedure(HWND a_WindowHandle, U
 
 #ifdef _MSC_VER
 void Foundation_Window::TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeyState)
->>>>>>> 2e0397aa3527a8f258506bd46c0cd142b195a066
 {
 	switch (a_WordParam)
 	{
@@ -750,18 +737,10 @@ void Foundation_Window::InitializeWin32(LPCSTR a_MenuName,
 	HINSTANCE a_Instance /* = GetModuleHandle(0) */,
 	HICON a_Icon /* = LoadIcon(0 , IDI_APPLICATION)*/, 
 	HCURSOR a_Cursor /* = LoadCursor(0 , IDC_ARROW)*/,
-<<<<<<< HEAD
 	HBRUSH a_Brush /* = (HBRUSH)BLACK_BRUSH */)
 {
 	m_WindowClass.style = a_Style;
 	m_WindowClass.lpfnWndProc = Foundation_WindowManager::StaticWindowProcedure;
-=======
-	HBRUSH a_Brush /* = (HBRUSH)BLACK_BRUSH */, LPCSTR a_MenuName /* = m_WindowName */, 
-	LPCSTR a_ClassName /* = m_WindowName */)
-{
-	m_WindowClass.style = a_Style;
-	m_WindowClass.lpfnWndProc = a_WindowProcedure;
->>>>>>> 2e0397aa3527a8f258506bd46c0cd142b195a066
 	m_WindowClass.cbClsExtra = 0;
 	m_WindowClass.cbWndExtra = 0;
 	m_WindowClass.hInstance = a_Instance;
@@ -777,15 +756,6 @@ void Foundation_Window::InitializeWin32(LPCSTR a_MenuName,
 		CreateWindow(a_MenuName, a_MenuName, a_Style, 0,
 		0, m_Resolution[0],
 		m_Resolution[1],
-=======
-	m_WindowClass.lpszClassName = a_ClassName;
-	RegisterClass(&m_WindowClass);
-
-	m_WindowHandle =
-		CreateWindow(a_ClassName, a_MenuName, a_Style, 0,
-		0, Foundation_Window::m_Resolution.x,
-		Foundation_Window::m_Resolution.y,
->>>>>>> 2e0397aa3527a8f258506bd46c0cd142b195a066
 		0, 0, 0, 0);
 
 	ShowWindow(m_WindowHandle, true);
@@ -869,7 +839,7 @@ void Foundation_Window::Window_SwapBuffers()
 #endif
 
 }
-#ifdef _linux_ || __GNUG__ || __GNUC__ ||__clang__
+#ifdef __linux__ || __GNUG__ || __GNUC__ ||__clang__
 void Foundation_Window::XTranslateKey(GLuint a_KeySym, bool a_KeyState)
 {
 	switch(a_KeySym)

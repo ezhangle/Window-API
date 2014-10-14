@@ -48,12 +48,10 @@ public:
 	void GetResolution(GLuint& a_Width, GLuint& a_Height);
 
 	void SetResolution(GLuint a_Width, GLuint a_Height);
-<<<<<<< HEAD
-=======
+
 
 	 void Initialize(const char* a_WindowName, GLuint a_Height = 1280, GLuint a_Width = 720, GLuint a_ColourBits = 32, 
 		GLuint a_DepthBits = 8, GLuint a_StencilBits = 8, bool a_ShouldCreateTerminal = true);
->>>>>>> 2e0397aa3527a8f258506bd46c0cd142b195a066
 	
 	bool GetKey(GLuint a_Key);
 	void PollForEvents();
@@ -61,14 +59,10 @@ public:
 	bool GetWindowShouldClose();	
 	void Window_SwapBuffers();
 	void SetFullScreen(bool a_FullScreenState);
-<<<<<<< HEAD
 	void Initialize();
 	const char* GetWindowName();
 
 	friend Foundation_WindowManager;
-=======
-	const char* GetWindowName();
->>>>>>> 2e0397aa3527a8f258506bd46c0cd142b195a066
 
 private:
 
@@ -106,13 +100,8 @@ private:
 
 	void Win32TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeyState);
 
-<<<<<<< HEAD
 	void InitializeWin32(LPCSTR a_MenuName,
 		UINT a_Style = CS_OWNDC | CS_HREDRAW | CS_DROPSHADOW,
-=======
-	void InitializeWin32(UINT a_Style = CS_OWNDC | CS_HREDRAW | CS_DROPSHADOW,
-		WNDPROC a_WindowProcedure = Foundation_Window::StaticWindowProcedure,
->>>>>>> 2e0397aa3527a8f258506bd46c0cd142b195a066
 		int a_ClearScreenExtra = 0, int a_WindowExtra = 0,
 		HINSTANCE a_Instance = GetModuleHandle(0),
 		HICON a_Icon = LoadIcon(0, IDI_APPLICATION),
@@ -121,10 +110,7 @@ private:
 #endif
 
 #ifdef __linux__ || __GNUG__ || __GNUC__ || __clang__
-
-	/*ok now this is for fullscreen functionality. we need to save certain
-	 * window attributes in order to be able to easily toggle between
-	 * fullscreen states*/ 
+ 
 	struct SavedScreenState
 	{
 		int m_Count;
