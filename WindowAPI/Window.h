@@ -28,15 +28,16 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #include <fcntl.h>
 #include "Keys.h"
 
+class Foundation_WindowManager;
+
 class Foundation_Window
 {
 public:
 
-	Foundation_Window();
+	Foundation_Window(const char* a_WindowName, GLuint a_Width = 1280, GLuint a_Height = 720, GLuint a_ColourBits = 32,
+		GLuint a_DepthBits = 8, GLuint a_StencilBits = 8, bool a_ShouldCreateTerminal = true);
 
 	~Foundation_Window(){}
-	 
-	static Foundation_Window* GetInstance();
 
 	void InitializeGL();
 
@@ -47,10 +48,6 @@ public:
 	void GetResolution(GLuint& a_Width, GLuint& a_Height);
 
 	void SetResolution(GLuint a_Width, GLuint a_Height);
-
-	static void Initialize(const char* a_WindowName, GLuint a_Height = 1280, GLuint a_Width = 720, GLuint a_ColourBits = 32, 
-		GLuint a_DepthBits = 8, GLuint a_StencilBits = 8, bool a_ShouldCreateTerminal = true);
-
 	
 	bool GetKey(GLuint a_Key);
 	void PollForEvents();
@@ -58,6 +55,10 @@ public:
 	bool GetWindowShouldClose();	
 	void Window_SwapBuffers();
 	void SetFullScreen(bool a_FullScreenState);
+	void Initialize();
+	const char* GetWindowName();
+
+	friend Foundation_WindowManager;
 
 private:
 
@@ -69,13 +70,17 @@ private:
 	const char* m_WindowName;
 	GLuint m_Resolution[2];
 	GLuint m_WindowPosition[2];
-	static Foundation_Window* m_Instance;
 	bool WindowShouldClose;
+	GLuint m_WindowID;
 
 	void ShutDownWindow();	
 	void InitializePixelFormat();
 	
 #ifdef _MSC_VER
+
+public:
+	HWND GetWindowHandle();
+private:
 
 	HDC m_DeviceContextHandle;
 	HGLRC m_GLRenderingcontextHandle;
@@ -91,19 +96,13 @@ private:
 
 	void Win32TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeyState);
 
-	LRESULT CALLBACK WindowProcedure(HWND a_WindowHandle, GLuint a_Message, WPARAM a_WordParam, LPARAM a_LongParam);
-
-	static LRESULT CALLBACK StaticWindowProcedure(HWND a_WindowHandle, UINT a_Message, WPARAM a_WordParam, LPARAM a_LongParam);
-
-	void InitializeWin32(UINT a_Style = CS_OWNDC | CS_HREDRAW | CS_DROPSHADOW,
-		WNDPROC a_WindowProcedure = Foundation_Window::StaticWindowProcedure,
+	void InitializeWin32(LPCSTR a_MenuName,
+		UINT a_Style = CS_OWNDC | CS_HREDRAW | CS_DROPSHADOW,
 		int a_ClearScreenExtra = 0, int a_WindowExtra = 0,
 		HINSTANCE a_Instance = GetModuleHandle(0),
 		HICON a_Icon = LoadIcon(0, IDI_APPLICATION),
 		HCURSOR a_Cursor = LoadCursor(0, IDC_ARROW),
-		HBRUSH a_Brush = (HBRUSH)BLACK_BRUSH,
-		LPCSTR a_MenuName = GetInstance()->m_WindowName,
-		LPCSTR a_ClassName = GetInstance()->m_WindowName);
+		HBRUSH a_Brush = (HBRUSH)BLACK_BRUSH);
 #endif
 
 #ifdef __linux__ || __GNUG__ || __GNUC__ || __clang__

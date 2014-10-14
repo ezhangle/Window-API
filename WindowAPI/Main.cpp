@@ -1,17 +1,27 @@
 #include <stdio.h>
-#include "Window.h"
+#include "WindowManager.h"
 
 int main()
 {
-	Foundation_Window::Initialize("Blarg");
+	//Foundation_Window* l_Window = new Foundation_Window("Blarg");
+	Foundation_WindowManager::AddWindow(new Foundation_Window("Blarg"))->
+		AddWindow(new Foundation_Window("Penish"));
 
-	while (Foundation_Window::GetInstance()->GetKey(KEY_ESCAPE) != KEYSTATE_DOWN)
-	{		
-		glClearColor(0.0f, 0.25f, 0.25f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	printf("%i\n", Foundation_WindowManager::GetNumWindows());
 
-		Foundation_Window::GetInstance()->Window_SwapBuffers();
-		Foundation_Window::GetInstance()->PollForEvents();		
+	Foundation_WindowManager::InitializeWindows();
+	while (!Foundation_WindowManager::GetWindowByIndex(0)->GetKey(KEY_ESCAPE))
+	{
+
+		glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		for (GLuint i = 0; i < Foundation_WindowManager::GetNumWindows(); i++)
+		{
+			Foundation_WindowManager::GetWindowByIndex(i)->PollForEvents();
+			Foundation_WindowManager::GetWindowByIndex(i)->Window_SwapBuffers();
+		}
 	}
+
 	return 0;
 }

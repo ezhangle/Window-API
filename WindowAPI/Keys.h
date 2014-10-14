@@ -2,11 +2,6 @@
 #define KEYSTATE_UP 0
 #define KEYSTATE_IDLE 2
 
-#define KEY_BACKSPACE 8
-#define KEY_TAB 9
-#define KEY_ESCAPE 27
-#define KEY_DELETE 127
-
 #define KEY_FIRST 256 + 1
 #define KEY_F1 KEY_FIRST 
 #define KEY_F2 KEY_FIRST + 1
