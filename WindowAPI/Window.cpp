@@ -1,8 +1,8 @@
 #include "Window.h"
 #include "WindowManager.h"
 
-#ifdef _linux_ || __GNUG__ || __GNUC__ ||__clang__
-#include <keysymdef.h>
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+	#include <keysymdef.h>
 #endif
 
 Foundation_Window::Foundation_Window(const char* a_WindowName,
@@ -19,23 +19,88 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 {
 	m_Resolution[0] = a_Width;
 	m_Resolution[1] = a_Height;
+	m_Position[0] = 0;
+	m_Position[1] = 0;
+	WindowShouldClose = false;
 
 	if (a_ShouldCreateTerminal)
 	{
 		CreateTerminal();
 	}
 
+	/*
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+	//InitializeWin32(a_WindowName);
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+
+	m_Attributes = new GLuint[5]{GLX_RGBA, GLX_DEPTH_SIZE, m_DepthBits, GLX_DOUBLEBUFFER, None};
+
+	m_Display = XOpenDisplay(0);
+
+	if (!m_Display)
+	{
+		printf("Cannot Connect to X Server \n");
+		exit(0);
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		printf("%i\n", m_Attributes[i]);
+	}
+
+	m_VisualInfo = glXChooseVisual(m_Display, 0,
+		m_Attributes);
+
+	if (!m_VisualInfo)
+	{
+		printf("No appropriate visual found\n");
+		exit(0);
+	}
+
+	m_SetAttributes.colormap = XCreateColormap(m_Display,
+		DefaultRootWindow(m_Display),
+		m_VisualInfo->visual, AllocNone);
+
+	m_SetAttributes.event_mask = ExposureMask | KeyPressMask;
+
+	m_Window = XCreateWindow(m_Display,
+		DefaultRootWindow(m_Display), 0, 0,
+		m_Resolution[0], m_Resolution[1],
+		0, m_VisualInfo->depth, InputOutput,
+		m_VisualInfo->visual, CWColormap | CWEventMask,
+		&m_SetAttributes);
+
+	XMapWindow(m_Display, m_Window);
+	XStoreName(m_Display, m_Window,
+		m_WindowName);
+
+	m_Context = glXCreateContext(
+		m_Display, m_VisualInfo,
+		0, GL_TRUE);
+
+	glXMakeCurrent(m_Display,
+		m_Window, m_Context);
+
+	XWindowAttributes l_WindowAttributes;
+
+	XGetWindowAttributes(m_Display, m_Window, &l_WindowAttributes);
+	m_WindowPosition[0] = l_WindowAttributes.x;
+	m_WindowPosition[1] = l_WindowAttributes.y;
+#endif*/
 }
 
 void Foundation_Window::PollForEvents()
 {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 	GetMessage(&m_Message, 0, 0, 0);
 	TranslateMessage(&m_Message);
 	DispatchMessage(&m_Message);	
 #endif
 
-#ifdef __linux__ || __GNUG__ || __GNUC__ || __clang__
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 	XNextEvent(m_Display, &m_Event);
 
 	switch (m_Event.type)
@@ -113,64 +178,7 @@ void Foundation_Window::PollForEvents()
 #endif
 }
 
-void Foundation_Window::InitializeGL()
-{
-	glMatrixMode(GL_PROJECTION);
-	glFrustum(-0.5F, 0.5F, -0.5F, 0.5F, 1.0F, 3.0F);
-
-	/* position viewer */
-	glMatrixMode(GL_MODELVIEW);
-	glTranslatef(0.0F, 0.0F, -2.0F);
-
-	/* position object */
-	glRotatef(30.0F, 1.0F, 0.0F, 0.0F);
-	glRotatef(30.0F, 0.0F, 1.0F, 0.0F);
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-}
-
-void Foundation_Window::Redraw()
-{
-	/* clear color and depth buffers */
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	/* draw six faces of a cube */
-	glBegin(GL_QUADS);
-	glNormal3f(0.0F, 0.0F, 1.0F);
-	glVertex3f(0.5F, 0.5F, 0.5F); glVertex3f(-0.5F, 0.5F, 0.5F);
-	glVertex3f(-0.5F, -0.5F, 0.5F); glVertex3f(0.5F, -0.5F, 0.5F);
-
-	glNormal3f(0.0F, 0.0F, -1.0F);
-	glVertex3f(-0.5F, -0.5F, -0.5F); glVertex3f(-0.5F, 0.5F, -0.5F);
-	glVertex3f(0.5F, 0.5F, -0.5F); glVertex3f(0.5F, -0.5F, -0.5F);
-
-	glNormal3f(0.0F, 1.0F, 0.0F);
-	glVertex3f(0.5F, 0.5F, 0.5F); glVertex3f(0.5F, 0.5F, -0.5F);
-	glVertex3f(-0.5F, 0.5F, -0.5F); glVertex3f(-0.5F, 0.5F, 0.5F);
-
-	glNormal3f(0.0F, -1.0F, 0.0F);
-	glVertex3f(-0.5F, -0.5F, -0.5F); glVertex3f(0.5F, -0.5F, -0.5F);
-	glVertex3f(0.5F, -0.5F, 0.5F); glVertex3f(-0.5F, -0.5F, 0.5F);
-
-	glNormal3f(1.0F, 0.0F, 0.0F);
-	glVertex3f(0.5F, 0.5F, 0.5F); glVertex3f(0.5F, -0.5F, 0.5F);
-	glVertex3f(0.5F, -0.5F, -0.5F); glVertex3f(0.5F, 0.5F, -0.5F);
-
-	glNormal3f(-1.0F, 0.0F, 0.0F);
-	glVertex3f(-0.5F, -0.5F, -0.5F); glVertex3f(-0.5F, -0.5F, 0.5F);
-	glVertex3f(-0.5F, 0.5F, 0.5F); glVertex3f(-0.5F, 0.5F, -0.5F);
-	glEnd();
-
-	//SwapBuffers(m_DeviceContextHandle);
-}
-
-void Foundation_Window::Resize(GLuint a_Width, GLuint a_Height)
-{
-
-}
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 void Foundation_Window::InitializePixelFormat()
 {
 	m_PFD = {
@@ -207,196 +215,8 @@ void Foundation_Window::InitializePixelFormat()
 
 #endif
 
-void Foundation_Window::Initialize(const char* a_WindowName, GLuint a_Width, GLuint a_Height, GLuint a_ColourBits,
-	GLuint a_DepthBits, GLuint a_StencilBits, bool a_ShouldCreateTerminal) 
-{
-	m_Resolution[0] = a_Width;
-	m_Resolution[1] = a_Height;
-	m_WindowName = a_WindowName;
-	m_ColourBits = a_ColourBits;
-	m_DepthBits = a_DepthBits;
-	m_StencilBits = a_StencilBits;
-
-	if (a_ShouldCreateTerminal)
-	{
-		CreateTerminal();
-	}
-
-#ifdef _MSC_VER
-	InitializeWin32();
-#endif
-
-#ifdef __linux__ || __GNUG__ || __GNUC__ || __clang__
-
-	m_Attributes = new GLuint[5]{GLX_RGBA, GLX_DEPTH_SIZE, m_DepthBits, GLX_DOUBLEBUFFER, None};
-	
-	m_Display = XOpenDisplay(0);
-	
-	if(!m_Display)
-	{
-		printf("Cannot Connect to X Server \n");
-		exit(0);
-	}
-
-	for(int i = 0; i < 5; i++)
-	{
-		printf("%i\n", m_Attributes[i]);
-	}
-
-	m_VisualInfo = glXChooseVisual(m_Display, 0,
-		m_Attributes);
-
-	if (!m_VisualInfo)
-	{
-		printf("No appropriate visual found\n");
-		exit(0);
-	}
-
-	m_SetAttributes.colormap = XCreateColormap(m_Display,
-		DefaultRootWindow(m_Display), 
-		m_VisualInfo->visual, AllocNone);
-
-	m_SetAttributes.event_mask = ExposureMask | KeyPressMask;
-
-	m_Window = XCreateWindow(m_Display,
-		DefaultRootWindow(m_Display), 0, 0, 
-		m_Resolution[0], m_Resolution[1],
-		0, m_VisualInfo->depth, InputOutput, 
-		m_VisualInfo->visual, CWColormap | CWEventMask, 
-		&m_SetAttributes);
-
-	XMapWindow(m_Display, m_Window);
-	XStoreName(m_Display, m_Window,
-		m_WindowName);
-
-	m_Context = glXCreateContext(
-		m_Display, m_VisualInfo,
-		0, GL_TRUE);
-
-	glXMakeCurrent(m_Display,
-		m_Window, m_Context);
-
-	XWindowAttributes l_WindowAttributes;
-
-	XGetWindowAttributes(m_Display, m_Window, &l_WindowAttributes);
-	m_WindowPosition[0] = l_WindowAttributes.x;
-	m_WindowPosition[1] = l_WindowAttributes.y;
-#endif
-
-}
-#ifdef _MSC_VER
-LRESULT CALLBACK Foundation_Window::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPARAM a_WordParam, LPARAM a_LongParam)
-{
-	if(m_WindowHandle == a_WindowHandle)
-	{
-		printf("It's AliVe!!!");
-	}
-
-	switch (a_Message)
-	{
-	case WM_CREATE:
-	{
-		m_DeviceContextHandle = GetDC(m_WindowHandle);
-		InitializePixelFormat();
-		m_GLRenderingcontextHandle = wglCreateContext(m_DeviceContextHandle);
-		wglMakeCurrent(m_DeviceContextHandle, m_GLRenderingcontextHandle);
-		InitializeGL();
-		break;
-	}
-	case WM_DESTROY:
-	{
-		/* finish OpenGL rendering */
-		ShutDownWindow();
-		break;
-	}
-
-	case WM_SIZE:
-	{
-		if (m_GLRenderingcontextHandle)
-		{	
-			Resize((unsigned int)LOWORD(m_LongParam), (unsigned int)HIWORD(m_LongParam));
-			break;
-		}
-		break;
-	}
-
-	case WM_SIZING:
-	{
-		if (m_GLRenderingcontextHandle)
-		{
-			Resize((unsigned int)LOWORD(m_LongParam), (unsigned int)HIWORD(m_LongParam));
-			break;
-		}
-		break;
-	}
-
-	case WM_KEYDOWN:
-	{
-		TranslateKey(m_WordParam, m_LongParam, KEYSTATE_DOWN);
-		break;
-	}
-
-	case WM_KEYUP:
-	{
-		TranslateKey(a_WordParam, a_LongParam, KEYSTATE_UP);
-		break;
-	}
-
-	case WM_LBUTTONDOWN:
-	{
-		m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONDOWN;
-		break;
-	}
-
-	case WM_LBUTTONUP:
-	{
-		m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
-		break;
-	}
-
-	case WM_RBUTTONDOWN:
-	{
-		m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
-		break;
-	}
-
-	case WM_RBUTTONUP:
-	{
-		m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
-		break;
-	}
-
-	case WM_MBUTTONDOWN:
-	{
-		m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
-		break;
-	}
-
-	case WM_MBUTTONUP:
-	{
-		m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONUP;
-		break;
-	}
-
-	default:
-	{
-		return DefWindowProc(m_WindowHandle, a_Message, m_WordParam, m_LongParam);
-	}
-	}
-	return 0;
-}
-
-#endif
-
-#ifdef _MSC_VER
-LRESULT CALLBACK Foundation_Window::StaticWindowProcedure(HWND a_WindowHandle, UINT a_Message, WPARAM a_WordParam, LPARAM a_LongParam)
-{
-	return WindowProcedure(a_WindowHandle, a_Message, a_WordParam, a_LongParam);
-}
-#endif
-
-#ifdef _MSC_VER
-void Foundation_Window::TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeyState)
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+void Foundation_Window::Win32TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeyState)
 {
 	switch (a_WordParam)
 	{
@@ -689,7 +509,7 @@ bool Foundation_Window::GetKey(GLuint a_Key)
 
 void Foundation_Window::CreateTerminal()
 {
-	#ifdef _MSC_VER
+	#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 	int hConHandle;
 	long lStdHandle;
 	FILE *fp;
@@ -715,7 +535,7 @@ bool Foundation_Window::GetWindowShouldClose()
 
 void Foundation_Window::ShutDownWindow()
 {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 	if (m_GLRenderingcontextHandle) {
 		wglMakeCurrent(NULL, NULL);
 		wglDeleteContext(m_GLRenderingcontextHandle);
@@ -729,7 +549,7 @@ void Foundation_Window::ShutDownWindow()
 #endif
 }
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 void Foundation_Window::InitializeWin32(LPCSTR a_MenuName, 
 	UINT a_Style /* = CS_OWNDC | CS_HREDRAW | CS_DROPSHADOW */,
 	int a_ClearScreenExtra /* = 0 */, 
@@ -748,12 +568,11 @@ void Foundation_Window::InitializeWin32(LPCSTR a_MenuName,
 	m_WindowClass.hCursor = a_Cursor;
 	m_WindowClass.hbrBackground = a_Brush;
 	m_WindowClass.lpszMenuName = a_MenuName;
-<<<<<<< HEAD
 	m_WindowClass.lpszClassName = a_MenuName;
 	RegisterClass(&m_WindowClass);
 
 	m_WindowHandle =
-		CreateWindow(a_MenuName, a_MenuName, a_Style, 0,
+		CreateWindow(a_MenuName, a_MenuName, WS_OVERLAPPEDWINDOW, 0,
 		0, m_Resolution[0],
 		m_Resolution[1],
 		0, 0, 0, 0);
@@ -763,13 +582,13 @@ void Foundation_Window::InitializeWin32(LPCSTR a_MenuName,
 }
 #endif
 
-void Foundation_Window::Initialize()
+void Foundation_Window::InitializeGL()
 {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 	InitializeWin32(m_WindowName);
 #endif
 
-#ifdef _linux_ || __GNUG__ || __GNUC__ ||__clang__
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 	m_SavedScreenState.m_Count = 0;
 	m_Attributes = new GLuint[5]{GLX_RGBA, GLX_DEPTH_SIZE, m_DepthBits, GLX_DOUBLEBUFFER, None};
 
@@ -830,16 +649,17 @@ void Foundation_Window::Initialize()
 
 void Foundation_Window::Window_SwapBuffers()
 {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 	SwapBuffers(m_DeviceContextHandle);
 #endif
 
-#ifdef __linux__ || __GNUG__ || __GNUC__ || __clang__
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 	glXSwapBuffers(m_Display, m_Window);
 #endif
 
 }
-#ifdef __linux__ || __GNUG__ || __GNUC__ ||__clang__
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 void Foundation_Window::XTranslateKey(GLuint a_KeySym, bool a_KeyState)
 {
 	switch(a_KeySym)
@@ -1127,7 +947,7 @@ void Foundation_Window::XTranslateKey(GLuint a_KeySym, bool a_KeyState)
 
 void Foundation_Window::SetFullScreen(bool a_FullScreenState)
 {
-#ifdef __linux__ || __GNUC__ || __GNUG_ || __clang__
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 
 	if(a_FullScreenState)
 	{	
@@ -1177,7 +997,30 @@ void Foundation_Window::SetFullScreen(bool a_FullScreenState)
 		XConfigureWindow(m_Display, m_Window, CWWidth | CWHeight | CWX | CWY, &l_WindowChanges);
 		printf("%i %i \n", m_WindowPosition[0], m_WindowPosition[1]);
 	}	
-#endif  
+#endif
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+
+	if (a_FullScreenState)
+	{
+		SetWindowLong(m_WindowHandle, GWL_USERDATA, WS_POPUPWINDOW);
+
+		SetWindowPos(m_WindowHandle, HWND_TOP, 0, 0,
+			Foundation_WindowManager::GetScreenResolution()[0],
+			Foundation_WindowManager::GetScreenResolution()[1],
+			SWP_SHOWWINDOW);
+	}
+
+	else
+	{
+		SetWindowLong(m_WindowHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+
+		SetWindowPos(m_WindowHandle, HWND_TOP, 0, 0,
+			m_Resolution[0],
+			m_Resolution[1],
+			SWP_SHOWWINDOW);
+	}
+#endif
 }
 
 void Foundation_Window::GetResolution(GLuint& a_Width, GLuint& a_Height)
@@ -1186,10 +1029,98 @@ void Foundation_Window::GetResolution(GLuint& a_Width, GLuint& a_Height)
 	a_Height = m_Resolution[1];
 }
 
+GLuint* Foundation_Window::GetResolution()
+{
+	return m_Resolution;
+}
+
 void Foundation_Window::SetResolution(GLuint a_Width, GLuint a_Height)
 {
 	m_Resolution[0] = a_Width;
 	m_Resolution[1] = a_Height;
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+	SetWindowPos(m_WindowHandle, HWND_TOP,
+		m_Position[0], m_Position[1],
+		a_Width, a_Height,
+		SWP_SHOWWINDOW);
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+
+#endif
+	glViewport(0, 0, m_Resolution[0], m_Resolution[1]);
+}
+
+void Foundation_Window::GetMousePositionInWindow(GLuint& a_X, GLuint& a_Y)
+{
+	POINT l_Point;
+
+	if (GetCursorPos(&l_Point))
+	{
+		if (ScreenToClient(m_WindowHandle, &l_Point))
+		{
+			a_X = l_Point.x;
+			a_Y = l_Point.y;
+		}
+	}
+}
+
+GLuint* Foundation_Window::GetMousePositionInWindow()
+{
+	POINT l_Point;
+	GLuint l_MousePositionInWindow[2];
+
+	if (GetCursorPos(&l_Point))
+	{
+		if (ScreenToClient(m_WindowHandle, &l_Point))
+		{
+			l_MousePositionInWindow[0] = l_Point.x;
+			l_MousePositionInWindow[1] = l_Point.y;
+		}
+	}
+
+	m_MousePosition[0] = l_MousePositionInWindow[0];
+	m_MousePosition[1] = l_MousePositionInWindow[1];
+
+	return m_MousePosition;
+}
+
+void Foundation_Window::SetMousePositionInWindow(GLuint a_X, GLuint a_Y)
+{
+	POINT l_Point;
+	l_Point.x = a_X;
+	l_Point.y = a_Y;
+	ClientToScreen(m_WindowHandle, &l_Point);
+	SetCursorPos(l_Point.x, l_Point.y);
+}
+
+void Foundation_Window::GetPosition(GLuint& a_X, GLuint& a_Y)
+{
+	a_X = m_Position[0];
+	a_Y = m_Position[1];
+}
+
+GLuint* Foundation_Window::GetPosition()
+{
+	return m_Position;
+}
+
+void Foundation_Window::SetPosition(GLuint a_X, GLuint a_Y)
+{
+	m_Position[0] = a_X;
+	m_Position[1] = a_Y;
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+	SetWindowPos(m_WindowHandle, HWND_TOP,
+		m_Position[0], m_Position[1],
+		m_Resolution[0], m_Resolution[1],
+		SWP_SHOWWINDOW);
+#endif
+	
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+
+#endif
 }
 
 const char* Foundation_Window::GetWindowName()
@@ -1197,10 +1128,29 @@ const char* Foundation_Window::GetWindowName()
 	return m_WindowName;
 }
 
-#ifdef _MSC_VER
+void Foundation_Window::MakeCurrentContext()
+{
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+	wglMakeCurrent(m_DeviceContextHandle, m_GLRenderingcontextHandle);
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+
+#endif
+
+}
+
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 HWND Foundation_Window::GetWindowHandle()
 {
 	return m_WindowHandle;
 }
+#endif
 
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+Window Foundation_Window::GetWindowHandle()
+{
+	return m_Window;
+}
 #endif

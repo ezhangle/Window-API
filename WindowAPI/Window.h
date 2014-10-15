@@ -1,7 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
 #include <gl/GL.h>
 #include <io.h>
@@ -12,7 +12,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #endif
 
-#ifdef __linux__ || __GNUG__ || __GNUC__ || __clang__
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 #include <GL/glx.h>
 #include <GL/glu.h>
 #include <X11/X.h>
@@ -26,7 +26,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #include <stdlib.h>
 
 #include <fcntl.h>
-#include "Keys.h"
+#include "WindowAPI_Defs.h"
 
 class Foundation_WindowManager;
 
@@ -39,19 +39,20 @@ public:
 
 	~Foundation_Window(){}
 
-	void InitializeGL();
-
-	void Redraw();
-
-	void Resize(GLuint a_Width, GLuint a_Height);
-
+	//gets and sets for window resolution
 	void GetResolution(GLuint& a_Width, GLuint& a_Height);
-
+	GLuint* GetResolution();
 	void SetResolution(GLuint a_Width, GLuint a_Height);
 
+	//gets and sets for mouse position relative to window space
+	void GetMousePositionInWindow(GLuint& a_X, GLuint& a_Y);
+	GLuint* GetMousePositionInWindow();
+	void SetMousePositionInWindow(GLuint a_X, GLuint a_Y);
 
-	 void Initialize(const char* a_WindowName, GLuint a_Height = 1280, GLuint a_Width = 720, GLuint a_ColourBits = 32, 
-		GLuint a_DepthBits = 8, GLuint a_StencilBits = 8, bool a_ShouldCreateTerminal = true);
+	//gets and sets for window position
+	void GetPosition(GLuint& a_X, GLuint& a_Y);
+	GLuint* GetPosition();
+	void SetPosition(GLuint a_X, GLuint a_Y);
 	
 	bool GetKey(GLuint a_Key);
 	void PollForEvents();
@@ -59,8 +60,10 @@ public:
 	bool GetWindowShouldClose();	
 	void Window_SwapBuffers();
 	void SetFullScreen(bool a_FullScreenState);
-	void Initialize();
+	void InitializeGL();
 	const char* GetWindowName();
+
+	void MakeCurrentContext();
 
 	friend Foundation_WindowManager;
 
@@ -73,14 +76,15 @@ private:
 	bool m_MouseEvents[MOUSE_LAST];
 	const char* m_WindowName;
 	GLuint m_Resolution[2];
-	GLuint m_WindowPosition[2];
+	GLuint m_Position[2];
+	GLuint m_MousePosition[2];
 	bool WindowShouldClose;
 	GLuint m_WindowID;
 
 	void ShutDownWindow();	
 	void InitializePixelFormat();
 	
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 
 public:
 	HWND GetWindowHandle();
@@ -101,7 +105,7 @@ private:
 	void Win32TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeyState);
 
 	void InitializeWin32(LPCSTR a_MenuName,
-		UINT a_Style = CS_OWNDC | CS_HREDRAW | CS_DROPSHADOW,
+		UINT a_Style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW,
 		int a_ClearScreenExtra = 0, int a_WindowExtra = 0,
 		HINSTANCE a_Instance = GetModuleHandle(0),
 		HICON a_Icon = LoadIcon(0, IDI_APPLICATION),
@@ -109,7 +113,7 @@ private:
 		HBRUSH a_Brush = (HBRUSH)BLACK_BRUSH);
 #endif
 
-#ifdef __linux__ || __GNUG__ || __GNUC__ || __clang__
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
  
 	struct SavedScreenState
 	{
@@ -129,8 +133,8 @@ private:
 		GLuint m_Status;
 	};
 
-
 	void XTranslateKey(GLuint a_KeySym, bool a_KeyState);
+	Window GetWindowHandle();
 	Display* m_Display;
 	Window m_Window;
 	XEvent m_Event;

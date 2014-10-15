@@ -46,8 +46,60 @@ Foundation_Window* Foundation_WindowManager::GetWindowByIndex(GLuint a_WindowInd
 	return nullptr;
 }
 
+void Foundation_WindowManager::GetMousePositionInScreen(GLuint& a_X, GLuint& a_Y)
+{
+	POINT l_Point;
 
-#ifdef _MSC_VER
+	if (GetCursorPos(&l_Point))
+	{
+		a_X = l_Point.x;
+		a_Y = l_Point.y;
+	}
+}
+
+GLuint* Foundation_WindowManager::GetMousePositionInScreen()
+{
+	POINT l_Point;
+
+	if (GetCursorPos(&l_Point))
+	{
+		GetInstance()->m_ScreenMousePosition[0] = l_Point.x;
+		GetInstance()->m_ScreenMousePosition[1] = l_Point.y;
+	}
+
+
+	return GetInstance()->m_ScreenMousePosition;
+}
+
+GLuint* Foundation_WindowManager::GetScreenResolution()
+{
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+	RECT l_Screen;
+	HWND m_Desktop = GetDesktopWindow();
+	GetWindowRect(m_Desktop, &l_Screen);
+
+	GetInstance()->m_ScreenResolution[0] = l_Screen.right;
+	GetInstance()->m_ScreenResolution[1] = l_Screen.bottom;
+	return GetInstance()->m_ScreenResolution;
+
+#endif
+}
+
+void Foundation_WindowManager::GetScreenResolution(GLuint& a_Width, GLuint& a_Height)
+{
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+
+	RECT l_Screen;
+	HWND m_Desktop = GetDesktopWindow();
+	GetWindowRect(m_Desktop, &l_Screen);
+	a_Width = l_Screen.right;
+	a_Height = l_Screen.bottom;
+#endif
+
+
+}
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 Foundation_Window* Foundation_WindowManager::GetWindowByHandle(HWND a_WindowHandle)
 {
 	for (GLuint l_Iter = 0; l_Iter < GetInstance()->m_Windows.size(); l_Iter++)
@@ -60,7 +112,19 @@ Foundation_Window* Foundation_WindowManager::GetWindowByHandle(HWND a_WindowHand
 
 	return nullptr;
 }
+#endif
 
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+Foundation_Window* Foundation_WindowManager::GetWindowByHandle(Window a_WindowHandle)
+{
+	for (GLuint l_Iter = 0; l_Iter < GetInstance()->m_Windows.size(); l_Iter++)
+	{
+		if (GetInstance()->m_Windows[l_Iter]->GetWindowHandle() == a_WindowHandle)
+		{
+			return GetInstance()->m_Windows[l_Iter];
+		}
+	}
+}
 
 #endif
 
@@ -68,6 +132,7 @@ Foundation_WindowManager* Foundation_WindowManager::AddWindow(Foundation_Window*
 {
 	GetInstance()->m_Windows.push_back(a_Window);
 	a_Window->m_WindowID = GetInstance()->m_Windows.size() - 1;
+	a_Window->InitializeGL();
 	return m_Instance;
 }
 
@@ -90,18 +155,7 @@ GLuint Foundation_WindowManager::GetNumWindows()
 	return GetInstance()->m_Windows.size();
 }
 
-void Foundation_WindowManager::InitializeWindows()
-{
-	if (!m_Instance->m_Windows.empty())
-	{
-		for (int i = 0; i < m_Instance->m_Windows.size(); i++)
-		{
-			m_Instance->m_Windows[i]->Initialize();
-		}
-	}
-}
-
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 LRESULT CALLBACK Foundation_WindowManager::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPARAM a_WordParam, LPARAM a_LongParam)
 {
 	switch (a_Message)
@@ -113,12 +167,20 @@ LRESULT CALLBACK Foundation_WindowManager::WindowProcedure(HWND a_WindowHandle, 
 		GetWindowByHandle(a_WindowHandle)->InitializePixelFormat();
 		GetWindowByHandle(a_WindowHandle)->m_GLRenderingcontextHandle = wglCreateContext(GetWindowByHandle(a_WindowHandle)->m_DeviceContextHandle);
 		wglMakeCurrent(GetWindowByHandle(a_WindowHandle)->m_DeviceContextHandle, GetWindowByHandle(a_WindowHandle)->m_GLRenderingcontextHandle);
-		GetWindowByHandle(a_WindowHandle)->InitializeGL();
+		//GetWindowByHandle(a_WindowHandle)->InitializeGL();
 		break;
 	}
 	case WM_DESTROY:
 	{
+		GetWindowByHandle(a_WindowHandle)->WindowShouldClose = true;
 		GetWindowByHandle(a_WindowHandle)->ShutDownWindow();
+		break;
+	}
+	case WM_MOVE:
+	{
+		GetWindowByHandle(a_WindowHandle)->m_Position[0] = LOWORD(a_LongParam);
+		GetWindowByHandle(a_WindowHandle)->m_Position[1] = HIWORD(a_LongParam);
+		
 		break;
 	}
 
@@ -126,7 +188,8 @@ LRESULT CALLBACK Foundation_WindowManager::WindowProcedure(HWND a_WindowHandle, 
 	{
 		if (GetWindowByHandle(a_WindowHandle)->m_GLRenderingcontextHandle)
 		{	
-			GetWindowByHandle(a_WindowHandle)->Resize((unsigned int)LOWORD(a_LongParam), (unsigned int)HIWORD(a_LongParam));
+			GetWindowByHandle(a_WindowHandle)->m_Resolution[0] = (GLuint)LOWORD(a_LongParam);
+			GetWindowByHandle(a_WindowHandle)->m_Resolution[1] =(GLuint)HIWORD(a_LongParam);
 			break;
 		}
 		break;
@@ -136,7 +199,8 @@ LRESULT CALLBACK Foundation_WindowManager::WindowProcedure(HWND a_WindowHandle, 
 	{
 		if (GetWindowByHandle(a_WindowHandle)->m_GLRenderingcontextHandle)
 		{
-			GetWindowByHandle(a_WindowHandle)->Resize((unsigned int)LOWORD(a_LongParam), (unsigned int)HIWORD(a_LongParam));
+			GetWindowByHandle(a_WindowHandle)->m_Resolution[0] = (GLuint)LOWORD(a_LongParam);
+			GetWindowByHandle(a_WindowHandle)->m_Resolution[1] = (GLuint)HIWORD(a_LongParam);
 			break;
 		}
 		break;
@@ -155,6 +219,13 @@ LRESULT CALLBACK Foundation_WindowManager::WindowProcedure(HWND a_WindowHandle, 
 		break;
 	}
 
+	case WM_MOUSEMOVE:
+	{
+		GetWindowByHandle(a_WindowHandle)->m_MousePosition[0] = (GLuint)LOWORD(a_LongParam);
+		GetWindowByHandle(a_WindowHandle)->m_MousePosition[1] = (GLuint)HIWORD(a_LongParam);
+		break;
+	}
+
 	case WM_LBUTTONDOWN:
 	{
 		GetWindowByHandle(a_WindowHandle)->m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONDOWN;
@@ -164,7 +235,6 @@ LRESULT CALLBACK Foundation_WindowManager::WindowProcedure(HWND a_WindowHandle, 
 	case WM_LBUTTONUP:
 	{
 		GetWindowByHandle(a_WindowHandle)->m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
-		m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
 		break;
 	}
 
@@ -182,13 +252,25 @@ LRESULT CALLBACK Foundation_WindowManager::WindowProcedure(HWND a_WindowHandle, 
 
 	case WM_MBUTTONDOWN:
 	{
-		m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
+		GetWindowByHandle(a_WindowHandle)->m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
 		break;
 	}
 
 	case WM_MBUTTONUP:
 	{
 		GetWindowByHandle(a_WindowHandle)->m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONUP;
+		break;
+	}
+
+	case WM_MOUSEWHEEL:
+	{
+		printf("%i %i\n", (GLint)HIWORD(a_WordParam), (GLint)HIWORD(a_WordParam) % WHEEL_DELTA);
+		break;
+	}
+
+	case WM_MOUSELEAVE:
+	{
+		printf("Mouse had left");
 		break;
 	}
 
@@ -202,7 +284,7 @@ LRESULT CALLBACK Foundation_WindowManager::WindowProcedure(HWND a_WindowHandle, 
 
 #endif
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 LRESULT CALLBACK Foundation_WindowManager::StaticWindowProcedure(HWND a_WindowHandle, UINT a_Message, WPARAM a_WordParam, LPARAM a_LongParam)
 {
 	return Foundation_WindowManager::GetInstance()->WindowProcedure(a_WindowHandle, a_Message, a_WordParam, a_LongParam);
@@ -210,6 +292,6 @@ LRESULT CALLBACK Foundation_WindowManager::StaticWindowProcedure(HWND a_WindowHa
 #endif
 
 
+
+
 Foundation_WindowManager* Foundation_WindowManager::m_Instance = 0;
-
-
