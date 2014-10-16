@@ -2,7 +2,7 @@
 #include "WindowManager.h"
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-	#include <keysymdef.h>
+	//#include <keysymdef.h>
 #endif
 
 Foundation_Window::Foundation_Window(const char* a_WindowName,
@@ -23,15 +23,12 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 	m_Position[1] = 0;
 	WindowShouldClose = false;
 
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+
 	if (a_ShouldCreateTerminal)
 	{
 		CreateTerminal();
 	}
-
-	/*
-
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-	//InitializeWin32(a_WindowName);
 #endif
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
@@ -44,11 +41,6 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 	{
 		printf("Cannot Connect to X Server \n");
 		exit(0);
-	}
-
-	for (int i = 0; i < 5; i++)
-	{
-		printf("%i\n", m_Attributes[i]);
 	}
 
 	m_VisualInfo = glXChooseVisual(m_Display, 0,
@@ -64,20 +56,24 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 		DefaultRootWindow(m_Display),
 		m_VisualInfo->visual, AllocNone);
 
-	m_SetAttributes.event_mask = ExposureMask | KeyPressMask;
+	m_SetAttributes.event_mask = ExposureMask | KeyPressMask 
+		| SubstructureNotifyMask | KeyReleaseMask | MotionNotify | 
+		ButtonPressMask | ButtonReleaseMask | FocusIn | FocusOut
+		| Button1MotionMask | Button2MotionMask | Button3MotionMask | 
+		Button4MotionMask | Button5MotionMask | PointerMotionMask;
 
 	m_Window = XCreateWindow(m_Display,
 		DefaultRootWindow(m_Display), 0, 0,
 		m_Resolution[0], m_Resolution[1],
 		0, m_VisualInfo->depth, InputOutput,
-		m_VisualInfo->visual, CWColormap | CWEventMask,
+		m_VisualInfo->visual, CWColormap | CWEventMask | SubstructureNotifyMask,
 		&m_SetAttributes);
 
 	XMapWindow(m_Display, m_Window);
 	XStoreName(m_Display, m_Window,
 		m_WindowName);
 
-	m_Context = glXCreateContext(
+	/*m_Context = glXCreateContext(
 		m_Display, m_VisualInfo,
 		0, GL_TRUE);
 
@@ -87,9 +83,9 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 	XWindowAttributes l_WindowAttributes;
 
 	XGetWindowAttributes(m_Display, m_Window, &l_WindowAttributes);
-	m_WindowPosition[0] = l_WindowAttributes.x;
-	m_WindowPosition[1] = l_WindowAttributes.y;
-#endif*/
+	m_Position[0] = l_WindowAttributes.x;
+	m_Position[1] = l_WindowAttributes.y;*/
+#endif
 }
 
 void Foundation_Window::PollForEvents()
@@ -113,23 +109,28 @@ void Foundation_Window::PollForEvents()
 				glViewport(0, 0, m_Resolution[0],
 				m_Resolution[1]);
 
-				m_WindowPosition[0] = m_WindowAttributes.x;
-				m_WindowPosition[1] = m_WindowAttributes.y;
+				m_Position[0] = m_WindowAttributes.x;
+				m_Position[1] = m_WindowAttributes.y;
+			break;
+		}
+
+		case CreateNotify:
+		{	
+			InitializeGL();
+			printf("Window was created");
 			break;
 		}
 
 		case KeyPress:
 		{			
-			char* CurrentlyPressedKey;
 			KeySym l_KeySym;
-			XLookupString(&m_Event.xkey, CurrentlyPressedKey, sizeof(CurrentlyPressedKey), &l_KeySym, 1);
 
 			GLuint l_FunctionKeysym = XKeycodeToKeysym(m_Display, m_Event.xkey.keycode, 1);
 			
 			if(l_FunctionKeysym >= 0 && l_FunctionKeysym <= 255)
 			{
-				m_Keys[CurrentlyPressedKey[0]] = KEYSTATE_DOWN;
-				printf("%c\n", CurrentlyPressedKey[0]);		
+				m_Keys[l_FunctionKeysym] = KEYSTATE_DOWN;
+				//printf("%c\n", CurrentlyPressedKey[0]);		
 			}
 			
 			else
@@ -142,8 +143,7 @@ void Foundation_Window::PollForEvents()
 
 		case KeyRelease:
 		{
-			printf("Key Release");
-
+			KeySym l_KeySym;
 			bool l_IsRetriggered = false;
 			if(XEventsQueued(m_Display, QueuedAfterReading))
 			{
@@ -155,19 +155,94 @@ void Foundation_Window::PollForEvents()
 						l_NextEvent.xkey.keycode == m_Event.xkey.keycode)
 				{
 					printf("Key was retriggered\n");
-				XNextEvent(m_Display, 
-						&m_Event);
-				l_IsRetriggered = true;
+					XNextEvent(m_Display, &m_Event);
+					l_IsRetriggered = true;
 				}
 			}
 
 			if(!l_IsRetriggered)
 			{
-				printf("Key Was released");
+				GLuint l_FunctionKeysym = XKeycodeToKeysym(m_Display, m_Event.xkey.keycode, 1);
+
+				if(l_FunctionKeysym >= 0 && l_FunctionKeysym <= 255)
+				{
+					m_Keys[l_FunctionKeysym] = KEYSTATE_UP;
+				}
+
+				else
+				{
+					XTranslateKey(l_FunctionKeysym, KEYSTATE_UP);
+				}
 			}
 
 			break;	
 		}
+
+		case ButtonPress:
+		{
+			printf("%i\n", m_Event.xbutton.button);
+			
+			switch(m_Event.xbutton.button)
+			{
+				case 1:
+					{
+						m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONDOWN;
+						break;
+					}
+
+				case 2:
+					{
+						m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
+						break;
+					}
+
+				case 3:
+					{
+						m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
+						break;
+					}
+
+				default:
+					{
+						break;
+					}
+			}
+			break;
+		}
+
+		case ButtonRelease:
+		{
+			switch(m_Event.xbutton.button)
+			{
+				case 1:
+					{
+						m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
+						break;
+					}
+
+				case 2:
+					{
+						m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONUP;
+						break;
+					}
+
+				case 3:
+					{
+						m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONUP;
+						break;
+					}
+					break;
+			}
+		}
+
+		case MotionNotify:
+		{ 
+			m_MousePosition[0] = m_Event.xmotion.y;
+			m_MousePosition[1] = m_Event.xmotion.y;
+			break;
+		}
+
+
 
 		default:
 		{
@@ -589,47 +664,6 @@ void Foundation_Window::InitializeGL()
 #endif
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-	m_SavedScreenState.m_Count = 0;
-	m_Attributes = new GLuint[5]{GLX_RGBA, GLX_DEPTH_SIZE, m_DepthBits, GLX_DOUBLEBUFFER, None};
-
-	m_Display = XOpenDisplay(0);
-
-	if (!m_Display)
-	{
-		printf("Cannot Connect to X Server \n");
-		exit(0);
-	}
-
-	for (int i = 0; i < 5; i++)
-	{
-		printf("%i\n", m_Attributes[i]);
-	}
-
-	m_VisualInfo = glXChooseVisual(m_Display, 0,
-		m_Attributes);
-
-	if (!m_VisualInfo)
-	{
-		printf("No appropriate visual found\n");
-		exit(0);
-	}
-
-	m_SetAttributes.colormap = XCreateColormap(m_Display,
-		DefaultRootWindow(m_Display),
-		m_VisualInfo->visual, AllocNone);
-
-	m_SetAttributes.event_mask = ExposureMask | KeyPressMask;
-
-	m_Window = XCreateWindow(m_Display,
-		DefaultRootWindow(m_Display), 0, 0,
-		m_Resolution[0], m_Resolution[1],
-		0, m_VisualInfo->depth, InputOutput,
-		m_VisualInfo->visual, CWColormap | CWEventMask,
-		&m_SetAttributes);
-
-	XMapWindow(m_Display, m_Window);
-	XStoreName(m_Display, m_Window,
-		m_WindowName);
 
 	m_Context = glXCreateContext(
 		m_Display, m_VisualInfo,
@@ -641,8 +675,8 @@ void Foundation_Window::InitializeGL()
 	XWindowAttributes l_WindowAttributes;
 
 	XGetWindowAttributes(m_Display, m_Window, &l_WindowAttributes);
-	m_WindowPosition[0] = l_WindowAttributes.x;
-	m_WindowPosition[1] = l_WindowAttributes.y;
+	m_Position[0] = l_WindowAttributes.x;
+	m_Position[1] = l_WindowAttributes.y;
 #endif
 
 }
@@ -992,11 +1026,11 @@ void Foundation_Window::SetFullScreen(bool a_FullScreenState)
 		XWindowChanges l_WindowChanges;
 		l_WindowChanges.width = m_Resolution[0];
 		l_WindowChanges.height = m_Resolution[1];
-		l_WindowChanges.x = m_WindowPosition[0];
-		l_WindowChanges.y = m_WindowPosition[1];
+		l_WindowChanges.x = m_Position[0];
+		l_WindowChanges.y = m_Position[1];
 		XConfigureWindow(m_Display, m_Window, CWWidth | CWHeight | CWX | CWY, &l_WindowChanges);
-		printf("%i %i \n", m_WindowPosition[0], m_WindowPosition[1]);
-	}	
+		
+}	
 #endif
 
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
@@ -1048,12 +1082,20 @@ void Foundation_Window::SetResolution(GLuint a_Width, GLuint a_Height)
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 
+	XWindowChanges l_WindowChanges;
+
+	l_WindowChanges.width = m_Resolution[0];
+	l_WindowChanges.height = m_Resolution[1];
+
+	XConfigureWindow(m_Display, m_Window, CWWidth | CWHeight, &l_WindowChanges);
+
 #endif
 	glViewport(0, 0, m_Resolution[0], m_Resolution[1]);
 }
 
 void Foundation_Window::GetMousePositionInWindow(GLuint& a_X, GLuint& a_Y)
 {
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 	POINT l_Point;
 
 	if (GetCursorPos(&l_Point))
@@ -1064,10 +1106,17 @@ void Foundation_Window::GetMousePositionInWindow(GLuint& a_X, GLuint& a_Y)
 			a_Y = l_Point.y;
 		}
 	}
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+a_X = m_MousePosition[0];
+a_Y = m_MousePosition[1];
+#endif
 }
 
 GLuint* Foundation_Window::GetMousePositionInWindow()
 {
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 	POINT l_Point;
 	GLuint l_MousePositionInWindow[2];
 
@@ -1084,15 +1133,36 @@ GLuint* Foundation_Window::GetMousePositionInWindow()
 	m_MousePosition[1] = l_MousePositionInWindow[1];
 
 	return m_MousePosition;
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+return m_MousePosition;
+#endif
+
 }
 
 void Foundation_Window::SetMousePositionInWindow(GLuint a_X, GLuint a_Y)
 {
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+
 	POINT l_Point;
 	l_Point.x = a_X;
 	l_Point.y = a_Y;
 	ClientToScreen(m_WindowHandle, &l_Point);
 	SetCursorPos(l_Point.x, l_Point.y);
+
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+
+	XWarpPointer(m_Display, 
+			m_Window, m_Window,
+			m_Position[0], m_Position[1],
+			m_Resolution[0], m_Resolution[1],
+			a_X, a_Y);
+#endif
+
 }
 
 void Foundation_Window::GetPosition(GLuint& a_X, GLuint& a_Y)
@@ -1120,6 +1190,13 @@ void Foundation_Window::SetPosition(GLuint a_X, GLuint a_Y)
 	
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 
+	XWindowChanges l_WindowChanges;
+
+	l_WindowChanges.x = a_X;
+	l_WindowChanges.y = a_Y;
+
+	XConfigureWindow(m_Display, m_Window, CWX | CWY, &l_WindowChanges);
+
 #endif
 }
 
@@ -1135,9 +1212,30 @@ void Foundation_Window::MakeCurrentContext()
 #endif
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-
+	glXMakeCurrent(m_Display, m_Window, m_Context);
 #endif
 
+}
+
+void Foundation_Window::AddSelfToManager()
+{
+	//check if this window is already in the manager
+	//if not then add else just skip over
+
+	bool l_Successful = false;
+
+	for(int l_Iter = 0; l_Iter < Foundation_WindowManager::GetNumWindows(); l_Iter++)
+	{
+		if(this == Foundation_WindowManager::GetWindowByIndex(l_Iter))
+		{
+			l_Successful = true;
+		}
+	}
+
+	if(!l_Successful)
+	{
+		Foundation_WindowManager::AddWindow(this);
+	}
 }
 
 

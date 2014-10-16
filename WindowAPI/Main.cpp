@@ -4,8 +4,7 @@
 int main()
 {
 	//Foundation_Window* l_Window = new Foundation_Window("Blarg");
-	Foundation_WindowManager::AddWindow(new Foundation_Window("Blarg"))->
-		AddWindow(new Foundation_Window("Penish"));
+	Foundation_WindowManager::AddWindow(new Foundation_Window("Blarg"));
 
 	while (!Foundation_WindowManager::GetWindowByIndex(0)->GetKey(KEY_ESCAPE) ||
 		!Foundation_WindowManager::GetWindowByIndex(0)->GetWindowShouldClose())

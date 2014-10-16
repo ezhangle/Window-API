@@ -48,6 +48,9 @@ Foundation_Window* Foundation_WindowManager::GetWindowByIndex(GLuint a_WindowInd
 
 void Foundation_WindowManager::GetMousePositionInScreen(GLuint& a_X, GLuint& a_Y)
 {
+#if defined(_MSC_VER_) || defined(_WIN32) || defined(_WIN64)
+
+
 	POINT l_Point;
 
 	if (GetCursorPos(&l_Point))
@@ -55,10 +58,19 @@ void Foundation_WindowManager::GetMousePositionInScreen(GLuint& a_X, GLuint& a_Y
 		a_X = l_Point.x;
 		a_Y = l_Point.y;
 	}
+
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+
+#endif
+
 }
 
 GLuint* Foundation_WindowManager::GetMousePositionInScreen()
 {
+#if defined(_MSC_VER_) || defined(_WIN32) || defined(_WIN64)
+
 	POINT l_Point;
 
 	if (GetCursorPos(&l_Point))
@@ -66,6 +78,13 @@ GLuint* Foundation_WindowManager::GetMousePositionInScreen()
 		GetInstance()->m_ScreenMousePosition[0] = l_Point.x;
 		GetInstance()->m_ScreenMousePosition[1] = l_Point.y;
 	}
+
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+
+#endif
+
 
 
 	return GetInstance()->m_ScreenMousePosition;

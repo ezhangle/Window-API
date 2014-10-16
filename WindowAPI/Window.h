@@ -81,6 +81,8 @@ private:
 	bool WindowShouldClose;
 	GLuint m_WindowID;
 
+	void AddSelfToManager();
+
 	void ShutDownWindow();	
 	void InitializePixelFormat();
 	
