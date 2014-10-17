@@ -55,7 +55,7 @@ public:
 	void SetPosition(GLuint a_X, GLuint a_Y);
 	
 	bool GetKey(GLuint a_Key);
-	void PollForEvents();
+	//void PollForEvents();
 	void CreateTerminal();
 	bool GetWindowShouldClose();	
 	void Window_SwapBuffers();
@@ -64,6 +64,9 @@ public:
 	const char* GetWindowName();
 
 	void MakeCurrentContext();
+
+	bool GetInFocus();
+	bool GetIsObscured();
 
 	friend Foundation_WindowManager;
 
@@ -80,6 +83,8 @@ private:
 	GLuint m_MousePosition[2];
 	bool WindowShouldClose;
 	GLuint m_WindowID;
+	bool m_InFocus;
+	bool m_IsObscured;
 
 	void AddSelfToManager();
 
@@ -92,13 +97,13 @@ public:
 	HWND GetWindowHandle();
 private:
 
-	HDC m_DeviceContextHandle;
+	//HDC m_DeviceContextHandle;
 	HGLRC m_GLRenderingcontextHandle;
 	HPALETTE m_PaletteHandle;
 	PIXELFORMATDESCRIPTOR m_PFD;
 
 	WNDCLASS m_WindowClass;
-	MSG m_Message;
+	//MSG m_Message;
 	HWND m_WindowHandle;
 
 	LPARAM m_LongParam;
@@ -137,9 +142,9 @@ private:
 
 	void XTranslateKey(GLuint a_KeySym, bool a_KeyState);
 	Window GetWindowHandle();
-	Display* m_Display;
+	//Display* m_Display;
 	Window m_Window;
-	XEvent m_Event;
+	//XEvent m_Event;
 	GLXContext m_Context;
 	XVisualInfo* m_VisualInfo;
 	GLint* m_Attributes;

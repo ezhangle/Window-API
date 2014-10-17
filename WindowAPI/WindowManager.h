@@ -10,6 +10,9 @@
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 	#include <GL/gl.h>
+	#include <X11/X.h>
+	#include <X11/Xlib.h>
+	#include <X11/keysym.h>	
 #endif
 
 #include "WindowAPI_Defs.h"
@@ -38,6 +41,8 @@ class Foundation_WindowManager
 		static void GetScreenResolution(GLuint& a_Width, GLuint& a_Height);
 
 		friend Foundation_Window;
+
+		static void PollForEvents();
 	private:
 
 		std::vector<Foundation_Window*> m_Windows;
@@ -52,10 +57,20 @@ class Foundation_WindowManager
 		static LRESULT CALLBACK StaticWindowProcedure(HWND a_WindowHandle, UINT a_Message, WPARAM a_WordParam, LPARAM a_LongParam);
 
 		static Foundation_Window* GetWindowByHandle(HWND a_WindowHandle);
+
+		void Win32PollfForEvents();
+
+		MSG m_Message;
+		HDC m_DeviceContextHandle;
 #endif
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 		static Foundation_Window* GetWindowByHandle(Window a_WindowHandle);
+
+		static void X11PollForEvents();
+
+		Display* m_Display;
+		XEvent m_Event;
 #endif
 };
 #endif 
