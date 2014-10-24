@@ -35,14 +35,18 @@ class Foundation_WindowManager
 
 		static void GetMousePositionInScreen(GLuint& a_X, GLuint& a_Y);
 		static GLuint* GetMousePositionInScreen();
-		static void SetMousePositionInScreen();
+		static void SetMousePositionInScreen(GLuint a_X, GLuint a_Y);
 
 		static GLuint* GetScreenResolution();
 		static void GetScreenResolution(GLuint& a_Width, GLuint& a_Height);
 
+	static void Initialize();
+
 		friend Foundation_Window;
 
 		static void PollForEvents();
+
+		static void RemoveWindow(Foundation_Window* a_Window);
 	private:
 
 		std::vector<Foundation_Window*> m_Windows;
@@ -71,6 +75,16 @@ class Foundation_WindowManager
 
 		Display* m_Display;
 		XEvent m_Event;
+
+		Atom m_ACloseWindow;
+		Atom m_AWindowState;
+		Atom m_AFullScreenState;
+		Atom m_AMaximizedHorizontal;
+		Atom m_AMaximizedVertical;
+		Atom m_AMoveResizeWindow;
+		Atom m_AAddState;
+
+
 #endif
 };
 #endif 

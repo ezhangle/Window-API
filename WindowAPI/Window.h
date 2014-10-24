@@ -59,7 +59,16 @@ public:
 	void CreateTerminal();
 	bool GetWindowShouldClose();	
 	void Window_SwapBuffers();
+
 	void SetFullScreen(bool a_FullScreenState);
+	bool GetIsFullScreen();
+
+	void SetMinimize(bool a_MinimizeState);
+	bool GetIsMinimized();
+
+	void SetMaximise(bool a_MaximizeState);
+	bool GetIsMaximised();
+
 	void InitializeGL();
 	const char* GetWindowName();
 
@@ -85,6 +94,10 @@ private:
 	GLuint m_WindowID;
 	bool m_InFocus;
 	bool m_IsObscured;
+
+	bool m_IsFullScreen;
+	bool m_IsMinimised;
+	bool m_IsMaximised;
 
 	void AddSelfToManager();
 
@@ -157,14 +170,14 @@ private:
 
 	WindowHints m_WindowHints;
 
-	Atom WM_STATE;
-	Atom WM_DELETE_WINDOW;
-	Atom NET_WM_STATE;
-	Atom NET_WM_STATE_FULLSCREEN;
-	Atom NET_WM_BYPASS_COMPOSITOR;
-	Atom NET_ACTIVE_WINDOW;
-	Atom _MOTIF_WM_HINTS;
-	Atom _NET_WM_STATE_ADD;
+
+	Atom WindowState; //_NET_WM_STATE
+	Atom FullScreenState; //_NET_WM_STATE_FULLSCREEN
+	Atom m_AState; //_NET_WM_STATE
+	Atom m_AFullScreenState; //NET_WM_STATE_FULLSCREEN
+	Atom m_AMaximizedHorizontal; // _NET_WM_STATE_MAXIMIZED_HORZ
+	Atom m_AMaximizedVertical; // _NET_WM_STATE_MAXIMIZED_VERT
+
 	bool m_OverrideRedirect;
 
 	Atom m_WindowProperty;

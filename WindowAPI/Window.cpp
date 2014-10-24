@@ -33,15 +33,14 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 
-	m_Attributes = new GLint[5]{GLX_RGBA, GLX_DEPTH_SIZE, m_DepthBits, GLX_DOUBLEBUFFER, None};
+	m_Attributes = new GLuint[5]{GLX_RGBA, GLX_DEPTH_SIZE, m_DepthBits, GLX_DOUBLEBUFFER, None};
+	Foundation_WindowManager::GetInstance()->m_Display = XOpenDisplay(0);
 
-	//m_Display = XOpenDisplay(0);
-
-	/*if (!m_Display)
+	if (!Foundation_WindowManager::GetInstance()->m_Display)
 	{
 		printf("Cannot Connect to X Server \n");
 		exit(0);
-	}*/
+	}
 
 	m_VisualInfo = glXChooseVisual(Foundation_WindowManager::GetInstance()->m_Display, 0,
 		m_Attributes);
@@ -57,11 +56,12 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 		m_VisualInfo->visual, AllocNone);
 
 	m_SetAttributes.event_mask = ExposureMask | KeyPressMask 
-	   	| KeyReleaseMask | MotionNotify | GravityNotify | 
-		ButtonPressMask | ButtonReleaseMask | FocusIn | FocusOut
-		| Button1MotionMask | Button2MotionMask | Button3MotionMask | 
-		Button4MotionMask | Button5MotionMask | PointerMotionMask
-		| FocusChangeMask | SubstructureNotifyMask | VisibilityChangeMask;
+	   	| KeyReleaseMask | MotionNotify | ButtonPressMask | ButtonReleaseMask
+	   	| FocusIn | FocusOut | Button1MotionMask | Button2MotionMask | Button3MotionMask | 
+		Button4MotionMask | Button5MotionMask | PointerMotionMask | FocusChangeMask 
+		| SubstructureNotifyMask | SubstructureRedirectMask;
+
+//	m_SetAttributes.override_redirect = True;
 
 	//m_SetAttributes.bit_gravity
 
@@ -69,25 +69,20 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 		DefaultRootWindow(Foundation_WindowManager::GetInstance()->m_Display), 0, 0,
 		m_Resolution[0], m_Resolution[1],
 		0, m_VisualInfo->depth, InputOutput,
-		m_VisualInfo->visual, CWColormap | CWEventMask,
+		m_VisualInfo->visual, CWColormap | CWEventMask /*CWOverrideRedirect*/,
 		&m_SetAttributes);
 
 	XMapWindow(Foundation_WindowManager::GetInstance()->m_Display, m_Window);
 	XStoreName(Foundation_WindowManager::GetInstance()->m_Display, m_Window,
 		m_WindowName);
 
-	/*m_Context = glXCreateContext(
-		m_Display, m_VisualInfo,
-		0, GL_TRUE);
+	XSetWMProtocols(Foundation_WindowManager::GetInstance()->m_Display, 
+			m_Window, &Foundation_WindowManager::GetInstance()->m_ACloseWindow, 1);
 
-	glXMakeCurrent(m_Display,
-		m_Window, m_Context);
+	XSetWMProtocols(Foundation_WindowManager::GetInstance()->m_Display,
+		m_Window, &Foundation_WindowManager::GetInstance()->m_AFullScreenState, 1);
+	
 
-	XWindowAttributes l_WindowAttributes;
-
-	XGetWindowAttributes(m_Display, m_Window, &l_WindowAttributes);
-	m_Position[0] = l_WindowAttributes.x;
-	m_Position[1] = l_WindowAttributes.y;*/
 #endif
 }
 
@@ -126,10 +121,37 @@ void Foundation_Window::InitializePixelFormat()
 	return;
 }
 
-#endif
+void Foundation_Window::InitializeWin32(LPCSTR a_MenuName, 
+	UINT a_Style /* = CS_OWNDC | CS_HREDRAW | CS_DROPSHADOW */,
+	int a_ClearScreenExtra /* = 0 */, 
+	int a_WindowExtra /* = 0 */,
+	HINSTANCE a_Instance /* = GetModuleHandle(0) */,
+	HICON a_Icon /* = LoadIcon(0 , IDI_APPLICATION)*/, 
+	HCURSOR a_Cursor /* = LoadCursor(0 , IDC_ARROW)*/,
+	HBRUSH a_Brush /* = (HBRUSH)BLACK_BRUSH */)
+{
+	m_WindowClass.style = a_Style;
+	m_WindowClass.lpfnWndProc = Foundation_WindowManager::StaticWindowProcedure;
+	m_WindowClass.cbClsExtra = 0;
+	m_WindowClass.cbWndExtra = 0;
+	m_WindowClass.hInstance = a_Instance;
+	m_WindowClass.hIcon = a_Icon;
+	m_WindowClass.hCursor = a_Cursor;
+	m_WindowClass.hbrBackground = a_Brush;
+	m_WindowClass.lpszMenuName = a_MenuName;
+	m_WindowClass.lpszClassName = a_MenuName;
+	RegisterClass(&m_WindowClass);
 
+	m_WindowHandle =
+		CreateWindow(a_MenuName, a_MenuName, WS_OVERLAPPEDWINDOW, 0,
+		0, m_Resolution[0],
+		m_Resolution[1],
+		0, 0, 0, 0);
 
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+	ShowWindow(m_WindowHandle, true);
+	UpdateWindow(m_WindowHandle);
+}
+
 void Foundation_Window::Win32TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeyState)
 {
 	switch (a_WordParam)
@@ -420,7 +442,6 @@ bool Foundation_Window::GetKey(GLuint a_Key)
 	return m_Keys[a_Key];
 }
 
-
 void Foundation_Window::CreateTerminal()
 {
 	#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
@@ -463,38 +484,7 @@ void Foundation_Window::ShutDownWindow()
 #endif
 }
 
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-void Foundation_Window::InitializeWin32(LPCSTR a_MenuName, 
-	UINT a_Style /* = CS_OWNDC | CS_HREDRAW | CS_DROPSHADOW */,
-	int a_ClearScreenExtra /* = 0 */, 
-	int a_WindowExtra /* = 0 */,
-	HINSTANCE a_Instance /* = GetModuleHandle(0) */,
-	HICON a_Icon /* = LoadIcon(0 , IDI_APPLICATION)*/, 
-	HCURSOR a_Cursor /* = LoadCursor(0 , IDC_ARROW)*/,
-	HBRUSH a_Brush /* = (HBRUSH)BLACK_BRUSH */)
-{
-	m_WindowClass.style = a_Style;
-	m_WindowClass.lpfnWndProc = Foundation_WindowManager::StaticWindowProcedure;
-	m_WindowClass.cbClsExtra = 0;
-	m_WindowClass.cbWndExtra = 0;
-	m_WindowClass.hInstance = a_Instance;
-	m_WindowClass.hIcon = a_Icon;
-	m_WindowClass.hCursor = a_Cursor;
-	m_WindowClass.hbrBackground = a_Brush;
-	m_WindowClass.lpszMenuName = a_MenuName;
-	m_WindowClass.lpszClassName = a_MenuName;
-	RegisterClass(&m_WindowClass);
 
-	m_WindowHandle =
-		CreateWindow(a_MenuName, a_MenuName, WS_OVERLAPPEDWINDOW, 0,
-		0, m_Resolution[0],
-		m_Resolution[1],
-		0, 0, 0, 0);
-
-	ShowWindow(m_WindowHandle, true);
-	UpdateWindow(m_WindowHandle);
-}
-#endif
 
 
 void Foundation_Window::InitializeGL()
@@ -538,6 +528,15 @@ void Foundation_Window::XTranslateKey(GLuint a_KeySym, bool a_KeyState)
 {
 	switch(a_KeySym)
 	{
+		case XK_Escape:
+			{
+				//printf("escape was pressed");
+				WindowShouldClose = true;
+				m_Keys[KEY_ESCAPE] = a_KeyState;
+				break;
+			}
+
+
 		case XK_Home:
 			{
 				m_Keys[KEY_HOME] = a_KeyState;
@@ -547,14 +546,14 @@ void Foundation_Window::XTranslateKey(GLuint a_KeySym, bool a_KeyState)
 		case XK_Left:
 			{
 				m_Keys[KEY_ARROW_LEFT] = a_KeyState;
-				SetFullScreen(false);
+				SetMaximise(true);
 				break;
 			}
 
 		case XK_Right:
 			{
 				m_Keys[KEY_ARROW_RIGHT] = a_KeyState;
-				SetFullScreen(true);
+				SetMaximise(false);
 				break;
 			}
 
@@ -819,44 +818,54 @@ void Foundation_Window::XTranslateKey(GLuint a_KeySym, bool a_KeyState)
 }
 #endif
 
+bool Foundation_Window::GetIsFullScreen()
+{
+	return m_IsFullScreen;
+}
+
 void Foundation_Window::SetFullScreen(bool a_FullScreenState)
 {
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 
-	if(a_FullScreenState)
+	m_IsFullScreen = a_FullScreenState;
+
+	if(m_IsFullScreen)
 	{	
+
+	XWindowChanges l_WindowChanges;
+	l_WindowChanges.x = 0;
+	l_WindowChanges.y = 0;
+	l_WindowChanges.width = Foundation_WindowManager::GetScreenResolution()[0];
+	l_WindowChanges.height = Foundation_WindowManager::GetScreenResolution()[1];	
+
 	m_WindowHints.m_Flags = 2;
 	m_WindowHints.m_Decorations = 0;
 
-	m_WindowProperty = XInternAtom(Foundation_WindowManager::GetInstance()->m_Display,"_MOTIF_WM_HINTS", False);
+	m_WindowProperty = XInternAtom(Foundation_WindowManager::GetInstance()->m_Display,"_MOTIF_WM_HINTS", False);	
 
-	XChangeProperty(Foundation_WindowManager::GetInstance()->m_Display,
-			m_Window,
-			m_WindowProperty,
-			m_WindowProperty,
-			32,
-			PropModeReplace,
-			(unsigned char*)&m_WindowHints, 5);
+	XSetWindowAttributes l_Attributes;
+	l_Attributes.override_redirect = True;
+	
+	XMoveResizeWindow(Foundation_WindowManager::GetInstance()->m_Display, m_Window, 
+			0, 0, Foundation_WindowManager::GetScreenResolution()[0],
+		   	Foundation_WindowManager::GetScreenResolution()[1]);
 
-	XWindowChanges l_WindowChanges;	 
-	l_WindowChanges.width = WidthOfScreen(XScreenOfDisplay(Foundation_WindowManager::GetInstance()->m_Display,
-			   	DefaultScreen(Foundation_WindowManager::GetInstance()->m_Display)));
-	l_WindowChanges.height = HeightOfScreen(XScreenOfDisplay(Foundation_WindowManager::GetInstance()->m_Display, 
-				DefaultScreen(Foundation_WindowManager::GetInstance()->m_Display)));
+	XChangeWindowAttributes(Foundation_WindowManager::GetInstance()->m_Display, m_Window, CWOverrideRedirect | CWBorderPixel, &l_Attributes);
 
-	l_WindowChanges.x = 0;
-	l_WindowChanges.y = 0;
-	XConfigureWindow(Foundation_WindowManager::GetInstance()->m_Display, m_Window, CWWidth | CWHeight | CWX | CWY, &l_WindowChanges); 
+	XMapRaised(Foundation_WindowManager::GetInstance()->m_Display, m_Window);
 	}
 
 	else
-	{
-		m_WindowHints.m_Flags = 2;
-		m_WindowHints.m_Decorations = 3;
-
-		m_WindowProperty = XInternAtom(Foundation_WindowManager::GetInstance()->m_Display, "_MOTIF_WM_HINTS", False);
-
+	{		
+		XSetWindowAttributes l_Attributes;
+		l_Attributes.override_redirect = False;
 		GLuint l_Value = 0;
+		XMoveResizeWindow(Foundation_WindowManager::GetInstance()->m_Display,
+				m_Window, m_Position[0], m_Position[1],
+				m_Resolution[0], m_Resolution[1]);
+			
+		XChangeWindowAttributes(Foundation_WindowManager::GetInstance()->m_Display, m_Window, CWOverrideRedirect, &l_Attributes);
+		m_WindowProperty = XInternAtom(Foundation_WindowManager::GetInstance()->m_Display, "_MOTIF_WM_HINTS", True);
 
 		XChangeProperty(Foundation_WindowManager::GetInstance()->m_Display,
 				m_Window,
@@ -864,16 +873,7 @@ void Foundation_Window::SetFullScreen(bool a_FullScreenState)
 				m_WindowProperty,
 				32,
 				PropModeReplace,
-				(unsigned char*)&l_Value, 1);
-
-		XWindowChanges l_WindowChanges;
-		l_WindowChanges.width = m_Resolution[0];
-		l_WindowChanges.height = m_Resolution[1];
-		l_WindowChanges.x = m_Position[0];
-		l_WindowChanges.y = m_Position[1];
-		XConfigureWindow(Foundation_WindowManager::GetInstance()->m_Display,
-			   	m_Window, CWWidth | CWHeight | CWX | CWY, &l_WindowChanges);
-		
+					(unsigned char*)&l_Value, 1);
 }	
 #endif
 
@@ -901,6 +901,58 @@ void Foundation_Window::SetFullScreen(bool a_FullScreenState)
 #endif
 }
 
+bool Foundation_Window::GetIsMinimized()
+{
+	return m_IsMinimised;
+}
+
+void Foundation_Window::SetMinimize(bool a_MinimizeState)
+{
+	m_IsMinimised = a_MinimizeState;
+
+	if(m_IsMinimised)
+	{
+		XIconifyWindow(Foundation_WindowManager::GetInstance()->m_Display, 
+				m_Window, 0);	
+	}
+
+	else
+	{
+		XMapWindow(Foundation_WindowManager::GetInstance()->m_Display,
+				m_Window);
+	}
+	
+}
+
+bool Foundation_Window::GetIsMaximised()
+{
+	return m_IsMaximised;
+}
+
+void Foundation_Window::SetMaximise(bool a_MaximizeState)
+{
+	
+	
+/*	XEvent* l_Event = new XEvent();
+
+	l_Event->type = ClientMessage;
+	l_Event->xclient.window = m_Window;
+	l_Event->xclient.message_type = Foundation_WindowManager::GetInstance()->m_AWindowState;
+	l_Event->xclient.format = 32;
+	l_Event->xclient.data.l[0] = Foundation_WindowManager::GetInstance()->m_AAddState;
+	l_Event->xclient.data.l[1] = Foundation_WindowManager::GetInstance()->m_AMaximizedHorizontal;
+	l_Event->xclient.data.l[2] = Foundation_WindowManager::GetInstance()->m_AMaximizedVertical;
+
+	XSendEvent(Foundation_WindowManager::GetInstance()->m_Display,
+			DefaultRootWindow(Foundation_WindowManager::GetInstance()->m_Display),
+			False,
+			SubstructureNotifyMask,
+			l_Event);
+
+	delete l_Event;*/
+	
+}
+
 void Foundation_Window::GetResolution(GLuint& a_Width, GLuint& a_Height)
 {
 	a_Width = m_Resolution[0];
@@ -925,13 +977,20 @@ void Foundation_Window::SetResolution(GLuint a_Width, GLuint a_Height)
 #endif
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+	
+	XSetWindowAttributes l_Attributes;
+	l_Attributes.override_redirect = True;
+	
+	XChangeWindowAttributes(Foundation_WindowManager::GetInstance()->m_Display, m_Window, CWOverrideRedirect, &l_Attributes);
 
-	XWindowChanges l_WindowChanges;
+	XResizeWindow(Foundation_WindowManager::GetInstance()->m_Display, m_Window, m_Resolution[0], m_Resolution[1]);	
+		l_Attributes.override_redirect = False;
 
-	l_WindowChanges.width = m_Resolution[0];
-	l_WindowChanges.height = m_Resolution[1];
+	l_Attributes.override_redirect = False;
 
-	XConfigureWindow(Foundation_WindowManager::GetInstance()->m_Display, m_Window, CWWidth | CWHeight, &l_WindowChanges);
+	XChangeWindowAttributes(Foundation_WindowManager::GetInstance()->m_Display, 
+			m_Window, CWOverrideRedirect,
+			&l_Attributes);
 
 #endif
 	glViewport(0, 0, m_Resolution[0], m_Resolution[1]);

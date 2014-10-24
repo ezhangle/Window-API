@@ -3,18 +3,38 @@
 Foundation_WindowManager::Foundation_WindowManager()
 {
 #if defined(__linux__)|| defined(__GNUC__) || defined(__GNUG__) || defined(__Clang__)
-	m_Display = XOpenDisplay(0);
 
-	if(!m_Display)
-	{
-		printf("Cannot Connect to X server\n");
-	exit(0);
-	}
-
-	GetInstance()->m_ScreenResolution[0] = WidthOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
-	GetInstance()->m_ScreenResolution[1] = HeightOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
 
 #endif
+}
+
+void Foundation_WindowManager::Initialize()
+{
+	GetInstance()->m_Display = XOpenDisplay(0);
+
+	if(!GetInstance()->m_Display)
+	{
+		printf("Cannot Connect to X server\n");
+		exit(0);
+	}
+
+	/**/
+
+	GetInstance()->m_ACloseWindow = XInternAtom(GetInstance()->m_Display, "WM_DELETE_WINDOW", False);
+	GetInstance()->m_AWindowState = XInternAtom(GetInstance()->m_Display, "_NET_WM_STATE", False);
+	GetInstance()->m_AFullScreenState = XInternAtom(GetInstance()->m_Display, "_NET_WM_STATE_FULLSCREEN", False);
+	GetInstance()->m_AMoveResizeWindow = XInternAtom(GetInstance()->m_Display, "_NET_MOVERESIZE_WINDOW", False);
+	GetInstance()->m_AMaximizedHorizontal = XInternAtom(GetInstance()->m_Display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+	GetInstance()->m_AMaximizedVertical = XInternAtom(GetInstance()->m_Display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+	GetInstance()->m_AAddState = XInternAtom(GetInstance()->m_Display, "_NET_WM_STATE_ADD", False);
+
+	GetInstance()->m_ScreenResolution[0] = WidthOfScreen(XScreenOfDisplay(GetInstance()->m_Display, 
+				DefaultScreen(GetInstance()->m_Display)));
+
+	GetInstance()->m_ScreenResolution[1] = HeightOfScreen(XScreenOfDisplay(GetInstance()->m_Display,
+				DefaultScreen(GetInstance()->m_Display)));
+
+
 }
 
 Foundation_WindowManager::~Foundation_WindowManager()
@@ -111,6 +131,17 @@ GLuint* Foundation_WindowManager::GetMousePositionInScreen()
 	return GetInstance()->m_ScreenMousePosition;
 }
 
+void Foundation_WindowManager::SetMousePositionInScreen(GLuint a_X, GLuint a_Y)
+{
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+
+	XWarpPointer(GetInstance()->m_Display, None, XDefaultRootWindow(GetInstance()->m_Display),
+		   	0, 0, GetScreenResolution()[0], GetScreenResolution()[1], a_X, a_Y);
+
+
+#endif
+}
+
 GLuint* Foundation_WindowManager::GetScreenResolution()
 {
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
@@ -125,7 +156,8 @@ GLuint* Foundation_WindowManager::GetScreenResolution()
 #endif
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-
+	GetInstance()->m_ScreenResolution[0] = WidthOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
+	GetInstance()->m_ScreenResolution[1] = HeightOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
 	//
 
 	return GetInstance()->m_ScreenResolution;
@@ -160,8 +192,12 @@ void Foundation_WindowManager::GetScreenResolution(GLuint& a_Width, GLuint& a_He
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 
-	a_Width = GetInstance()->m_ScreenResolution[0];
-	a_Height = GetInstance()->m_ScreenResolution[1];
+	a_Width = WidthOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
+	a_Height = HeightOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
+
+
+	GetInstance()->m_ScreenResolution[0] = a_Width;
+	GetInstance()->m_ScreenResolution[1] = a_Height;
 #endif
 }
 
@@ -341,31 +377,42 @@ void Foundation_WindowManager::X11PollForEvents()
 	{
 		case Expose:
 		{
+			printf("window was exposed\n");
 			XGetWindowAttributes(GetInstance()->m_Display,
 				GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Window,
 				&GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_WindowAttributes);
 				
-			glViewport(0, 0, 
-				GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Resolution[0],
-				GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Resolution[1]);
+			/*if(GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->GetIsFullScreen())
+			{
+				glViewport(0, 0, 
+					GetScreenResolution()[0],
+					GetScreenResolution()[1]);	
+			}
 
-				GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Position[0] = GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_WindowAttributes.x;
+			else
+			{
+				glViewport(0, 0, 
+						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Resolution[0],
+						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Resolution[1]);
+			}*/
 
-				GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Position[1] = GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_WindowAttributes.y;
+				/*GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Position[0] = GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_WindowAttributes.x;
+
+				GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Position[1] = GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_WindowAttributes.y;*/
 			break;
 		}
 
 		case DestroyNotify:
 		{
-			GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->ShutDownWindow();
+			GetWindowByHandle(GetInstance()->m_Event.xdestroywindow.window)->ShutDownWindow();
 			printf("Window was destroyed\n");
 			break;
 		}
 
 		case CreateNotify:
 		{	
-			GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->InitializeGL();
 			printf("Window was created\n");
+			GetWindowByHandle(GetInstance()->m_Event.xcreatewindow.window)->InitializeGL();
 			break;
 		}
 
@@ -377,13 +424,13 @@ void Foundation_WindowManager::X11PollForEvents()
 			
 			if(l_FunctionKeysym <= 255)
 			{
-				GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Keys[l_FunctionKeysym] = KEYSTATE_DOWN;
-				//printf("%c\n", CurrentlyPressedKey[0]);		
+				GetWindowByHandle(GetInstance()->m_Event.xkey.window)->m_Keys[l_FunctionKeysym] = KEYSTATE_DOWN;
+				printf("%c\n", l_FunctionKeysym);		
 			}
 			
 			else
 			{
-				GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->XTranslateKey(l_FunctionKeysym, KEYSTATE_DOWN);
+				GetWindowByHandle(GetInstance()->m_Event.xkey.window)->XTranslateKey(l_FunctionKeysym, KEYSTATE_DOWN);
 			}
 
 			break;
@@ -414,12 +461,13 @@ void Foundation_WindowManager::X11PollForEvents()
 
 				if(l_FunctionKeysym <= 255)
 				{
-					GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Keys[l_FunctionKeysym] = KEYSTATE_UP;
+					printf("Key %c was released", l_FunctionKeysym);
+					GetWindowByHandle(GetInstance()->m_Event.xkey.window)->m_Keys[l_FunctionKeysym] = KEYSTATE_UP;
 				}
 
 				else
 				{
-					GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->XTranslateKey(l_FunctionKeysym, KEYSTATE_UP);
+					GetWindowByHandle(GetInstance()->m_Event.xkey.window)->XTranslateKey(l_FunctionKeysym, KEYSTATE_UP);
 				}
 			}
 
@@ -434,31 +482,31 @@ void Foundation_WindowManager::X11PollForEvents()
 			{
 				case 1:
 					{
-						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONDOWN;
+						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONDOWN;
 						break;
 					}
 
 				case 2:
 					{
-						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
+						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
 						break;
 					}
 
 				case 3:
 					{
-						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
+						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
 						break;
 					}
 
 				case 4:
 					{
-						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_MouseEvents[MOUSE_SCROLL_UP] = MOUSE_BUTTONDOWN;
+						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_SCROLL_UP] = MOUSE_BUTTONDOWN;
 						break;
 					}
 
 				case 5:
 					{
-						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_MouseEvents[MOUSE_SCROLL_DOWN] = MOUSE_BUTTONDOWN;
+						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_SCROLL_DOWN] = MOUSE_BUTTONDOWN;
 						break;
 					}
 
@@ -472,35 +520,36 @@ void Foundation_WindowManager::X11PollForEvents()
 
 		case ButtonRelease:
 		{
+			printf("Button released %i\n", GetInstance()->m_Event.xbutton.button);
 			switch(GetInstance()->m_Event.xbutton.button)
 			{
 				case 1:
 					{
-						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
+						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
 						break;
 					}
 
 				case 2:
 					{
-						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONUP;
+						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONUP;
 						break;
 					}
 
 				case 3:
 					{
-						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONUP;
+						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONUP;
 						break;
 					}
 
 				case 4:
 					{
-						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_MouseEvents[MOUSE_SCROLL_UP] = MOUSE_BUTTONDOWN;
+						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_SCROLL_UP] = MOUSE_BUTTONDOWN;
 						break;
 					}
 
 				case 5:
 					{
-						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_MouseEvents[MOUSE_SCROLL_DOWN] = MOUSE_BUTTONDOWN;
+						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_SCROLL_DOWN] = MOUSE_BUTTONDOWN;
 						break;
 					}
 
@@ -514,12 +563,11 @@ void Foundation_WindowManager::X11PollForEvents()
 
 		case MotionNotify:
 		{ 
-			GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_MousePosition[0] = 
+			GetWindowByHandle(GetInstance()->m_Event.xmotion.window)->m_MousePosition[0] = 
 				GetInstance()->m_Event.xmotion.x;
 
-			//printf("%i %i\n", GetInstance()->m_Event.xmotion.x_root, GetInstance()->m_Event.xmotion.y_root);
-
-			GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_MousePosition[1] = GetInstance()->m_Event.xmotion.y;
+			GetWindowByHandle(GetInstance()->m_Event.xmotion.window)->m_MousePosition[1] = 
+				GetInstance()->m_Event.xmotion.y;
 
 			GetInstance()->m_ScreenMousePosition[0] = GetInstance()->m_Event.xmotion.x_root;
 			GetInstance()->m_ScreenMousePosition[1] = GetInstance()->m_Event.xmotion.y_root;
@@ -528,14 +576,75 @@ void Foundation_WindowManager::X11PollForEvents()
 
 		case FocusOut:
 		{
-			printf("window now in focus");
-			GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_InFocus = false;
+			//printf("window now out of  focus");
+			GetWindowByHandle(GetInstance()->m_Event.xfocus.window)->m_InFocus = false;
 			break;
 		}
 
 		case FocusIn:
 		{
-			GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_InFocus = true;
+			//printf("window now in focus");
+			GetWindowByHandle(GetInstance()->m_Event.xfocus.window)->m_InFocus = true;
+			break;
+		}
+
+		case ResizeRequest:
+		{
+			printf("window was resized\n");
+			/*printf("%i %i\n",
+			GetInstance()->m_Event.xresizerequest.width,
+			GetInstance()->m_Event.xresizerequest.height);*/
+
+			glViewport(0, 0,
+					GetWindowByHandle(GetInstance()->m_Event.xresizerequest.window)->GetResolution()[0],
+					GetWindowByHandle(GetInstance()->m_Event.xresizerequest.window)->GetResolution()[1]);
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+
+			
+			break;
+		}
+
+		case ConfigureNotify:
+		{
+			//GetWindowByIndex(0)->m_Position[0] = GetInstance()->m_Event.xconfigure.x;
+
+			//GetWindowByIndex(0)->m_Position[1] = GetInstance()->m_Event.xconfigure.y;
+			//
+			//XClearWindow(GetInstance()->m_Display, GetInstance()->m_Event.xconfigure.window);
+
+			glViewport(0, 0, GetInstance()->m_Event.xconfigure.width,
+						GetInstance()->m_Event.xconfigure.height);
+
+		printf("%i %i %i %i\n", GetInstance()->m_Event.xconfigure.x, GetInstance()->m_Event.xconfigure.y,
+				GetInstance()->m_Event.xconfigure.width, GetInstance()->m_Event.xconfigure.height);
+			break;
+		}
+
+		case GravityNotify:
+		{
+			//window has moved
+			printf("window has moved");
+			break;
+		}
+
+		case ClientMessage:
+		{
+			printf("ClientMessage\n");
+			if((Atom)GetInstance()->m_Event.xclient.data.l[1] == GetInstance()->m_ACloseWindow)
+			{
+				printf("window closed\n");
+				GetWindowByHandle(GetInstance()->m_Event.xclient.window)->WindowShouldClose = true;
+				XDestroyWindow(GetInstance()->m_Display, GetInstance()->m_Event.xclient.window);
+				break;
+			}
+
+			if((Atom)GetInstance()->m_Event.xclient.data.l[1] == GetInstance()->m_AFullScreenState)
+			{
+				printf("resized window \n");
+				break;
+			}
 			break;
 		}
 
