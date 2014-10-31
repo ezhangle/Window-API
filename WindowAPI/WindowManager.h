@@ -26,6 +26,8 @@ class Foundation_WindowManager
 		Foundation_WindowManager();
 		~Foundation_WindowManager();
 
+		static void ShutDown();
+
 		static Foundation_Window* GetWindowByName(const char* a_WindowName);
 		static Foundation_Window* GetWindowByIndex(GLuint a_WindowIndex);
 
@@ -73,18 +75,10 @@ class Foundation_WindowManager
 
 		static void X11PollForEvents();
 
+		static Display* GetDisplay();
+
 		Display* m_Display;
 		XEvent m_Event;
-
-		Atom m_ACloseWindow;
-		Atom m_AWindowState;
-		Atom m_AFullScreenState;
-		Atom m_AMaximizedHorizontal;
-		Atom m_AMaximizedVertical;
-		Atom m_AMoveResizeWindow;
-		Atom m_AAddState;
-
-
 #endif
 };
 #endif 

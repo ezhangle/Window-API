@@ -18,23 +18,11 @@ void Foundation_WindowManager::Initialize()
 		exit(0);
 	}
 
-	/**/
-
-	GetInstance()->m_ACloseWindow = XInternAtom(GetInstance()->m_Display, "WM_DELETE_WINDOW", False);
-	GetInstance()->m_AWindowState = XInternAtom(GetInstance()->m_Display, "_NET_WM_STATE", False);
-	GetInstance()->m_AFullScreenState = XInternAtom(GetInstance()->m_Display, "_NET_WM_STATE_FULLSCREEN", False);
-	GetInstance()->m_AMoveResizeWindow = XInternAtom(GetInstance()->m_Display, "_NET_MOVERESIZE_WINDOW", False);
-	GetInstance()->m_AMaximizedHorizontal = XInternAtom(GetInstance()->m_Display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
-	GetInstance()->m_AMaximizedVertical = XInternAtom(GetInstance()->m_Display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
-	GetInstance()->m_AAddState = XInternAtom(GetInstance()->m_Display, "_NET_WM_STATE_ADD", False);
-
 	GetInstance()->m_ScreenResolution[0] = WidthOfScreen(XScreenOfDisplay(GetInstance()->m_Display, 
 				DefaultScreen(GetInstance()->m_Display)));
 
 	GetInstance()->m_ScreenResolution[1] = HeightOfScreen(XScreenOfDisplay(GetInstance()->m_Display,
 				DefaultScreen(GetInstance()->m_Display)));
-
-
 }
 
 Foundation_WindowManager::~Foundation_WindowManager()
@@ -103,6 +91,19 @@ Foundation_WindowManager* Foundation_WindowManager::GetInstance()
 GLuint Foundation_WindowManager::GetNumWindows()
 {
 	return GetInstance()->m_Windows.size();
+}
+
+void Foundation_WindowManager::ShutDown()
+{
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+	for(GLuint l_CurrentWindow = 0; l_CurrentWindow < GetInstance()->m_Windows.size(); l_CurrentWindow++)
+	{
+		delete GetInstance()->m_Windows[l_CurrentWindow];
+	}
+
+	XCloseDisplay(GetInstance()->m_Display);
+
+#endif
 }
 
 void Foundation_WindowManager::GetMousePositionInScreen(GLuint& a_X, GLuint& a_Y)
@@ -369,6 +370,11 @@ Foundation_Window* Foundation_WindowManager::GetWindowByHandle(Window a_WindowHa
 	return nullptr;
 }
 
+Display* Foundation_WindowManager::GetDisplay()
+{
+	return GetInstance()->m_Display;
+}
+
 void Foundation_WindowManager::X11PollForEvents()
 {
 	XNextEvent(GetInstance()->m_Display, &GetInstance()->m_Event);
@@ -430,7 +436,7 @@ void Foundation_WindowManager::X11PollForEvents()
 			
 			else
 			{
-				GetWindowByHandle(GetInstance()->m_Event.xkey.window)->XTranslateKey(l_FunctionKeysym, KEYSTATE_DOWN);
+				GetWindowByHandle(GetInstance()->m_Event.xkey.window)->Linux_TranslateKey(l_FunctionKeysym, KEYSTATE_DOWN);
 			}
 
 			break;
@@ -467,7 +473,7 @@ void Foundation_WindowManager::X11PollForEvents()
 
 				else
 				{
-					GetWindowByHandle(GetInstance()->m_Event.xkey.window)->XTranslateKey(l_FunctionKeysym, KEYSTATE_UP);
+					GetWindowByHandle(GetInstance()->m_Event.xkey.window)->Linux_TranslateKey(l_FunctionKeysym, KEYSTATE_UP);
 				}
 			}
 
@@ -632,7 +638,7 @@ void Foundation_WindowManager::X11PollForEvents()
 		case ClientMessage:
 		{
 			printf("ClientMessage\n");
-			if((Atom)GetInstance()->m_Event.xclient.data.l[1] == GetInstance()->m_ACloseWindow)
+			if((Atom)GetInstance()->m_Event.xclient.data.l[1] == Foundation_WindowManager::GetWindowByHandle(GetInstance()->m_Event.xclient.window)->m_ACloseWindow)
 			{
 				printf("window closed\n");
 				GetWindowByHandle(GetInstance()->m_Event.xclient.window)->WindowShouldClose = true;
@@ -640,12 +646,27 @@ void Foundation_WindowManager::X11PollForEvents()
 				break;
 			}
 
-			if((Atom)GetInstance()->m_Event.xclient.data.l[1] == GetInstance()->m_AFullScreenState)
+			if((Atom)GetInstance()->m_Event.xclient.data.l[1] == GetWindowByHandle(GetInstance()->m_Event.xclient.window)->m_AFullScreenState)
 			{
 				printf("resized window \n");
 				break;
 			}
 			break;
+		}
+
+		case VisibilityNotify:
+		{
+			if(GetInstance()->m_Event.xvisibility.state == VisibilityUnobscured)
+			{
+				printf("window not obscured \n");
+				GetWindowByHandle(GetInstance()->m_Event.xany.window)->m_IsObscured = false;
+			}
+
+			else
+			{
+				printf("window obscured\n");
+				GetWindowByHandle(GetInstance()->m_Event.xany.window)->m_IsObscured = true;
+			}
 		}
 
 		default:

@@ -1,8 +1,11 @@
+#include <limits.h>
 #include "Window.h"
 #include "WindowManager.h"
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 	//#include <keysymdef.h>
+//#include <glx.h>
+#include <cstring>
 #endif
 
 Foundation_Window::Foundation_Window(const char* a_WindowName,
@@ -34,15 +37,15 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 
 	m_Attributes = new GLuint[5]{GLX_RGBA, GLX_DEPTH_SIZE, m_DepthBits, GLX_DOUBLEBUFFER, None};
-	Foundation_WindowManager::GetInstance()->m_Display = XOpenDisplay(0);
+	//Foundation_WindowManager::GetInstance()->m_Display = XOpenDisplay(0);
 
-	if (!Foundation_WindowManager::GetInstance()->m_Display)
+	if (!Foundation_WindowManager::GetDisplay())
 	{
 		printf("Cannot Connect to X Server \n");
 		exit(0);
 	}
 
-	m_VisualInfo = glXChooseVisual(Foundation_WindowManager::GetInstance()->m_Display, 0,
+	m_VisualInfo = glXChooseVisual(Foundation_WindowManager::GetDisplay(), 0,
 		m_Attributes);
 
 	if (!m_VisualInfo)
@@ -51,39 +54,55 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 		exit(0);
 	}
 
-	m_SetAttributes.colormap = XCreateColormap(Foundation_WindowManager::GetInstance()->m_Display,
-		DefaultRootWindow(Foundation_WindowManager::GetInstance()->m_Display),
+	m_SetAttributes.colormap = XCreateColormap(Foundation_WindowManager::GetDisplay(),
+		DefaultRootWindow(Foundation_WindowManager::GetDisplay()),
 		m_VisualInfo->visual, AllocNone);
 
 	m_SetAttributes.event_mask = ExposureMask | KeyPressMask 
 	   	| KeyReleaseMask | MotionNotify | ButtonPressMask | ButtonReleaseMask
 	   	| FocusIn | FocusOut | Button1MotionMask | Button2MotionMask | Button3MotionMask | 
-		Button4MotionMask | Button5MotionMask | PointerMotionMask | FocusChangeMask 
-		| SubstructureNotifyMask | SubstructureRedirectMask;
+		Button4MotionMask | Button5MotionMask | PointerMotionMask | FocusChangeMask
+		| SubstructureNotifyMask | VisibilityChangeMask;
 
 //	m_SetAttributes.override_redirect = True;
 
 	//m_SetAttributes.bit_gravity
 
 	m_Window = XCreateWindow(Foundation_WindowManager::GetInstance()->m_Display,
-		DefaultRootWindow(Foundation_WindowManager::GetInstance()->m_Display), 0, 0,
+		XDefaultRootWindow(Foundation_WindowManager::GetInstance()->m_Display), 0, 0,
 		m_Resolution[0], m_Resolution[1],
 		0, m_VisualInfo->depth, InputOutput,
 		m_VisualInfo->visual, CWColormap | CWEventMask /*CWOverrideRedirect*/,
 		&m_SetAttributes);
 
-	XMapWindow(Foundation_WindowManager::GetInstance()->m_Display, m_Window);
-	XStoreName(Foundation_WindowManager::GetInstance()->m_Display, m_Window,
+	XMapWindow(Foundation_WindowManager::GetDisplay(), m_Window);
+	XStoreName(Foundation_WindowManager::GetDisplay(), m_Window,
 		m_WindowName);
 
-	XSetWMProtocols(Foundation_WindowManager::GetInstance()->m_Display, 
-			m_Window, &Foundation_WindowManager::GetInstance()->m_ACloseWindow, 1);
+	m_AState = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE", False);
+	m_AAddState = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_ADD", False);
+	m_ARemoveState = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_REMOVE", False);
+	m_AFullScreenState = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_FULLSCREEN", False);
+	m_AMaximizedHorizontal = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+	m_AMaximizedVertical = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_MAXIMIZED_VERT", False);
+	m_AWindowMotifs = XInternAtom(Foundation_WindowManager::GetInstance()->m_Display, "_MOTIF_WM_HINTS", False);
+	m_ABypassCompositor = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_BYPASS_COMPOSITOR", False);
+	m_AActiveWindow = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_ACTIVE_WINDOW", False);
+	m_ACloseWindow = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_CLOSE_WINDOW", False);
 
-	XSetWMProtocols(Foundation_WindowManager::GetInstance()->m_Display,
-		m_Window, &Foundation_WindowManager::GetInstance()->m_AFullScreenState, 1);
+	XSetWMProtocols(Foundation_WindowManager::GetDisplay(), 
+			m_Window, &m_ACloseWindow, 1);
+
+	XSetWMProtocols(Foundation_WindowManager::GetDisplay(),
+		m_Window, &m_AFullScreenState, 1);
 	
-
 #endif
+}
+
+void Foundation_Window::Shutdown()
+{
+	glXDestroyContext(Foundation_WindowManager::GetDisplay(), m_Context);
+	XDestroyWindow(Foundation_WindowManager::GetDisplay(), m_Window);
 }
 
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
@@ -496,15 +515,15 @@ void Foundation_Window::InitializeGL()
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 
 	m_Context = glXCreateContext(
-		Foundation_WindowManager::GetInstance()->m_Display, m_VisualInfo,
+		Foundation_WindowManager::GetDisplay(), m_VisualInfo,
 		0, GL_TRUE);
 
-	glXMakeCurrent(Foundation_WindowManager::GetInstance()->m_Display,
+	glXMakeCurrent(Foundation_WindowManager::GetDisplay(),
 		m_Window, m_Context);
 
 	XWindowAttributes l_WindowAttributes;
 
-	XGetWindowAttributes(Foundation_WindowManager::GetInstance()->m_Display, m_Window, &l_WindowAttributes);
+	XGetWindowAttributes(Foundation_WindowManager::GetDisplay(), m_Window, &l_WindowAttributes);
 	m_Position[0] = l_WindowAttributes.x;
 	m_Position[1] = l_WindowAttributes.y;
 #endif
@@ -518,13 +537,13 @@ void Foundation_Window::Window_SwapBuffers()
 #endif
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-	glXSwapBuffers(Foundation_WindowManager::GetInstance()->m_Display, m_Window);
+	glXSwapBuffers(Foundation_WindowManager::GetDisplay(), m_Window);
 #endif
 
 }
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-void Foundation_Window::XTranslateKey(GLuint a_KeySym, bool a_KeyState)
+void Foundation_Window::Linux_TranslateKey(GLuint a_KeySym, bool a_KeyState)
 {
 	switch(a_KeySym)
 	{
@@ -546,14 +565,14 @@ void Foundation_Window::XTranslateKey(GLuint a_KeySym, bool a_KeyState)
 		case XK_Left:
 			{
 				m_Keys[KEY_ARROW_LEFT] = a_KeyState;
-				SetMaximise(true);
+				//SetResolution(800, 600);
 				break;
 			}
 
 		case XK_Right:
 			{
 				m_Keys[KEY_ARROW_RIGHT] = a_KeyState;
-				SetMaximise(false);
+				//SetResolution(1366, 768);
 				break;
 			}
 
@@ -827,54 +846,22 @@ void Foundation_Window::SetFullScreen(bool a_FullScreenState)
 {
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 
-	m_IsFullScreen = a_FullScreenState;
+	m_IsFullScreen = a_FullScreenState;	
 
-	if(m_IsFullScreen)
-	{	
+	XEvent l_Event;
 
-	XWindowChanges l_WindowChanges;
-	l_WindowChanges.x = 0;
-	l_WindowChanges.y = 0;
-	l_WindowChanges.width = Foundation_WindowManager::GetScreenResolution()[0];
-	l_WindowChanges.height = Foundation_WindowManager::GetScreenResolution()[1];	
+	memset(&l_Event, 0, sizeof(l_Event));
 
-	m_WindowHints.m_Flags = 2;
-	m_WindowHints.m_Decorations = 0;
+	l_Event.xany.type = ClientMessage;
+	l_Event.xclient.message_type = m_AState;
+	l_Event.xclient.format = 32;
+	l_Event.xclient.window = m_Window;
+	l_Event.xclient.data.l[0] = m_IsFullScreen;
+	l_Event.xclient.data.l[1] = m_AFullScreenState;
 
-	m_WindowProperty = XInternAtom(Foundation_WindowManager::GetInstance()->m_Display,"_MOTIF_WM_HINTS", False);	
+	XSendEvent(Foundation_WindowManager::GetDisplay(), XDefaultRootWindow(Foundation_WindowManager::GetDisplay()),
+			0, SubstructureNotifyMask, &l_Event);
 
-	XSetWindowAttributes l_Attributes;
-	l_Attributes.override_redirect = True;
-	
-	XMoveResizeWindow(Foundation_WindowManager::GetInstance()->m_Display, m_Window, 
-			0, 0, Foundation_WindowManager::GetScreenResolution()[0],
-		   	Foundation_WindowManager::GetScreenResolution()[1]);
-
-	XChangeWindowAttributes(Foundation_WindowManager::GetInstance()->m_Display, m_Window, CWOverrideRedirect | CWBorderPixel, &l_Attributes);
-
-	XMapRaised(Foundation_WindowManager::GetInstance()->m_Display, m_Window);
-	}
-
-	else
-	{		
-		XSetWindowAttributes l_Attributes;
-		l_Attributes.override_redirect = False;
-		GLuint l_Value = 0;
-		XMoveResizeWindow(Foundation_WindowManager::GetInstance()->m_Display,
-				m_Window, m_Position[0], m_Position[1],
-				m_Resolution[0], m_Resolution[1]);
-			
-		XChangeWindowAttributes(Foundation_WindowManager::GetInstance()->m_Display, m_Window, CWOverrideRedirect, &l_Attributes);
-		m_WindowProperty = XInternAtom(Foundation_WindowManager::GetInstance()->m_Display, "_MOTIF_WM_HINTS", True);
-
-		XChangeProperty(Foundation_WindowManager::GetInstance()->m_Display,
-				m_Window,
-				m_WindowProperty,
-				m_WindowProperty,
-				32,
-				PropModeReplace,
-					(unsigned char*)&l_Value, 1);
-}	
 #endif
 
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
@@ -912,13 +899,13 @@ void Foundation_Window::SetMinimize(bool a_MinimizeState)
 
 	if(m_IsMinimised)
 	{
-		XIconifyWindow(Foundation_WindowManager::GetInstance()->m_Display, 
+		XIconifyWindow(Foundation_WindowManager::GetDisplay(), 
 				m_Window, 0);	
 	}
 
 	else
 	{
-		XMapWindow(Foundation_WindowManager::GetInstance()->m_Display,
+		XMapWindow(Foundation_WindowManager::GetDisplay(),
 				m_Window);
 	}
 	
@@ -931,26 +918,28 @@ bool Foundation_Window::GetIsMaximised()
 
 void Foundation_Window::SetMaximise(bool a_MaximizeState)
 {
-	
-	
-/*	XEvent* l_Event = new XEvent();
+	m_IsMaximised = a_MaximizeState;
+	XEvent l_Event;
 
-	l_Event->type = ClientMessage;
-	l_Event->xclient.window = m_Window;
-	l_Event->xclient.message_type = Foundation_WindowManager::GetInstance()->m_AWindowState;
-	l_Event->xclient.format = 32;
-	l_Event->xclient.data.l[0] = Foundation_WindowManager::GetInstance()->m_AAddState;
-	l_Event->xclient.data.l[1] = Foundation_WindowManager::GetInstance()->m_AMaximizedHorizontal;
-	l_Event->xclient.data.l[2] = Foundation_WindowManager::GetInstance()->m_AMaximizedVertical;
+	memset(&l_Event, 0, sizeof(l_Event));
 
-	XSendEvent(Foundation_WindowManager::GetInstance()->m_Display,
-			DefaultRootWindow(Foundation_WindowManager::GetInstance()->m_Display),
-			False,
-			SubstructureNotifyMask,
-			l_Event);
+	l_Event.xany.type = ClientMessage;
+	l_Event.xclient.message_type = m_AState;
+	l_Event.xclient.format = 32;
+	l_Event.xclient.window = m_Window;
+	l_Event.xclient.data.l[0] = a_MaximizeState;
+	l_Event.xclient.data.l[1] = m_AMaximizedVertical;
+	l_Event.xclient.data.l[2] = m_AMaximizedHorizontal;
 
-	delete l_Event;*/
-	
+	XSendEvent(Foundation_WindowManager::GetDisplay(), XDefaultRootWindow(Foundation_WindowManager::GetDisplay()),
+			0, SubstructureNotifyMask, &l_Event);
+
+
+	if(!a_MaximizeState)
+	{
+		XMoveWindow(Foundation_WindowManager::GetDisplay(), m_Window, m_Position[0],
+		m_Position[1]);	
+	}
 }
 
 void Foundation_Window::GetResolution(GLuint& a_Width, GLuint& a_Height)
@@ -977,20 +966,9 @@ void Foundation_Window::SetResolution(GLuint a_Width, GLuint a_Height)
 #endif
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+
+	XResizeWindow(Foundation_WindowManager::GetDisplay(), m_Window, m_Resolution[0], m_Resolution[1]);
 	
-	XSetWindowAttributes l_Attributes;
-	l_Attributes.override_redirect = True;
-	
-	XChangeWindowAttributes(Foundation_WindowManager::GetInstance()->m_Display, m_Window, CWOverrideRedirect, &l_Attributes);
-
-	XResizeWindow(Foundation_WindowManager::GetInstance()->m_Display, m_Window, m_Resolution[0], m_Resolution[1]);	
-		l_Attributes.override_redirect = False;
-
-	l_Attributes.override_redirect = False;
-
-	XChangeWindowAttributes(Foundation_WindowManager::GetInstance()->m_Display, 
-			m_Window, CWOverrideRedirect,
-			&l_Attributes);
 
 #endif
 	glViewport(0, 0, m_Resolution[0], m_Resolution[1]);
@@ -1099,7 +1077,7 @@ void Foundation_Window::SetPosition(GLuint a_X, GLuint a_Y)
 	l_WindowChanges.y = a_Y;
 
 	XConfigureWindow(
-			Foundation_WindowManager::GetInstance()->m_Display, 
+			Foundation_WindowManager::GetDisplay(), 
 			m_Window, CWX | CWY, &l_WindowChanges);
 
 #endif
@@ -1110,6 +1088,19 @@ const char* Foundation_Window::GetWindowName()
 	return m_WindowName;
 }
 
+void Foundation_Window::SetWindowName(const char* a_WindowName)
+{
+	m_WindowName = a_WindowName;
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined (__clang__)
+
+	XStoreName(Foundation_WindowManager::GetDisplay(),
+			m_Window, m_WindowName);
+
+#endif
+
+
+}
+
 void Foundation_Window::MakeCurrentContext()
 {
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
@@ -1117,7 +1108,7 @@ void Foundation_Window::MakeCurrentContext()
 #endif
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-	glXMakeCurrent(Foundation_WindowManager::GetInstance()->m_Display, m_Window, m_Context);
+	glXMakeCurrent(Foundation_WindowManager::GetDisplay(), m_Window, m_Context);
 #endif
 
 }
@@ -1152,7 +1143,6 @@ bool Foundation_Window::GetIsObscured()
 {
 	return m_IsObscured;
 }
-
 
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 HWND Foundation_Window::GetWindowHandle()

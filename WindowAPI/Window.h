@@ -33,48 +33,68 @@ class Foundation_WindowManager;
 class Foundation_Window
 {
 public:
-
+	//window constructor
 	Foundation_Window(const char* a_WindowName, GLuint a_Width = 1280, GLuint a_Height = 720, GLuint a_ColourBits = 32,
 		GLuint a_DepthBits = 8, GLuint a_StencilBits = 8, bool a_ShouldCreateTerminal = true);
 
+	//window deconstructor
 	~Foundation_Window(){}
 
-	//gets and sets for window resolution
+	void Shutdown();
+
+	//gets and set for window resolution(NOT IMPLEMENTED)
 	void GetResolution(GLuint& a_Width, GLuint& a_Height);
 	GLuint* GetResolution();
 	void SetResolution(GLuint a_Width, GLuint a_Height);
 
-	//gets and sets for mouse position relative to window space
+	//gets and set for mouse position relative to window space(COMPLETED)
 	void GetMousePositionInWindow(GLuint& a_X, GLuint& a_Y);
 	GLuint* GetMousePositionInWindow();
 	void SetMousePositionInWindow(GLuint a_X, GLuint a_Y);
 
-	//gets and sets for window position
+	//gets and sets for window position(TESTING NEEDED)
 	void GetPosition(GLuint& a_X, GLuint& a_Y);
 	GLuint* GetPosition();
 	void SetPosition(GLuint a_X, GLuint a_Y);
 	
+	//get mouse key by index
 	bool GetKey(GLuint a_Key);
-	//void PollForEvents();
+
+	//create a terminal output. linux not really required
 	void CreateTerminal();
-	bool GetWindowShouldClose();	
+
+	//wether or not the window should be closing
+	bool GetWindowShouldClose();
+
+	//make the window swap drawbuffers
 	void Window_SwapBuffers();
 
+	//get and set for triggering fullscreen mode (SEMI FUNCTIONAL)
 	void SetFullScreen(bool a_FullScreenState);
 	bool GetIsFullScreen();
 
+	//set and get for minimising a window(SEMI FUNCTIONAL)
 	void SetMinimize(bool a_MinimizeState);
 	bool GetIsMinimized();
 
+	// set and get for maxmising a window(NOT  IMPLEMENTED)
 	void SetMaximise(bool a_MaximizeState);
 	bool GetIsMaximised();
 
+	//creates on OpenGL Context
 	void InitializeGL();
-	const char* GetWindowName();
 
+	//get and set for window Name(NOT IMPLEMENTED)
+	const char* GetWindowName();
+	void SetWindowName(const char* a_WindowName);
+
+	//make the window thr current OpenGL context to be drawn
 	void MakeCurrentContext();
 
+	//wether the window is in focus(WINDOWS NOT IMPLEMENTED)
 	bool GetInFocus();
+
+	//wether the window is obscured(NOT IMPLEMENTED)
 	bool GetIsObscured();
 
 	friend Foundation_WindowManager;
@@ -134,30 +154,11 @@ private:
 #endif
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
- 
-	struct SavedScreenState
-	{
-		int m_Count;
-		int m_TimeOut;
-		int m_Interval;
-		int m_Blanking;
-		int m_Exposure;		
-	};
 
-	struct WindowHints
-	{
-		GLuint m_Flags;
-		GLuint m_Functions;
-		GLuint m_Decorations;
-		GLint m_InputMode;
-		GLuint m_Status;
-	};
+	void Linux_TranslateKey(GLuint a_KeySym, bool a_KeyState);
 
-	void XTranslateKey(GLuint a_KeySym, bool a_KeyState);
 	Window GetWindowHandle();
-	//Display* m_Display;
 	Window m_Window;
-	//XEvent m_Event;
 	GLXContext m_Context;
 	XVisualInfo* m_VisualInfo;
 	GLint* m_Attributes;
@@ -165,25 +166,21 @@ private:
 	Colormap m_Colourmap;
 	XSetWindowAttributes m_SetAttributes;
 	XWindowAttributes m_WindowAttributes;
-	
-	SavedScreenState m_SavedScreenState;
 
-	WindowHints m_WindowHints;
-
-
-	Atom WindowState; //_NET_WM_STATE
-	Atom FullScreenState; //_NET_WM_STATE_FULLSCREEN
 	Atom m_AState; //_NET_WM_STATE
+	Atom m_AAddState; //_NET_WM_STATE_ADD
+	Atom m_ARemoveState; // _NET_WM_STATE_REMOVE
 	Atom m_AFullScreenState; //NET_WM_STATE_FULLSCREEN
 	Atom m_AMaximizedHorizontal; // _NET_WM_STATE_MAXIMIZED_HORZ
 	Atom m_AMaximizedVertical; // _NET_WM_STATE_MAXIMIZED_VERT
+	Atom m_AWindowMotifs; // _MOTIF_WM_HINTS
+	Atom m_ABypassCompositor; // _NET_WM_BYPASS_COMPOSITOR
+	Atom m_AActiveWindow; // _NET_ACTIVE_WINDOW
+	Atom m_ACloseWindow; // _NET_CLOSE_WINDOW
 
-	bool m_OverrideRedirect;
-
-	Atom m_WindowProperty;
+	bool m_OverrideRedirect; //wether to use window manager or not	
 
 #endif
-
 };
 
 #endif
