@@ -38,7 +38,7 @@ public:
 		GLuint a_DepthBits = 8, GLuint a_StencilBits = 8, bool a_ShouldCreateTerminal = true);
 
 	//window deconstructor
-	~Foundation_Window(){}
+	~Foundation_Window();
 
 	void Shutdown();
 
@@ -70,15 +70,15 @@ public:
 	void Window_SwapBuffers();
 
 	//get and set for triggering fullscreen mode (SEMI FUNCTIONAL)
-	void SetFullScreen(bool a_FullScreenState);
+	void FullScreen(bool a_FullScreenState);
 	bool GetIsFullScreen();
 
 	//set and get for minimising a window(SEMI FUNCTIONAL)
-	void SetMinimize(bool a_MinimizeState);
+	void Minimize(bool a_MinimizeState);
 	bool GetIsMinimized();
 
 	// set and get for maxmising a window(NOT  IMPLEMENTED)
-	void SetMaximise(bool a_MaximizeState);
+	void Maximise(bool a_MaximizeState);
 	bool GetIsMaximised();
 
 	//creates on OpenGL Context
@@ -155,7 +155,27 @@ private:
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 
+	void Linux_SetResolution();
+
+	void Linux_SetPosition(GLuint a_X, GLuint a_Y);
+
+	void Linux_SetMousePositionInWindow(GLuint a_X, GLuint a_Y);
+	
+	void Linux_FullScreen(bool a_FullScreenState);
+
+	void Linux_Minimize(bool a_MinimizeState);
+
+	void Linux_Maximize(bool a_MaximizeState);
+
+	void Linux_SetWindowName();
+
+	void Linux_FocusWindow(bool a_FocusState);
+
 	void Linux_TranslateKey(GLuint a_KeySym, bool a_KeyState);
+
+	void InitializeAtomics();
+
+	void Linux_InitializeGL();
 
 	Window GetWindowHandle();
 	Window m_Window;

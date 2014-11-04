@@ -42,7 +42,113 @@ class Foundation_WindowManager
 		static GLuint* GetScreenResolution();
 		static void GetScreenResolution(GLuint& a_Width, GLuint& a_Height);
 
-	static void Initialize();
+		//these are another way to set and get window variables
+		
+		//sets and gets for window resolution
+		static void GetWindowResolution(Foundation_Window* a_Window, GLuint& a_Width, GLuint& a_Height);
+		static void GetWindowResolution(const char* a_WindowName, GLuint& a_Width, GLuint& a_Height);
+		static void GetWindowResolution(GLuint a_WindowIndex, GLuint& a_Width, GLuint& a_Height);
+
+		static GLuint* GetWindowResolution(Foundation_Window* a_Window);
+		static GLuint* GetWindowResolution(const char* a_WindowName);
+		static GLuint* GetWindowResolution(GLuint a_WindowIndex);
+
+		static void SetWindowResolution(Foundation_Window* a_Window, GLuint a_Width, GLuint a_Height);
+		static void SetWindowResolution(const char* a_WindowName, GLuint a_Width, GLuint a_Height);
+		static void SetWindowResolution(GLuint a_WindowIndex, GLuint a_Width, GLuint a_Height);
+
+		//sets and gets for window position
+		static void GetWindowPosition(Foundation_Window* a_Window, GLuint& a_Width, GLuint& a_Height);
+		static void GetWindowPosition(const char* a_WindowName, GLuint& a_Width, GLuint& a_Height);
+		static void GetWindowPosition(GLuint a_WindowIndex, GLuint& a_Width, GLuint a_Hieght);
+
+		static GLuint* GetWindowPosition(Foundation_Window* a_Window);
+		static GLuint* GetWindowPosition(const char* a_WindowName);
+		static GLuint* GetWindowPosition(GLuint a_WindowIndex);
+
+		static void SetWindowPosition(Foundation_Window* a_Window, GLuint a_Width, GLuint a_Height);
+		static void SetWindowPosition(const char* a_WindowName, GLuint a_Width, GLuint a_Height);
+		static void SetWindowPosition(GLuint a_WindowIndex, GLuint a_Width, GLuint a_Height);
+
+		//sets and gets for the mouse position in window
+		static void GetMousePositionInWindow(Foundation_Window* a_Window, GLuint& a_Width, GLuint& a_Height);
+		static void GetMousePositionInWindow(const char* a_WindowName, GLuint& a_Width, GLuint& a_Height);
+		static void GetMousePositionInWindow(GLuint a_WindowIndex, GLuint& a_Width, GLuint& a_Height);
+
+		static GLuint* GetMousePositionInWindow(Foundation_Window* a_Window);
+		static GLuint* GetMousePositionInWindow(const char* a_WindowName);
+		static GLuint* GetMousePositionInWindow(GLuint a_WindowIndex);
+
+		static void SetMousePositionInWindow(Foundation_Window* a_Window, GLuint a_Width, GLuint a_Height);
+		static void SetMousePositionInWindow(const char* a_WindowName, GLuint a_Width, GLuint a_Height);
+		static void SetMousePositionInWindow(GLuint a_WindowIndex, GLuint a_Width, GLuint a_Height);
+
+		//gets for window keys
+		static bool WindowGetKey(Foundation_Window* a_Window, GLuint a_Key);
+		static bool WindowGetKey(const char* a_WindowName, GLuint a_Key);
+		static bool WindowGetKey(GLuint a_WindowIndex);
+
+		//gets for window should close
+		static bool GetWindowShouldClose(Foundation_Window* a_Window);
+		static bool GetWindowShouldClose(const char* a_WindowName);
+		static bool GetWindowShouldClose(GLuint a_WindowIndex);
+
+		//swap buffers
+		static void WindowSwapBuffers(Foundation_Window* a_Window);
+		static void WindowSwapBuffers(const char* a_WindowName);
+		static void WindowSwapBuffers(GLuint a_WindowIndex);
+
+		//sets and gets for fullscreen
+		static void SetFullScreen(Foundation_Window* a_Window, bool a_FullScreenState);
+		static void SetFullScreen(const char* a_WindowName, bool a_FullScreenState);
+		static void SetFullScreen(GLuint a_WindowIndex, bool a_FullScreenState);
+
+		static bool GetWindowIsFullScreen(Foundation_Window* a_Window);
+		static bool GetWindowIsFullScreen(const char* a_WindowName);
+		static bool GetWindowIsFullScreen(GLuint a_WindowIndex);
+
+		//gets and sets for minimized
+		static bool GetWindowIsMinimized(Foundation_Window* a_Window);
+		static bool GetWindowIsMinimized(const char* a_WindowName);
+		static bool GetWindowIsMinimized(GLuint a_WindowIndex);
+
+		static void MinimizeWindow(Foundation_Window* a_Window, bool a_MinimizeState);
+		static void MinimizeWindow(const char* a_WindowName, bool a_MinimizeState);
+		static void MinimizeWindow(GLuint a_WindowIndex, bool a_MinimizeState);
+
+		//gets and sets for maximised
+		static bool GetWindowIsMaximized(Foundation_Window* a_Window);
+		static bool GetWindowIsMaximized(const char* a_WindowName);
+		static bool GetWindowIsMaximized(GLuint a_WindowIndex);
+
+		static void MaximizeWindow(Foundation_Window* a_Window, bool a_MaximizeState);
+		static void MaxmizeWindow(const char* a_WindowName, bool a_MaximizeState);
+		static void MaximizeWindow(GLuint a_WindowIndex, bool a_MaximizeState);
+
+		//gets and sets for window name
+		static const char* GetWindowName(Foundation_Window* a_Window);
+		static const char* GetWindowName(const char* a_WindowName);
+		static const char* GetWindowName(GLuint a_WindowIndex);
+
+		static void SetWindowName(Foundation_Window* a_Window, const char* a_NewName);
+		static void SetWindowName(const char* a_WindowName, const char* a_NewName);
+		static void SetWindowName(GLuint* a_WindowIndex, const char* a_NewName);
+
+		//gets and sets window is in focus
+		static bool GetWindowIsInFocus(Foundation_Window* a_Window);
+		static bool GetWindowIsInFocus(const char* a_WindowName);
+		static bool GetWindowIsInFocus(GLuint a_WindowIndex);
+
+		static bool FocusWindow(Foundation_Window* a_Window, bool a_FocusState);
+		static bool FocusWindow(const char* a_WindowName, bool a_FocusState);
+		static bool FocusWindow(GLuint a_WindowIndex, bool a_FocusState);
+
+		//get window obscurity
+		static bool GetWindowIsObscured(Foundation_Window* a_Window);
+		static bool GetWindowIsObscured(const char* a_WindowName);
+		static bool GetWindowIsObscured(GLuint a_WindowIndex);
+		
+		static void Initialize();
 
 		friend Foundation_Window;
 
@@ -73,7 +179,7 @@ class Foundation_WindowManager
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 		static Foundation_Window* GetWindowByHandle(Window a_WindowHandle);
 
-		static void X11PollForEvents();
+		static void Linux_PollForEvents();
 
 		static Display* GetDisplay();
 

@@ -176,7 +176,7 @@ void Foundation_WindowManager::PollForEvents()
 
 #if defined (__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 
-	GetInstance()->X11PollForEvents();
+	GetInstance()->Linux_PollForEvents();
 #endif
 }
 
@@ -375,7 +375,7 @@ Display* Foundation_WindowManager::GetDisplay()
 	return GetInstance()->m_Display;
 }
 
-void Foundation_WindowManager::X11PollForEvents()
+void Foundation_WindowManager::Linux_PollForEvents()
 {
 	XNextEvent(GetInstance()->m_Display, &GetInstance()->m_Event);
 

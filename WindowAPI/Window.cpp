@@ -79,16 +79,7 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 	XStoreName(Foundation_WindowManager::GetDisplay(), m_Window,
 		m_WindowName);
 
-	m_AState = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE", False);
-	m_AAddState = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_ADD", False);
-	m_ARemoveState = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_REMOVE", False);
-	m_AFullScreenState = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_FULLSCREEN", False);
-	m_AMaximizedHorizontal = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_MAXIMIZED_HORZ", False);
-	m_AMaximizedVertical = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_MAXIMIZED_VERT", False);
-	m_AWindowMotifs = XInternAtom(Foundation_WindowManager::GetInstance()->m_Display, "_MOTIF_WM_HINTS", False);
-	m_ABypassCompositor = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_BYPASS_COMPOSITOR", False);
-	m_AActiveWindow = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_ACTIVE_WINDOW", False);
-	m_ACloseWindow = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_CLOSE_WINDOW", False);
+	InitializeAtomics();
 
 	XSetWMProtocols(Foundation_WindowManager::GetDisplay(), 
 			m_Window, &m_ACloseWindow, 1);
@@ -97,6 +88,13 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 		m_Window, &m_AFullScreenState, 1);
 	
 #endif
+}
+
+Foundation_Window::~Foundation_Window()
+{
+	Shutdown();
+
+
 }
 
 void Foundation_Window::Shutdown()
@@ -503,9 +501,6 @@ void Foundation_Window::ShutDownWindow()
 #endif
 }
 
-
-
-
 void Foundation_Window::InitializeGL()
 {
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
@@ -514,20 +509,8 @@ void Foundation_Window::InitializeGL()
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 
-	m_Context = glXCreateContext(
-		Foundation_WindowManager::GetDisplay(), m_VisualInfo,
-		0, GL_TRUE);
-
-	glXMakeCurrent(Foundation_WindowManager::GetDisplay(),
-		m_Window, m_Context);
-
-	XWindowAttributes l_WindowAttributes;
-
-	XGetWindowAttributes(Foundation_WindowManager::GetDisplay(), m_Window, &l_WindowAttributes);
-	m_Position[0] = l_WindowAttributes.x;
-	m_Position[1] = l_WindowAttributes.y;
+	Linux_InitializeGL();
 #endif
-
 }
 
 void Foundation_Window::Window_SwapBuffers()
@@ -539,10 +522,369 @@ void Foundation_Window::Window_SwapBuffers()
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 	glXSwapBuffers(Foundation_WindowManager::GetDisplay(), m_Window);
 #endif
+}
+
+bool Foundation_Window::GetIsFullScreen()
+{
+	return m_IsFullScreen;
+}
+
+void Foundation_Window::FullScreen(bool a_FullScreenState)
+{
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+
+	Linux_FullScreen(a_FullScreenState);
+
+#endif
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+
+	if (a_FullScreenState)
+	{
+		SetWindowLong(m_WindowHandle, GWL_USERDATA, WS_POPUPWINDOW);
+
+		SetWindowPos(m_WindowHandle, HWND_TOP, 0, 0,
+			Foundation_WindowManager::GetScreenResolution()[0],
+			Foundation_WindowManager::GetScreenResolution()[1],
+			SWP_SHOWWINDOW);
+	}
+
+	else
+	{
+		SetWindowLong(m_WindowHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+
+		SetWindowPos(m_WindowHandle, HWND_TOP, 0, 0,
+			m_Resolution[0],
+			m_Resolution[1],
+			SWP_SHOWWINDOW);
+	}
+#endif
+}
+
+bool Foundation_Window::GetIsMinimized()
+{
+	return m_IsMinimised;
+}
+
+void Foundation_Window::Minimize(bool a_MinimizeState)
+{
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+
+	Linux_Minimize(a_MinimizeState);
+#endif	
+}
+
+bool Foundation_Window::GetIsMaximised()
+{
+	return m_IsMaximised;
+}
+
+void Foundation_Window::Maximise(bool a_MaximizeState)
+{
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+	Linux_Maximize(a_MaximizeState);
+
+#endif
+}
+
+void Foundation_Window::GetResolution(GLuint& a_Width, GLuint& a_Height)
+{
+	a_Width = m_Resolution[0];
+	a_Height = m_Resolution[1];
+}
+
+GLuint* Foundation_Window::GetResolution()
+{
+	return m_Resolution;
+}
+
+void Foundation_Window::SetResolution(GLuint a_Width, GLuint a_Height)
+{
+	m_Resolution[0] = a_Width;
+	m_Resolution[1] = a_Height;
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+	SetWindowPos(m_WindowHandle, HWND_TOP,
+		m_Position[0], m_Position[1],
+		a_Width, a_Height,
+		SWP_SHOWWINDOW);
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+
+	Linux_SetResolution();	
+
+#endif
+	glViewport(0, 0, m_Resolution[0], m_Resolution[1]);
+}
+
+void Foundation_Window::GetMousePositionInWindow(GLuint& a_X, GLuint& a_Y)
+{
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+	POINT l_Point;
+
+	if (GetCursorPos(&l_Point))
+	{
+		if (ScreenToClient(m_WindowHandle, &l_Point))
+		{
+			a_X = l_Point.x;
+			a_Y = l_Point.y;
+		}
+	}
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+a_X = m_MousePosition[0];
+a_Y = m_MousePosition[1];
+#endif
+}
+
+GLuint* Foundation_Window::GetMousePositionInWindow()
+{
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+	POINT l_Point;
+	GLuint l_MousePositionInWindow[2];
+
+	if (GetCursorPos(&l_Point))
+	{
+		if (ScreenToClient(m_WindowHandle, &l_Point))
+		{
+			l_MousePositionInWindow[0] = l_Point.x;
+			l_MousePositionInWindow[1] = l_Point.y;
+		}
+	}
+
+	m_MousePosition[0] = l_MousePositionInWindow[0];
+	m_MousePosition[1] = l_MousePositionInWindow[1];
+
+	return m_MousePosition;
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+return m_MousePosition;
+#endif
 
 }
 
+void Foundation_Window::SetMousePositionInWindow(GLuint a_X, GLuint a_Y)
+{
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+
+	POINT l_Point;
+	l_Point.x = a_X;
+	l_Point.y = a_Y;
+	ClientToScreen(m_WindowHandle, &l_Point);
+	SetCursorPos(l_Point.x, l_Point.y);
+
+#endif
+
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+	
+	Linux_SetMousePositionInWindow(a_X, a_Y);
+
+#endif
+}
+
+void Foundation_Window::GetPosition(GLuint& a_X, GLuint& a_Y)
+{
+	a_X = m_Position[0];
+	a_Y = m_Position[1];
+}
+
+GLuint* Foundation_Window::GetPosition()
+{
+	return m_Position;
+}
+
+void Foundation_Window::SetPosition(GLuint a_X, GLuint a_Y)
+{
+	m_Position[0] = a_X;
+	m_Position[1] = a_Y;
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+	SetWindowPos(m_WindowHandle, HWND_TOP,
+		m_Position[0], m_Position[1],
+		m_Resolution[0], m_Resolution[1],
+		SWP_SHOWWINDOW);
+#endif
+	
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+
+	Linux_SetPosition(a_X, a_Y);
+#endif
+}
+
+const char* Foundation_Window::GetWindowName()
+{
+	return m_WindowName;
+}
+
+void Foundation_Window::SetWindowName(const char* a_WindowName)
+{
+	m_WindowName = a_WindowName;
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined (__clang__)
+
+	Linux_SetWindowName();
+
+#endif
+}
+
+void Foundation_Window::MakeCurrentContext()
+{
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+	wglMakeCurrent(m_DeviceContextHandle, m_GLRenderingcontextHandle);
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+	glXMakeCurrent(Foundation_WindowManager::GetDisplay(), m_Window, m_Context);
+#endif
+
+}
+
+void Foundation_Window::AddSelfToManager()
+{
+	//check if this window is already in the manager
+	//if not then add else just skip over
+
+	bool l_Successful = false;
+
+	for(GLuint l_Iter = 0; l_Iter < Foundation_WindowManager::GetNumWindows(); l_Iter++)
+	{
+		if(this == Foundation_WindowManager::GetWindowByIndex(l_Iter))
+		{
+			l_Successful = true;
+		}
+	}
+
+	if(!l_Successful)
+	{
+		Foundation_WindowManager::AddWindow(this);
+	}
+}
+
+bool Foundation_Window::GetInFocus()
+{
+	return m_InFocus;
+}
+
+bool Foundation_Window::GetIsObscured()
+{
+	return m_IsObscured;
+}
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+HWND Foundation_Window::GetWindowHandle()
+{
+	return m_WindowHandle;
+}
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+void Foundation_Window::Linux_SetResolution()
+{
+	XResizeWindow(Foundation_WindowManager::GetDisplay(),
+		m_Window, m_Resolution[0], m_Resolution[1]);	
+}
+
+void Foundation_Window::Linux_SetPosition(GLuint a_X, GLuint a_Y)
+{
+
+	XWindowChanges l_WindowChanges;
+
+	l_WindowChanges.x = a_X;
+	l_WindowChanges.y = a_Y;
+
+	XConfigureWindow(
+			Foundation_WindowManager::GetDisplay(),
+			m_Window, CWX | CWY, &l_WindowChanges);
+}
+
+void Foundation_Window::Linux_SetMousePositionInWindow(GLuint a_X, GLuint a_Y)
+{
+	XWarpPointer(
+			Foundation_WindowManager::GetInstance()->m_Display,
+			m_Window, m_Window,
+			m_Position[0], m_Position[1],
+			m_Resolution[0], m_Resolution[1],
+			a_X, a_Y);
+}
+
+void Foundation_Window::Linux_FullScreen(bool a_FullScreenState)
+{
+	m_IsFullScreen = a_FullScreenState;
+
+	XEvent l_Event;
+
+	memset(&l_Event, 0, sizeof(l_Event));
+
+	l_Event.xany.type = ClientMessage;
+	l_Event.xclient.message_type = m_AState;
+	l_Event.xclient.format = 32;
+	l_Event.xclient.window = m_Window;
+	l_Event.xclient.data.l[0] = m_IsFullScreen;
+	l_Event.xclient.data.l[1] = m_AFullScreenState;
+
+	XSendEvent(Foundation_WindowManager::GetDisplay(),
+			XDefaultRootWindow(Foundation_WindowManager::GetDisplay()),
+			0, SubstructureNotifyMask, &l_Event);
+}
+
+void Foundation_Window::Linux_Minimize(bool a_MinimizeState)
+{
+	m_IsMinimised = a_MinimizeState;
+
+	if(m_IsMinimised)
+	{
+		XIconifyWindow(Foundation_WindowManager::GetDisplay(),
+				m_Window, 0);
+	}
+
+	else
+	{
+		XMapWindow(Foundation_WindowManager::GetDisplay(),
+				m_Window);
+	}
+}
+
+void Foundation_Window::Linux_Maximize(bool a_MaximizeState)
+{
+
+	m_IsMaximised = a_MaximizeState;
+	XEvent l_Event;
+
+	memset(&l_Event, 0, sizeof(l_Event));
+
+	l_Event.xany.type = ClientMessage;
+	l_Event.xclient.message_type = m_AState;
+	l_Event.xclient.format = 32;
+	l_Event.xclient.window = m_Window;
+	l_Event.xclient.data.l[0] = m_IsMaximised;
+	l_Event.xclient.data.l[1] = m_AMaximizedVertical;
+	l_Event.xclient.data.l[2] = m_AMaximizedHorizontal;
+
+	XSendEvent(Foundation_WindowManager::GetDisplay(),
+			XDefaultRootWindow(Foundation_WindowManager::GetDisplay()),
+			0, SubstructureNotifyMask, &l_Event);
+	
+	if(!m_IsMaximised)
+	{
+		XMoveWindow(Foundation_WindowManager::GetDisplay(),
+				m_Window, m_Position[0], m_Position[1]);
+	}
+}
+
+void Foundation_Window::Linux_SetWindowName()
+{
+	XStoreName(Foundation_WindowManager::GetDisplay(),
+			m_Window, m_WindowName);
+}
+
+void Foundation_Window::Linux_FocusWindow(bool a_FocusState)
+{
+
+}
+
 void Foundation_Window::Linux_TranslateKey(GLuint a_KeySym, bool a_KeyState)
 {
 	switch(a_KeySym)
@@ -833,325 +1175,40 @@ void Foundation_Window::Linux_TranslateKey(GLuint a_KeySym, bool a_KeyState)
 				break;
 			}
 	}
-
 }
-#endif
 
-bool Foundation_Window::GetIsFullScreen()
+void Foundation_Window::Linux_InitializeGL()
 {
-	return m_IsFullScreen;
+	m_Context = glXCreateContext(
+			Foundation_WindowManager::GetDisplay(),
+			m_VisualInfo, 0, GL_TRUE);
+
+	glXMakeCurrent(
+			Foundation_WindowManager::GetDisplay(),
+			m_Window, m_Context);
+
+	XWindowAttributes l_Attributes;
+
+	XGetWindowAttributes(Foundation_WindowManager::GetDisplay(),
+			m_Window, &l_Attributes);
+	m_Position[0] = l_Attributes.x;
+	m_Position[1] = l_Attributes.y;
 }
 
-void Foundation_Window::SetFullScreen(bool a_FullScreenState)
+void Foundation_Window::InitializeAtomics()
 {
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-
-	m_IsFullScreen = a_FullScreenState;	
-
-	XEvent l_Event;
-
-	memset(&l_Event, 0, sizeof(l_Event));
-
-	l_Event.xany.type = ClientMessage;
-	l_Event.xclient.message_type = m_AState;
-	l_Event.xclient.format = 32;
-	l_Event.xclient.window = m_Window;
-	l_Event.xclient.data.l[0] = m_IsFullScreen;
-	l_Event.xclient.data.l[1] = m_AFullScreenState;
-
-	XSendEvent(Foundation_WindowManager::GetDisplay(), XDefaultRootWindow(Foundation_WindowManager::GetDisplay()),
-			0, SubstructureNotifyMask, &l_Event);
-
-#endif
-
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-
-	if (a_FullScreenState)
-	{
-		SetWindowLong(m_WindowHandle, GWL_USERDATA, WS_POPUPWINDOW);
-
-		SetWindowPos(m_WindowHandle, HWND_TOP, 0, 0,
-			Foundation_WindowManager::GetScreenResolution()[0],
-			Foundation_WindowManager::GetScreenResolution()[1],
-			SWP_SHOWWINDOW);
-	}
-
-	else
-	{
-		SetWindowLong(m_WindowHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
-
-		SetWindowPos(m_WindowHandle, HWND_TOP, 0, 0,
-			m_Resolution[0],
-			m_Resolution[1],
-			SWP_SHOWWINDOW);
-	}
-#endif
+	m_AState = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE", False);
+	m_AAddState = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_ADD", False);
+	m_ARemoveState = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_REMOVE", False);
+	m_AFullScreenState = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_FULLSCREEN", False);
+	m_AMaximizedHorizontal = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+	m_AMaximizedVertical = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_STATE_MAXIMIZED_VERT", False);
+	m_AWindowMotifs = XInternAtom(Foundation_WindowManager::GetDisplay(), "_MOTIF_WM_MOTIFS", False);
+	m_ABypassCompositor = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_WM_BYPASS_COMPOSITOR", False);
+	m_AActiveWindow = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_ACTIVE_WINDOW", False);
+	m_ACloseWindow = XInternAtom(Foundation_WindowManager::GetDisplay(), "_NET_CLOSE_WINDOW", False);
 }
 
-bool Foundation_Window::GetIsMinimized()
-{
-	return m_IsMinimised;
-}
-
-void Foundation_Window::SetMinimize(bool a_MinimizeState)
-{
-	m_IsMinimised = a_MinimizeState;
-
-	if(m_IsMinimised)
-	{
-		XIconifyWindow(Foundation_WindowManager::GetDisplay(), 
-				m_Window, 0);	
-	}
-
-	else
-	{
-		XMapWindow(Foundation_WindowManager::GetDisplay(),
-				m_Window);
-	}
-	
-}
-
-bool Foundation_Window::GetIsMaximised()
-{
-	return m_IsMaximised;
-}
-
-void Foundation_Window::SetMaximise(bool a_MaximizeState)
-{
-	m_IsMaximised = a_MaximizeState;
-	XEvent l_Event;
-
-	memset(&l_Event, 0, sizeof(l_Event));
-
-	l_Event.xany.type = ClientMessage;
-	l_Event.xclient.message_type = m_AState;
-	l_Event.xclient.format = 32;
-	l_Event.xclient.window = m_Window;
-	l_Event.xclient.data.l[0] = a_MaximizeState;
-	l_Event.xclient.data.l[1] = m_AMaximizedVertical;
-	l_Event.xclient.data.l[2] = m_AMaximizedHorizontal;
-
-	XSendEvent(Foundation_WindowManager::GetDisplay(), XDefaultRootWindow(Foundation_WindowManager::GetDisplay()),
-			0, SubstructureNotifyMask, &l_Event);
-
-
-	if(!a_MaximizeState)
-	{
-		XMoveWindow(Foundation_WindowManager::GetDisplay(), m_Window, m_Position[0],
-		m_Position[1]);	
-	}
-}
-
-void Foundation_Window::GetResolution(GLuint& a_Width, GLuint& a_Height)
-{
-	a_Width = m_Resolution[0];
-	a_Height = m_Resolution[1];
-}
-
-GLuint* Foundation_Window::GetResolution()
-{
-	return m_Resolution;
-}
-
-void Foundation_Window::SetResolution(GLuint a_Width, GLuint a_Height)
-{
-	m_Resolution[0] = a_Width;
-	m_Resolution[1] = a_Height;
-
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-	SetWindowPos(m_WindowHandle, HWND_TOP,
-		m_Position[0], m_Position[1],
-		a_Width, a_Height,
-		SWP_SHOWWINDOW);
-#endif
-
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-
-	XResizeWindow(Foundation_WindowManager::GetDisplay(), m_Window, m_Resolution[0], m_Resolution[1]);
-	
-
-#endif
-	glViewport(0, 0, m_Resolution[0], m_Resolution[1]);
-}
-
-void Foundation_Window::GetMousePositionInWindow(GLuint& a_X, GLuint& a_Y)
-{
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-	POINT l_Point;
-
-	if (GetCursorPos(&l_Point))
-	{
-		if (ScreenToClient(m_WindowHandle, &l_Point))
-		{
-			a_X = l_Point.x;
-			a_Y = l_Point.y;
-		}
-	}
-#endif
-
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-a_X = m_MousePosition[0];
-a_Y = m_MousePosition[1];
-#endif
-}
-
-GLuint* Foundation_Window::GetMousePositionInWindow()
-{
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-	POINT l_Point;
-	GLuint l_MousePositionInWindow[2];
-
-	if (GetCursorPos(&l_Point))
-	{
-		if (ScreenToClient(m_WindowHandle, &l_Point))
-		{
-			l_MousePositionInWindow[0] = l_Point.x;
-			l_MousePositionInWindow[1] = l_Point.y;
-		}
-	}
-
-	m_MousePosition[0] = l_MousePositionInWindow[0];
-	m_MousePosition[1] = l_MousePositionInWindow[1];
-
-	return m_MousePosition;
-#endif
-
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-return m_MousePosition;
-#endif
-
-}
-
-void Foundation_Window::SetMousePositionInWindow(GLuint a_X, GLuint a_Y)
-{
-
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-
-	POINT l_Point;
-	l_Point.x = a_X;
-	l_Point.y = a_Y;
-	ClientToScreen(m_WindowHandle, &l_Point);
-	SetCursorPos(l_Point.x, l_Point.y);
-
-#endif
-
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-	XWarpPointer(
-			Foundation_WindowManager::GetInstance()->m_Display, 
-			m_Window, m_Window,
-			m_Position[0], m_Position[1],
-			m_Resolution[0], m_Resolution[1],
-			a_X, a_Y);
-#endif
-
-}
-
-void Foundation_Window::GetPosition(GLuint& a_X, GLuint& a_Y)
-{
-	a_X = m_Position[0];
-	a_Y = m_Position[1];
-}
-
-GLuint* Foundation_Window::GetPosition()
-{
-	return m_Position;
-}
-
-void Foundation_Window::SetPosition(GLuint a_X, GLuint a_Y)
-{
-	m_Position[0] = a_X;
-	m_Position[1] = a_Y;
-
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-	SetWindowPos(m_WindowHandle, HWND_TOP,
-		m_Position[0], m_Position[1],
-		m_Resolution[0], m_Resolution[1],
-		SWP_SHOWWINDOW);
-#endif
-	
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-
-	XWindowChanges l_WindowChanges;
-
-	l_WindowChanges.x = a_X;
-	l_WindowChanges.y = a_Y;
-
-	XConfigureWindow(
-			Foundation_WindowManager::GetDisplay(), 
-			m_Window, CWX | CWY, &l_WindowChanges);
-
-#endif
-}
-
-const char* Foundation_Window::GetWindowName()
-{
-	return m_WindowName;
-}
-
-void Foundation_Window::SetWindowName(const char* a_WindowName)
-{
-	m_WindowName = a_WindowName;
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined (__clang__)
-
-	XStoreName(Foundation_WindowManager::GetDisplay(),
-			m_Window, m_WindowName);
-
-#endif
-
-
-}
-
-void Foundation_Window::MakeCurrentContext()
-{
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-	wglMakeCurrent(m_DeviceContextHandle, m_GLRenderingcontextHandle);
-#endif
-
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-	glXMakeCurrent(Foundation_WindowManager::GetDisplay(), m_Window, m_Context);
-#endif
-
-}
-
-void Foundation_Window::AddSelfToManager()
-{
-	//check if this window is already in the manager
-	//if not then add else just skip over
-
-	bool l_Successful = false;
-
-	for(GLuint l_Iter = 0; l_Iter < Foundation_WindowManager::GetNumWindows(); l_Iter++)
-	{
-		if(this == Foundation_WindowManager::GetWindowByIndex(l_Iter))
-		{
-			l_Successful = true;
-		}
-	}
-
-	if(!l_Successful)
-	{
-		Foundation_WindowManager::AddWindow(this);
-	}
-}
-
-bool Foundation_Window::GetInFocus()
-{
-	return m_InFocus;
-}
-
-bool Foundation_Window::GetIsObscured()
-{
-	return m_IsObscured;
-}
-
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-HWND Foundation_Window::GetWindowHandle()
-{
-	return m_WindowHandle;
-}
-#endif
-
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 Window Foundation_Window::GetWindowHandle()
 {
 	return m_Window;
