@@ -35,7 +35,7 @@ class Foundation_Window
 {
 public:
 	//window constructor
-	Foundation_Window(std::string  a_WindowName, GLuint a_Width = 1280, GLuint a_Height = 720, GLuint a_ColourBits = 32,
+	Foundation_Window(const char*  a_WindowName, GLuint a_Width = 1280, GLuint a_Height = 720, GLuint a_ColourBits = 32,
 		GLuint a_DepthBits = 8, GLuint a_StencilBits = 8, bool a_ShouldCreateTerminal = true);
 
 	//window deconstructor
@@ -86,8 +86,8 @@ public:
 	void InitializeGL();
 
 	//get and set for window Name(NOT IMPLEMENTED)
-	std::string GetWindowName();
-	void SetName(std::string a_WindowName);
+	const char* GetWindowName();
+	void SetName(const char* a_WindowName);
 
 	//make the window thr current OpenGL context to be drawn
 	void MakeCurrentContext();
@@ -107,7 +107,7 @@ private:
 	GLuint m_StencilBits;
 	bool m_Keys[KEY_LAST];
 	bool m_MouseEvents[MOUSE_LAST];
-	std::string  m_WindowName;
+	const char*  m_WindowName;
 	GLuint m_Resolution[2];
 	GLuint m_Position[2];
 	GLuint m_MousePosition[2];

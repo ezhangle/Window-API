@@ -8,7 +8,7 @@
 #include <cstring>
 #endif
 
-Foundation_Window::Foundation_Window(std::string  a_WindowName,
+Foundation_Window::Foundation_Window(const char*  a_WindowName,
 	GLuint a_Width /* = 1280 */,
 	GLuint a_Height /* = 720 */,
 	GLuint a_ColourBits /* = 32 */, 
@@ -26,7 +26,7 @@ Foundation_Window::Foundation_Window(std::string  a_WindowName,
 	m_Position[1] = 0;
 	WindowShouldClose = false;
 
-	if(m_WindowName.empty())
+	if(m_WindowName == NULL || m_WindowName == nullptr)
 	{
 		printf("that was not a valid window name");
 		exit(0);
@@ -83,7 +83,7 @@ Foundation_Window::Foundation_Window(std::string  a_WindowName,
 
 	XMapWindow(Foundation_WindowManager::GetDisplay(), m_Window);
 	XStoreName(Foundation_WindowManager::GetDisplay(), m_Window,
-		m_WindowName.c_str());
+		m_WindowName);
 
 	InitializeAtomics();
 
@@ -720,14 +720,14 @@ void Foundation_Window::SetPosition(GLuint a_X, GLuint a_Y)
 #endif
 }
 
-std::string Foundation_Window::GetWindowName()
+const char* Foundation_Window::GetWindowName()
 {
 	return m_WindowName;
 }
 
-void Foundation_Window::SetName(std::string a_WindowName)
+void Foundation_Window::SetName(const char* a_WindowName)
 {
-	if(!a_WindowName.empty())
+	if(a_WindowName != NULL || a_WindowName != nullptr)
 	{
 		m_WindowName = a_WindowName;
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined (__clang__)
@@ -885,7 +885,7 @@ void Foundation_Window::Linux_Maximize(bool a_MaximizeState)
 void Foundation_Window::Linux_SetWindowName()
 {
 	XStoreName(Foundation_WindowManager::GetDisplay(),
-			m_Window, m_WindowName.c_str());
+			m_Window, m_WindowName);
 }
 
 void Foundation_Window::Linux_FocusWindow(bool a_FocusState)
