@@ -6,8 +6,8 @@ int main()
 	Foundation_WindowManager::Initialize();
 	Foundation_WindowManager::AddWindow(new Foundation_Window("Blarg"));
 	printf("Renderer: %s Version: %s\n", glGetString(GL_RENDERER), glGetString(GL_VERSION));
-	while (!Foundation_WindowManager::GetWindowByIndex(0)->GetKey(KEY_ESCAPE) ||
-		!Foundation_WindowManager::GetWindowByIndex(0)->GetWindowShouldClose())
+	while (!Foundation_WindowManager::WindowGetKey("Blarg", KEY_ESCAPE) ||
+		!Foundation_WindowManager::GetWindowShouldClose("Blarg"))
 	{
 		Foundation_WindowManager::PollForEvents();
 		for (GLuint i = 0; i < Foundation_WindowManager::GetNumWindows(); i++)
@@ -19,7 +19,7 @@ int main()
 			glClearColor(1.0f, 0.25f, 0.25f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
-			Foundation_WindowManager::GetWindowByIndex(i)->Window_SwapBuffers();
+			Foundation_WindowManager::WindowSwapBuffers("Blarg");
 		}
 	}
 	

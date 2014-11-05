@@ -85,8 +85,7 @@ Foundation_Window::Foundation_Window(const char* a_WindowName,
 			m_Window, &m_ACloseWindow, 1);
 
 	XSetWMProtocols(Foundation_WindowManager::GetDisplay(),
-		m_Window, &m_AFullScreenState, 1);
-	
+		m_Window, &m_AFullScreenState, 1);	
 #endif
 }
 
@@ -480,7 +479,7 @@ void Foundation_Window::CreateTerminal()
 }
 
 
-bool Foundation_Window::GetWindowShouldClose()
+bool Foundation_Window::GetShouldClose()
 {
 	return WindowShouldClose;
 }
@@ -513,7 +512,7 @@ void Foundation_Window::InitializeGL()
 #endif
 }
 
-void Foundation_Window::Window_SwapBuffers()
+void Foundation_Window::SwapBuffers()
 {
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 	SwapBuffers(m_DeviceContextHandle);
@@ -720,7 +719,7 @@ const char* Foundation_Window::GetWindowName()
 	return m_WindowName;
 }
 
-void Foundation_Window::SetWindowName(const char* a_WindowName)
+void Foundation_Window::SetName(const char* a_WindowName)
 {
 	m_WindowName = a_WindowName;
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined (__clang__)

@@ -678,4 +678,345 @@ void Foundation_WindowManager::Linux_PollForEvents()
 
 #endif
 
+void Foundation_WindowManager::GetWindowResolution(Foundation_Window* a_Window, GLuint& a_Width, GLuint& a_Height)
+{
+	a_Window->GetResolution(a_Width, a_Height);
+}
+
+void Foundation_WindowManager::GetWindowResolution(const char* a_WindowName, GLuint& a_Width, GLuint& a_Height)
+{
+	GetWindowByName(a_WindowName)->GetResolution(a_Width, a_Height);
+}
+
+void Foundation_WindowManager::GetWindowResolution(GLuint a_WindowIndex, GLuint& a_Width, GLuint& a_Height)
+{
+	GetWindowByIndex(a_WindowIndex)->GetResolution(a_Width, a_Height);
+}
+
+GLuint* Foundation_WindowManager::GetWindowResolution(Foundation_Window* a_Window)
+{
+	return a_Window->GetResolution();
+}
+
+GLuint* Foundation_WindowManager::GetWindowResolution(const char* a_WindowName)
+{
+	return GetWindowByName(a_WindowName)->GetResolution();
+}
+
+GLuint* Foundation_WindowManager::GetWindowResolution(GLuint a_WindowIndex)
+{
+	return GetWindowByIndex(a_WindowIndex)->GetResolution();
+}
+
+void Foundation_WindowManager::SetWindowResolution(Foundation_Window* a_Window, GLuint a_Width, GLuint a_Height)
+{
+	a_Window->SetResolution(a_Width, a_Height);
+}
+
+void Foundation_WindowManager::SetWindowResolution(const char* a_WindowName, GLuint a_Width, GLuint a_Height)
+{
+	GetWindowByName(a_WindowName)->SetResolution(a_Width, a_Height);
+}
+
+void Foundation_WindowManager::SetWindowResolution(GLuint a_WindowIndex, GLuint a_Width, GLuint a_Height)
+{
+	GetWindowByIndex(a_WindowIndex)->SetResolution(a_Width, a_Height);
+}
+
+void Foundation_WindowManager::GetWindowPosition(Foundation_Window* a_Window, GLuint& a_X, GLuint& a_Y)
+{
+	a_Window->GetPosition(a_X, a_Y);
+}
+
+void Foundation_WindowManager::GetWindowPosition(const char* a_WindowName, GLuint& a_X, GLuint& a_Y)
+{
+	GetWindowByName(a_WindowName)->GetPosition(a_X, a_Y);
+}
+
+void Foundation_WindowManager::GetWindowPosition(GLuint a_WindowIndex, GLuint& a_X, GLuint& a_Y)
+{
+	GetWindowByIndex(a_WindowIndex)->GetPosition(a_X, a_Y);
+}
+
+GLuint* Foundation_WindowManager::GetWindowPosition(Foundation_Window* a_Window)
+{
+	return a_Window->GetPosition();
+}
+
+GLuint* Foundation_WindowManager::GetWindowPosition(const char* a_WindowName)
+{
+	return GetWindowByName(a_WindowName)->GetPosition();
+}
+
+GLuint* Foundation_WindowManager::GetWindowPosition(GLuint a_WindowIndex)
+{
+	return GetWindowByIndex(a_WindowIndex)->GetPosition();
+}
+
+void Foundation_WindowManager::SetWindowPosition(Foundation_Window* a_Window, GLuint a_X, GLuint a_Y)
+{
+	a_Window->SetPosition(a_X, a_Y);
+}
+
+void Foundation_WindowManager::SetWindowPosition(const char* a_WindowName, GLuint a_X, GLuint a_Y)
+{
+	GetWindowByName(a_WindowName)->SetPosition(a_X, a_Y);
+}
+
+void Foundation_WindowManager::SetWindowPosition(GLuint a_WindowIndex, GLuint a_X, GLuint a_Y)
+{
+	GetWindowByIndex(a_WindowIndex)->SetPosition(a_X, a_Y);
+}
+
+void Foundation_WindowManager::GetMousePositionInWindow(Foundation_Window* a_Window, GLuint& a_X, GLuint& a_Y)
+{
+	a_Window->GetMousePositionInWindow(a_X, a_Y);
+}
+
+void Foundation_WindowManager::GetMousePositionInWindow(const char* a_WindowName, GLuint& a_X, GLuint& a_Y)
+{
+	GetWindowByName(a_WindowName)->GetMousePositionInWindow(a_X, a_Y);
+}
+
+void Foundation_WindowManager::GetMousePositionInWindow(GLuint a_WindowIndex, GLuint& a_X, GLuint& a_Y)
+{
+	GetWindowByIndex(a_WindowIndex)->GetPosition(a_X, a_Y);
+}
+
+GLuint* Foundation_WindowManager::GetMousePositionInWindow(Foundation_Window* a_Window)
+{
+	return a_Window->GetMousePositionInWindow();
+}
+
+GLuint* Foundation_WindowManager::GetMousePositionInWindow(const char* a_WindowName)
+{
+	return GetWindowByName(a_WindowName)->GetMousePositionInWindow();
+}
+
+GLuint* Foundation_WindowManager::GetMousePositionInWindow(GLuint a_WindowIndex)
+{
+	return GetWindowByIndex(a_WindowIndex)->GetMousePositionInWindow();
+}
+
+void Foundation_WindowManager::SetMousePositionInWindow(Foundation_Window* a_Window, GLuint a_X, GLuint a_Y)
+{
+	a_Window->SetMousePositionInWindow(a_X, a_Y);
+}
+
+void Foundation_WindowManager::SetMousePositionInWindow(const char* a_WindowName, GLuint a_X, GLuint a_Y)
+{
+	GetWindowByName(a_WindowName)->SetMousePositionInWindow(a_X, a_Y);
+}
+
+void Foundation_WindowManager::SetMousePositionInWindow(GLuint a_WindowIndex, GLuint a_X, GLuint a_Y)
+{
+	GetWindowByIndex(a_WindowIndex)->SetMousePositionInWindow(a_X, a_Y);
+}
+
+bool Foundation_WindowManager::WindowGetKey(Foundation_Window* a_Window, GLuint a_Key)
+{
+	return a_Window->GetKey(a_Key);
+}
+
+bool Foundation_WindowManager::WindowGetKey(const char* a_WindowName, GLuint a_Key)
+{
+	return GetWindowByName(a_WindowName)->GetKey(a_Key);
+}
+
+bool Foundation_WindowManager::WindowGetKey(GLuint a_WindowIndex, GLuint a_Key)
+{
+	return GetWindowByIndex(a_WindowIndex)->GetKey(a_Key);
+}
+
+bool Foundation_WindowManager::GetWindowShouldClose(Foundation_Window* a_Window)
+{
+	return a_Window->GetShouldClose();
+}
+
+bool Foundation_WindowManager::GetWindowShouldClose(const char* a_WindowName)
+{
+	return GetWindowByName(a_WindowName)->GetShouldClose();
+}
+
+bool Foundation_WindowManager::GetWindowShouldClose(GLuint a_WindowIndex)
+{
+	return GetWindowByIndex(a_WindowIndex)->GetShouldClose();
+}
+
+void Foundation_WindowManager::WindowSwapBuffers(Foundation_Window* a_Window)
+{
+	a_Window->SwapBuffers();
+}
+
+void Foundation_WindowManager::WindowSwapBuffers(const char* a_WindowName)
+{
+	GetWindowByName(a_WindowName)->SwapBuffers();
+}
+
+void Foundation_WindowManager::WindowSwapBuffers(GLuint a_WindowIndex)
+{
+	GetWindowByIndex(a_WindowIndex)->SwapBuffers();
+}
+
+bool Foundation_WindowManager::GetWindowIsFullScreen(Foundation_Window* a_Window)
+{
+	return a_Window->GetIsFullScreen();
+}
+
+bool Foundation_WindowManager::GetWindowIsFullScreen(const char* a_WindowName)
+{
+	return GetWindowByName(a_WindowName)->GetIsFullScreen();
+}
+
+bool Foundation_WindowManager::GetWindowIsFullScreen(GLuint a_WindowIndex)
+{
+	return GetWindowByIndex(a_WindowIndex)->GetIsFullScreen();
+}
+
+void Foundation_WindowManager::SetFullScreen(Foundation_Window* a_Window, bool a_FullScreenState)
+{
+	a_Window->FullScreen(a_FullScreenState); 
+}
+
+void Foundation_WindowManager::SetFullScreen(const char* a_WindowName, bool a_FullScreenState)
+{
+	GetWindowByName(a_WindowName)->FullScreen(a_FullScreenState);
+}
+
+void Foundation_WindowManager::SetFullScreen(GLuint a_WindowIndex, bool a_FullScreenState)
+{
+	GetWindowByIndex(a_WindowIndex)->FullScreen(a_FullScreenState);
+}
+
+bool Foundation_WindowManager::GetWindowIsMinimized(Foundation_Window* a_Window)
+{
+	return a_Window->GetIsMinimized();
+}
+
+bool Foundation_WindowManager::GetWindowIsMinimized(const char* a_WindowName)
+{
+	return GetWindowByName(a_WindowName)->GetIsMinimized();
+}
+
+bool Foundation_WindowManager::GetWindowIsMinimized(GLuint a_WindowIndex)
+{
+	return GetWindowByIndex(a_WindowIndex)->GetIsMinimized();
+}
+
+void Foundation_WindowManager::MinimizeWindow(Foundation_Window* a_Window, bool a_MinimizeState)
+{
+	a_Window->Minimize(a_MinimizeState);
+}
+
+void Foundation_WindowManager::MinimizeWindow(const char* a_WindowName, bool a_MinimizeState)
+{
+	GetWindowByName(a_WindowName)->Minimize(a_MinimizeState);
+}
+
+void Foundation_WindowManager::MinimizeWindow(GLuint a_WindowIndex, bool a_MinimizeState)
+{
+	GetWindowByIndex(a_WindowIndex)->Minimize(a_MinimizeState);
+}
+
+bool Foundation_WindowManager::GetWindowIsMaximized(Foundation_Window* a_Window)
+{
+	return a_Window->GetIsMaximised();
+}
+
+bool Foundation_WindowManager::GetWindowIsMaximized(const char* a_WindowName)
+{
+	return GetWindowByName(a_WindowName)->GetIsMaximised();
+}
+
+bool Foundation_WindowManager::GetWindowIsMaximized(GLuint a_WindowIndex)
+{
+	return GetWindowByIndex(a_WindowIndex)->GetIsMaximised();
+}
+
+void Foundation_WindowManager::MaximizeWindow(Foundation_Window* a_Window, bool a_MaximizeState)
+{
+	a_Window->Maximise(a_MaximizeState);
+}
+
+void Foundation_WindowManager::MaximizeWindow(const char* a_WindowName, bool a_MaximizeState)
+{
+	GetWindowByName(a_WindowName)->Maximise(a_MaximizeState);
+}
+
+void Foundation_WindowManager::MaximizeWindow(GLuint a_WindowIndex, bool a_MaximizeState)
+{
+	GetWindowByIndex(a_WindowIndex)->Maximise(a_MaximizeState);
+}
+
+const char* Foundation_WindowManager::GetWindowName(Foundation_Window* a_Window)
+{
+	return a_Window->GetWindowName();
+}
+
+const char* Foundation_WindowManager::GetWindowName(GLuint a_WindowIndex)
+{
+	return GetWindowByIndex(a_WindowIndex)->GetWindowName();
+}
+
+void Foundation_WindowManager::SetWindowName(Foundation_Window* a_Window, const char* a_NewName)
+{
+	a_Window->SetName(a_NewName);
+}
+
+void Foundation_WindowManager::SetWindowName(const char* a_WindowName, const char* a_NewName)
+{
+	GetWindowByName(a_WindowName)->SetName(a_NewName);
+}
+
+void Foundation_WindowManager::SetWindowName(GLuint a_WindowIndex, const char* a_NewName)
+{
+	GetWindowByIndex(a_WindowIndex)->SetName(a_NewName);
+}
+
+bool Foundation_WindowManager::GetWindowIsInFocus(Foundation_Window* a_Window)
+{
+	return a_Window->GetInFocus();
+}
+
+bool Foundation_WindowManager::GetWindowIsInFocus(const char* a_WindowName)
+{
+	return GetWindowByName(a_WindowName)->GetInFocus();
+}
+
+bool Foundation_WindowManager::GetWindowIsInFocus(GLuint a_WindowIndex)
+{
+	return GetWindowByIndex(a_WindowIndex)->GetInFocus();
+}
+
+void Foundation_WindowManager::FocusWindow(Foundation_Window* a_Window, bool a_FocusState)
+{
+	//implement window focusing
+	//a_Window->Focu
+}
+
+void Foundation_WindowManager::FocusWindow(const char* a_WindowName, bool a_FocusState)
+{
+	//implement window focusing
+}
+
+void Foundation_WindowManager::FocusWindow(GLuint a_WindowIndex, bool a_FocuState)
+{
+	//implement window focusing
+}
+
+bool Foundation_WindowManager::GetWindowIsObscured(Foundation_Window* a_Window)
+{
+	return a_Window->GetIsObscured();
+}
+
+bool Foundation_WindowManager::GetWindowIsObscured(const char* a_WindowName)
+{
+	return GetWindowByName(a_WindowName)->GetIsObscured();
+}
+
+bool Foundation_WindowManager::GetWindowIsObscured(GLuint a_WindowIndex)
+{
+	return GetWindowByIndex(a_WindowIndex)->GetIsObscured();
+}
+
 Foundation_WindowManager* Foundation_WindowManager::m_Instance = 0;

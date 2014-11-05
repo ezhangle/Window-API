@@ -64,10 +64,10 @@ public:
 	void CreateTerminal();
 
 	//wether or not the window should be closing
-	bool GetWindowShouldClose();
+	bool GetShouldClose();
 
 	//make the window swap drawbuffers
-	void Window_SwapBuffers();
+	void SwapBuffers();
 
 	//get and set for triggering fullscreen mode (SEMI FUNCTIONAL)
 	void FullScreen(bool a_FullScreenState);
@@ -86,7 +86,7 @@ public:
 
 	//get and set for window Name(NOT IMPLEMENTED)
 	const char* GetWindowName();
-	void SetWindowName(const char* a_WindowName);
+	void SetName(const char* a_WindowName);
 
 	//make the window thr current OpenGL context to be drawn
 	void MakeCurrentContext();
