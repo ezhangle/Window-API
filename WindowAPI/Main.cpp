@@ -6,7 +6,7 @@ int main()
 	Foundation_WindowManager::Initialize();
 	Foundation_WindowManager::AddWindow(new Foundation_Window("Blarg"));
 	printf("Renderer: %s Version: %s\n", glGetString(GL_RENDERER), glGetString(GL_VERSION));
-	while (!Foundation_WindowManager::WindowGetKey("Blarg", KEY_ESCAPE) ||
+	while (!Foundation_WindowManager::WindowGetKey(0, KEY_ESCAPE) ||
 		!Foundation_WindowManager::GetWindowShouldClose("Blarg"))
 	{
 		Foundation_WindowManager::PollForEvents();

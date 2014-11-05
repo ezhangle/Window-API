@@ -27,22 +27,22 @@ void Foundation_WindowManager::Initialize()
 
 Foundation_WindowManager::~Foundation_WindowManager()
 {
-	if(!m_Windows.empty())
+	if(!GetInstance()->m_Windows.empty())
 	{
-		for(GLuint l_Iter = 0; l_Iter <= m_Windows.size(); l_Iter++)
+		for(GLuint l_Iter = 0; l_Iter <= GetInstance()->m_Windows.size() - 1; l_Iter++)
 		{
-			delete m_Windows[l_Iter];
+			delete GetInstance()->m_Windows[l_Iter];
 		}
 
-		m_Windows.clear();
+		GetInstance()->m_Windows.clear();
 	}
 }
 
-Foundation_Window* Foundation_WindowManager::GetWindowByName(const char* a_WindowName)
+Foundation_Window* Foundation_WindowManager::GetWindowByName(std::string a_WindowName)
 {
-	if(a_WindowName != nullptr || a_WindowName != 0)
+	if(a_WindowName.empty())
 	{
-		for (GLuint l_Iter = 0; l_Iter <= GetInstance()->m_Windows.size(); l_Iter++)
+		for (GLuint l_Iter = 0; l_Iter <= GetInstance()->m_Windows.size() - 1; l_Iter++)
 		{
 			if(GetInstance()->m_Windows[l_Iter]->GetWindowName() == a_WindowName)
 			{
@@ -58,7 +58,7 @@ Foundation_Window* Foundation_WindowManager::GetWindowByName(const char* a_Windo
 
 Foundation_Window* Foundation_WindowManager::GetWindowByIndex(GLuint a_WindowIndex)
 {
-	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	if (a_WindowIndex <= GetInstance()->m_Windows.size())
 	{
 		return GetInstance()->m_Windows[a_WindowIndex];
 	}
@@ -96,7 +96,7 @@ GLuint Foundation_WindowManager::GetNumWindows()
 void Foundation_WindowManager::ShutDown()
 {
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-	for(GLuint l_CurrentWindow = 0; l_CurrentWindow < GetInstance()->m_Windows.size(); l_CurrentWindow++)
+	for(GLuint l_CurrentWindow = 0; l_CurrentWindow < GetInstance()->m_Windows.size() - 1; l_CurrentWindow++)
 	{
 		delete GetInstance()->m_Windows[l_CurrentWindow];
 	}
@@ -205,7 +205,7 @@ void Foundation_WindowManager::GetScreenResolution(GLuint& a_Width, GLuint& a_He
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 Foundation_Window* Foundation_WindowManager::GetWindowByHandle(HWND a_WindowHandle)
 {
-	for (GLuint l_Iter = 0; l_Iter < GetInstance()->m_Windows.size(); l_Iter++)
+	for (GLuint l_Iter = 0; l_Iter < GetInstance()->m_Windows.size() - 1; l_Iter++)
 	{
 		if (GetInstance()->m_Windows[l_Iter]->GetWindowHandle() == a_WindowHandle)
 		{
@@ -678,345 +678,578 @@ void Foundation_WindowManager::Linux_PollForEvents()
 
 #endif
 
-void Foundation_WindowManager::GetWindowResolution(Foundation_Window* a_Window, GLuint& a_Width, GLuint& a_Height)
+/*void Foundation_WindowManager::GetWindowResolution(Foundation_Window* a_Window, GLuint& a_Width, GLuint& a_Height)
 {
-	a_Window->GetResolution(a_Width, a_Height);
-}
+	if(a_Window != NULL || a_Window != nullptr)
+	{
+		a_Window->GetResolution(a_Width, a_Height);
+	}
+}*/
 
-void Foundation_WindowManager::GetWindowResolution(const char* a_WindowName, GLuint& a_Width, GLuint& a_Height)
+void Foundation_WindowManager::GetWindowResolution(std::string a_WindowName, GLuint& a_Width, GLuint& a_Height)
 {
-	GetWindowByName(a_WindowName)->GetResolution(a_Width, a_Height);
+	if(!a_WindowName.empty())
+	{
+		GetWindowByName(a_WindowName)->GetResolution(a_Width, a_Height);
+	}
 }
 
 void Foundation_WindowManager::GetWindowResolution(GLuint a_WindowIndex, GLuint& a_Width, GLuint& a_Height)
 {
-	GetWindowByIndex(a_WindowIndex)->GetResolution(a_Width, a_Height);
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->GetResolution(a_Width, a_Height);
+	}
 }
 
-GLuint* Foundation_WindowManager::GetWindowResolution(Foundation_Window* a_Window)
+/*GLuint* Foundation_WindowManager::GetWindowResolution(Foundation_Window* a_Window)
 {
-	return a_Window->GetResolution();
-}
+	if(a_Window != NULL || a_Window != nullptr)
+	{
+		return a_Window->GetResolution();
+	}
 
-GLuint* Foundation_WindowManager::GetWindowResolution(const char* a_WindowName)
+	return nullptr;
+}*/
+
+GLuint* Foundation_WindowManager::GetWindowResolution(std::string a_WindowName)
 {
-	return GetWindowByName(a_WindowName)->GetResolution();
+	if(!a_WindowName.empty())
+	{
+		return GetWindowByName(a_WindowName)->GetResolution();
+	}
+
+	return nullptr;
 }
 
 GLuint* Foundation_WindowManager::GetWindowResolution(GLuint a_WindowIndex)
 {
-	return GetWindowByIndex(a_WindowIndex)->GetResolution();
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		return GetWindowByIndex(a_WindowIndex)->GetResolution();
+	}
+
+	return nullptr;
 }
 
-void Foundation_WindowManager::SetWindowResolution(Foundation_Window* a_Window, GLuint a_Width, GLuint a_Height)
+/*void Foundation_WindowManager::SetWindowResolution(Foundation_Window* a_Window, GLuint a_Width, GLuint a_Height)
 {
-	a_Window->SetResolution(a_Width, a_Height);
-}
+	if(a_Window != NULL || a_Window != nullptr)
+	{
+		a_Window->SetResolution(a_Width, a_Height);
+	}
+}*/
 
-void Foundation_WindowManager::SetWindowResolution(const char* a_WindowName, GLuint a_Width, GLuint a_Height)
+void Foundation_WindowManager::SetWindowResolution(std::string a_WindowName, GLuint a_Width, GLuint a_Height)
 {
-	GetWindowByName(a_WindowName)->SetResolution(a_Width, a_Height);
+	if(!a_WindowName.empty())
+	{
+		GetWindowByName(a_WindowName)->SetResolution(a_Width, a_Height);
+	}
 }
 
 void Foundation_WindowManager::SetWindowResolution(GLuint a_WindowIndex, GLuint a_Width, GLuint a_Height)
 {
-	GetWindowByIndex(a_WindowIndex)->SetResolution(a_Width, a_Height);
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SetResolution(a_Width, a_Height);
+	}
 }
 
-void Foundation_WindowManager::GetWindowPosition(Foundation_Window* a_Window, GLuint& a_X, GLuint& a_Y)
+/*void Foundation_WindowManager::GetWindowPosition(Foundation_Window* a_Window, GLuint& a_X, GLuint& a_Y)
 {
-	a_Window->GetPosition(a_X, a_Y);
-}
+	if(a_Window != NULL || a_Window != nullptr)
+	{
+		a_Window->GetPosition(a_X, a_Y);
+	}
+}*/
 
-void Foundation_WindowManager::GetWindowPosition(const char* a_WindowName, GLuint& a_X, GLuint& a_Y)
+void Foundation_WindowManager::GetWindowPosition(std::string a_WindowName, GLuint& a_X, GLuint& a_Y)
 {
-	GetWindowByName(a_WindowName)->GetPosition(a_X, a_Y);
+	if(!a_WindowName.empty())
+	{
+		GetWindowByName(a_WindowName)->GetPosition(a_X, a_Y);
+	}
 }
 
 void Foundation_WindowManager::GetWindowPosition(GLuint a_WindowIndex, GLuint& a_X, GLuint& a_Y)
 {
-	GetWindowByIndex(a_WindowIndex)->GetPosition(a_X, a_Y);
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->GetPosition(a_X, a_Y);
+	}
 }
 
-GLuint* Foundation_WindowManager::GetWindowPosition(Foundation_Window* a_Window)
+/*GLuint* Foundation_WindowManager::GetWindowPosition(Foundation_Window* a_Window)
 {
-	return a_Window->GetPosition();
-}
+	if(a_Window != NULL || a_Window != nullptr)
+	{
+		return a_Window->GetPosition();
+	}
 
-GLuint* Foundation_WindowManager::GetWindowPosition(const char* a_WindowName)
+	return NULL;
+}*/
+
+GLuint* Foundation_WindowManager::GetWindowPosition(std::string a_WindowName)
 {
-	return GetWindowByName(a_WindowName)->GetPosition();
+	if(!a_WindowName.empty())
+	{
+		return GetWindowByName(a_WindowName)->GetPosition();
+	}
+
+	return NULL;
 }
 
 GLuint* Foundation_WindowManager::GetWindowPosition(GLuint a_WindowIndex)
 {
-	return GetWindowByIndex(a_WindowIndex)->GetPosition();
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() -1)
+	{
+		return GetWindowByIndex(a_WindowIndex)->GetPosition();
+	}
+
+	return NULL;
 }
 
-void Foundation_WindowManager::SetWindowPosition(Foundation_Window* a_Window, GLuint a_X, GLuint a_Y)
+/*void Foundation_WindowManager::SetWindowPosition(Foundation_Window* a_Window, GLuint a_X, GLuint a_Y)
 {
-	a_Window->SetPosition(a_X, a_Y);
-}
+	if(a_Window != NULL && a_Window != nullptr)
+	{
+		a_Window->SetPosition(a_X, a_Y);
+	}
+}*/
 
-void Foundation_WindowManager::SetWindowPosition(const char* a_WindowName, GLuint a_X, GLuint a_Y)
+void Foundation_WindowManager::SetWindowPosition(std::string a_WindowName, GLuint a_X, GLuint a_Y)
 {
-	GetWindowByName(a_WindowName)->SetPosition(a_X, a_Y);
+	if(!a_WindowName.empty())
+	{
+		GetWindowByName(a_WindowName)->SetPosition(a_X, a_Y);
+	}
 }
 
 void Foundation_WindowManager::SetWindowPosition(GLuint a_WindowIndex, GLuint a_X, GLuint a_Y)
 {
-	GetWindowByIndex(a_WindowIndex)->SetPosition(a_X, a_Y);
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() -1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SetPosition(a_X, a_Y);
+	}
 }
 
-void Foundation_WindowManager::GetMousePositionInWindow(Foundation_Window* a_Window, GLuint& a_X, GLuint& a_Y)
+/*void Foundation_WindowManager::GetMousePositionInWindow(Foundation_Window* a_Window, GLuint& a_X, GLuint& a_Y)
 {
-	a_Window->GetMousePositionInWindow(a_X, a_Y);
-}
+	if(a_Window != NULL || a_Window != nullptr)
+	{
+		a_Window->GetMousePositionInWindow(a_X, a_Y);
+	}
+}*/
 
-void Foundation_WindowManager::GetMousePositionInWindow(const char* a_WindowName, GLuint& a_X, GLuint& a_Y)
+void Foundation_WindowManager::GetMousePositionInWindow(std::string a_WindowName, GLuint& a_X, GLuint& a_Y)
 {
-	GetWindowByName(a_WindowName)->GetMousePositionInWindow(a_X, a_Y);
+	if(!a_WindowName.empty())
+	{
+		GetWindowByName(a_WindowName)->GetMousePositionInWindow(a_X, a_Y);
+	}
 }
 
 void Foundation_WindowManager::GetMousePositionInWindow(GLuint a_WindowIndex, GLuint& a_X, GLuint& a_Y)
 {
-	GetWindowByIndex(a_WindowIndex)->GetPosition(a_X, a_Y);
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->GetPosition(a_X, a_Y);
+	}
 }
 
-GLuint* Foundation_WindowManager::GetMousePositionInWindow(Foundation_Window* a_Window)
+/*GLuint* Foundation_WindowManager::GetMousePositionInWindow(Foundation_Window* a_Window)
 {
-	return a_Window->GetMousePositionInWindow();
-}
+	if(a_Window != NULL || a_Window != nullptr)
+	{
+		return a_Window->GetMousePositionInWindow();
+	}
 
-GLuint* Foundation_WindowManager::GetMousePositionInWindow(const char* a_WindowName)
+	return NULL;
+}*/
+
+GLuint* Foundation_WindowManager::GetMousePositionInWindow(std::string a_WindowName)
 {
-	return GetWindowByName(a_WindowName)->GetMousePositionInWindow();
+	if(!a_WindowName.empty())
+	{
+		return GetWindowByName(a_WindowName)->GetMousePositionInWindow();
+	}
+
+	return NULL;
 }
 
 GLuint* Foundation_WindowManager::GetMousePositionInWindow(GLuint a_WindowIndex)
 {
-	return GetWindowByIndex(a_WindowIndex)->GetMousePositionInWindow();
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		return GetWindowByIndex(a_WindowIndex)->GetMousePositionInWindow();
+	}
+
+	return NULL;
 }
 
-void Foundation_WindowManager::SetMousePositionInWindow(Foundation_Window* a_Window, GLuint a_X, GLuint a_Y)
+/*void Foundation_WindowManager::SetMousePositionInWindow(Foundation_Window* a_Window, GLuint a_X, GLuint a_Y)
 {
-	a_Window->SetMousePositionInWindow(a_X, a_Y);
-}
+	if(a_Window != NULL || a_Window != nullptr)
+	{
+		a_Window->SetMousePositionInWindow(a_X, a_Y);
+	}
+}*/
 
-void Foundation_WindowManager::SetMousePositionInWindow(const char* a_WindowName, GLuint a_X, GLuint a_Y)
+void Foundation_WindowManager::SetMousePositionInWindow(std::string a_WindowName, GLuint a_X, GLuint a_Y)
 {
-	GetWindowByName(a_WindowName)->SetMousePositionInWindow(a_X, a_Y);
+	if(!a_WindowName.empty())
+	{
+		GetWindowByName(a_WindowName)->SetMousePositionInWindow(a_X, a_Y);
+	}
 }
 
 void Foundation_WindowManager::SetMousePositionInWindow(GLuint a_WindowIndex, GLuint a_X, GLuint a_Y)
 {
-	GetWindowByIndex(a_WindowIndex)->SetMousePositionInWindow(a_X, a_Y);
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SetMousePositionInWindow(a_X, a_Y);
+	}
 }
 
-bool Foundation_WindowManager::WindowGetKey(Foundation_Window* a_Window, GLuint a_Key)
+/*bool Foundation_WindowManager::WindowGetKey(Foundation_Window* a_Window, GLuint a_Key)
 {
-	return a_Window->GetKey(a_Key);
-}
+	if(a_Window != NULL || a_Window != nullptr)
+	{
+		return a_Window->GetKey(a_Key);
+	}
 
-bool Foundation_WindowManager::WindowGetKey(const char* a_WindowName, GLuint a_Key)
+	return false;
+}*/
+
+bool Foundation_WindowManager::WindowGetKey(std::string a_WindowName, GLuint a_Key)
 {
-	return GetWindowByName(a_WindowName)->GetKey(a_Key);
+	if(!a_WindowName.empty())
+	{
+		return GetWindowByName(a_WindowName)->GetKey(a_Key);
+	}
+
+	return false;
 }
 
 bool Foundation_WindowManager::WindowGetKey(GLuint a_WindowIndex, GLuint a_Key)
 {
-	return GetWindowByIndex(a_WindowIndex)->GetKey(a_Key);
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		return GetWindowByIndex(a_WindowIndex)->GetKey(a_Key);
+	}
+
+	return false;
 }
 
-bool Foundation_WindowManager::GetWindowShouldClose(Foundation_Window* a_Window)
+/*bool Foundation_WindowManager::GetWindowShouldClose(Foundation_Window* a_Window)
 {
-	return a_Window->GetShouldClose();
-}
+	if(a_Window != NULL || a_Window != nullptr)
+	{
+		return a_Window->GetShouldClose();
+	}
 
-bool Foundation_WindowManager::GetWindowShouldClose(const char* a_WindowName)
+	return false;
+}*/
+
+bool Foundation_WindowManager::GetWindowShouldClose(std::string a_WindowName)
 {
-	return GetWindowByName(a_WindowName)->GetShouldClose();
+	if(!a_WindowName.empty())
+	{
+		return GetWindowByName(a_WindowName)->GetShouldClose();
+	}
+
+	return false;
 }
 
 bool Foundation_WindowManager::GetWindowShouldClose(GLuint a_WindowIndex)
 {
-	return GetWindowByIndex(a_WindowIndex)->GetShouldClose();
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		return GetWindowByIndex(a_WindowIndex)->GetShouldClose();
+	}
+
+	return false;
 }
 
-void Foundation_WindowManager::WindowSwapBuffers(Foundation_Window* a_Window)
+/*void Foundation_WindowManager::WindowSwapBuffers(Foundation_Window* a_Window)
 {
-	a_Window->SwapBuffers();
-}
+	if(a_Window != NULL || a_Window != nullptr)
+	{
+		a_Window->SwapBuffers();
+	}
+}*/
 
-void Foundation_WindowManager::WindowSwapBuffers(const char* a_WindowName)
+void Foundation_WindowManager::WindowSwapBuffers(std::string a_WindowName)
 {
-	GetWindowByName(a_WindowName)->SwapBuffers();
+	if(!a_WindowName.empty())
+	{
+		GetWindowByName(a_WindowName)->SwapBuffers();
+	}
 }
 
 void Foundation_WindowManager::WindowSwapBuffers(GLuint a_WindowIndex)
 {
-	GetWindowByIndex(a_WindowIndex)->SwapBuffers();
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SwapBuffers();
+	}
 }
 
-bool Foundation_WindowManager::GetWindowIsFullScreen(Foundation_Window* a_Window)
+/*bool Foundation_WindowManager::GetWindowIsFullScreen(Foundation_Window* a_Window)
 {
 	return a_Window->GetIsFullScreen();
-}
+}*/
 
-bool Foundation_WindowManager::GetWindowIsFullScreen(const char* a_WindowName)
+bool Foundation_WindowManager::GetWindowIsFullScreen(std::string a_WindowName)
 {
-	return GetWindowByName(a_WindowName)->GetIsFullScreen();
+	if(!a_WindowName.empty())
+	{
+		return GetWindowByName(a_WindowName)->GetIsFullScreen();
+	}
+
+	return false;
 }
 
 bool Foundation_WindowManager::GetWindowIsFullScreen(GLuint a_WindowIndex)
 {
-	return GetWindowByIndex(a_WindowIndex)->GetIsFullScreen();
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() -1)
+	{
+		return GetWindowByIndex(a_WindowIndex)->GetIsFullScreen();
+	}
+
+	return false;
 }
 
-void Foundation_WindowManager::SetFullScreen(Foundation_Window* a_Window, bool a_FullScreenState)
+/*void Foundation_WindowManager::SetFullScreen(Foundation_Window* a_Window, bool a_FullScreenState)
 {
 	a_Window->FullScreen(a_FullScreenState); 
-}
+}*/
 
-void Foundation_WindowManager::SetFullScreen(const char* a_WindowName, bool a_FullScreenState)
+void Foundation_WindowManager::SetFullScreen(std::string a_WindowName, bool a_FullScreenState)
 {
-	GetWindowByName(a_WindowName)->FullScreen(a_FullScreenState);
+	if(!a_WindowName.empty())
+	{
+		GetWindowByName(a_WindowName)->FullScreen(a_FullScreenState);
+	}
 }
 
 void Foundation_WindowManager::SetFullScreen(GLuint a_WindowIndex, bool a_FullScreenState)
 {
-	GetWindowByIndex(a_WindowIndex)->FullScreen(a_FullScreenState);
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->FullScreen(a_FullScreenState);
+	}
 }
 
-bool Foundation_WindowManager::GetWindowIsMinimized(Foundation_Window* a_Window)
+/*bool Foundation_WindowManager::GetWindowIsMinimized(Foundation_Window* a_Window)
 {
 	return a_Window->GetIsMinimized();
-}
+}*/
 
-bool Foundation_WindowManager::GetWindowIsMinimized(const char* a_WindowName)
+bool Foundation_WindowManager::GetWindowIsMinimized(std::string a_WindowName)
 {
-	return GetWindowByName(a_WindowName)->GetIsMinimized();
+	if(!a_WindowName.empty())
+	{
+		return GetWindowByName(a_WindowName)->GetIsMinimized();
+	}
+
+	return false;
 }
 
 bool Foundation_WindowManager::GetWindowIsMinimized(GLuint a_WindowIndex)
 {
-	return GetWindowByIndex(a_WindowIndex)->GetIsMinimized();
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		return GetWindowByIndex(a_WindowIndex)->GetIsMinimized();
+	}
 }
 
-void Foundation_WindowManager::MinimizeWindow(Foundation_Window* a_Window, bool a_MinimizeState)
+/*void Foundation_WindowManager::MinimizeWindow(Foundation_Window* a_Window, bool a_MinimizeState)
 {
 	a_Window->Minimize(a_MinimizeState);
-}
+}*/
 
-void Foundation_WindowManager::MinimizeWindow(const char* a_WindowName, bool a_MinimizeState)
+void Foundation_WindowManager::MinimizeWindow(std::string a_WindowName, bool a_MinimizeState)
 {
-	GetWindowByName(a_WindowName)->Minimize(a_MinimizeState);
+	if(!a_WindowName.empty())
+	{
+		GetWindowByName(a_WindowName)->Minimize(a_MinimizeState);
+	}
 }
 
 void Foundation_WindowManager::MinimizeWindow(GLuint a_WindowIndex, bool a_MinimizeState)
 {
-	GetWindowByIndex(a_WindowIndex)->Minimize(a_MinimizeState);
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->Minimize(a_MinimizeState);
+	}
 }
 
-bool Foundation_WindowManager::GetWindowIsMaximized(Foundation_Window* a_Window)
+/*bool Foundation_WindowManager::GetWindowIsMaximized(Foundation_Window* a_Window)
 {
 	return a_Window->GetIsMaximised();
-}
+}*/
 
-bool Foundation_WindowManager::GetWindowIsMaximized(const char* a_WindowName)
+bool Foundation_WindowManager::GetWindowIsMaximized(std::string a_WindowName)
 {
-	return GetWindowByName(a_WindowName)->GetIsMaximised();
+	if(!a_WindowName.empty())
+	{
+		return GetWindowByName(a_WindowName)->GetIsMaximised();
+	}
+
+	return false;
 }
 
 bool Foundation_WindowManager::GetWindowIsMaximized(GLuint a_WindowIndex)
 {
-	return GetWindowByIndex(a_WindowIndex)->GetIsMaximised();
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		return GetWindowByIndex(a_WindowIndex)->GetIsMaximised();
+	}
+
+	return false;
 }
 
-void Foundation_WindowManager::MaximizeWindow(Foundation_Window* a_Window, bool a_MaximizeState)
+/*void Foundation_WindowManager::MaximizeWindow(Foundation_Window* a_Window, bool a_MaximizeState)
 {
 	a_Window->Maximise(a_MaximizeState);
-}
+}*/
 
-void Foundation_WindowManager::MaximizeWindow(const char* a_WindowName, bool a_MaximizeState)
+void Foundation_WindowManager::MaximizeWindow(std::string a_WindowName, bool a_MaximizeState)
 {
-	GetWindowByName(a_WindowName)->Maximise(a_MaximizeState);
+	if(!a_WindowName.empty())
+	{
+		GetWindowByName(a_WindowName)->Maximise(a_MaximizeState);
+	}
 }
 
 void Foundation_WindowManager::MaximizeWindow(GLuint a_WindowIndex, bool a_MaximizeState)
 {
-	GetWindowByIndex(a_WindowIndex)->Maximise(a_MaximizeState);
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->Maximise(a_MaximizeState);
+	}
 }
 
-const char* Foundation_WindowManager::GetWindowName(Foundation_Window* a_Window)
+/*const char* Foundation_WindowManager::GetWindowName(Foundation_Window* a_Window)
 {
 	return a_Window->GetWindowName();
-}
+}*/
 
-const char* Foundation_WindowManager::GetWindowName(GLuint a_WindowIndex)
+std::string Foundation_WindowManager::GetWindowName(GLuint a_WindowIndex)
 {
-	return GetWindowByIndex(a_WindowIndex)->GetWindowName();
+	if(a_WindowIndex <= GetInstance()->m_Windows.size())
+	{
+		return GetWindowByIndex(a_WindowIndex)->GetWindowName();
+	}
+
+	return nullptr;
 }
 
-void Foundation_WindowManager::SetWindowName(Foundation_Window* a_Window, const char* a_NewName)
+GLuint Foundation_WindowManager::GetWindowIndex(std::string a_WindowName)
+{
+	if(!a_WindowName.empty())
+	{
+		return GetWindowByName(a_WindowName)->m_WindowID;
+	}
+
+	return 0;
+}
+
+/*void Foundation_WindowManager::SetWindowName(Foundation_Window* a_Window, const char* a_NewName)
 {
 	a_Window->SetName(a_NewName);
-}
+}*/
 
-void Foundation_WindowManager::SetWindowName(const char* a_WindowName, const char* a_NewName)
+void Foundation_WindowManager::SetWindowName(std::string a_WindowName, std::string a_NewName)
 {
-	GetWindowByName(a_WindowName)->SetName(a_NewName);
+	if(!a_WindowName.empty() && !a_NewName.empty())
+	{
+		GetWindowByName(a_WindowName)->SetName(a_NewName);
+	}
 }
 
-void Foundation_WindowManager::SetWindowName(GLuint a_WindowIndex, const char* a_NewName)
+void Foundation_WindowManager::SetWindowName(GLuint a_WindowIndex, std::string a_NewName)
 {
-	GetWindowByIndex(a_WindowIndex)->SetName(a_NewName);
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() && !a_NewName.empty())
+	{
+		GetWindowByIndex(a_WindowIndex)->SetName(a_NewName);
+	}
 }
 
-bool Foundation_WindowManager::GetWindowIsInFocus(Foundation_Window* a_Window)
+/*bool Foundation_WindowManager::GetWindowIsInFocus(Foundation_Window* a_Window)
 {
 	return a_Window->GetInFocus();
-}
+}*/
 
-bool Foundation_WindowManager::GetWindowIsInFocus(const char* a_WindowName)
+bool Foundation_WindowManager::GetWindowIsInFocus(std::string a_WindowName)
 {
-	return GetWindowByName(a_WindowName)->GetInFocus();
+	if(!a_WindowName.empty())
+	{
+		return GetWindowByName(a_WindowName)->GetInFocus();
+	}
+
+	return false;
 }
 
 bool Foundation_WindowManager::GetWindowIsInFocus(GLuint a_WindowIndex)
 {
-	return GetWindowByIndex(a_WindowIndex)->GetInFocus();
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		return GetWindowByIndex(a_WindowIndex)->GetInFocus();
+	}
+
+	return false;
 }
 
-void Foundation_WindowManager::FocusWindow(Foundation_Window* a_Window, bool a_FocusState)
+/*void Foundation_WindowManager::FocusWindow(Foundation_Window* a_Window, bool a_FocusState)
 {
 	//implement window focusing
 	//a_Window->Focu
-}
+}*/
 
-void Foundation_WindowManager::FocusWindow(const char* a_WindowName, bool a_FocusState)
+void Foundation_WindowManager::FocusWindow(std::string a_WindowName, bool a_FocusState)
 {
+	if(!a_WindowName.empty())
+	{
+
+	}
 	//implement window focusing
 }
 
 void Foundation_WindowManager::FocusWindow(GLuint a_WindowIndex, bool a_FocuState)
 {
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+
+	}
 	//implement window focusing
 }
 
-bool Foundation_WindowManager::GetWindowIsObscured(Foundation_Window* a_Window)
+/*bool Foundation_WindowManager::GetWindowIsObscured(Foundation_Window* a_Window)
 {
 	return a_Window->GetIsObscured();
-}
+}*/
 
-bool Foundation_WindowManager::GetWindowIsObscured(const char* a_WindowName)
+bool Foundation_WindowManager::GetWindowIsObscured(std::string a_WindowName)
 {
-	return GetWindowByName(a_WindowName)->GetIsObscured();
+	if(!a_WindowName.empty())
+	{
+		return GetWindowByName(a_WindowName)->GetIsObscured();
+	}
+
+	return false;
 }
 
 bool Foundation_WindowManager::GetWindowIsObscured(GLuint a_WindowIndex)
 {
-	return GetWindowByIndex(a_WindowIndex)->GetIsObscured();
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		return GetWindowByIndex(a_WindowIndex)->GetIsObscured();
+	}
+
+	return false;
 }
 
 Foundation_WindowManager* Foundation_WindowManager::m_Instance = 0;
