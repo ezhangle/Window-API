@@ -2,6 +2,9 @@
 #include "WindowManager.h"
 #if defined(CURRENT_OS_LINUX)
 #include <cstring>
+#include <GL/glxext.h>
+#include <GL/glext.h>
+#include <GL/glxproto.h>
 
 void F_W::Linux_Initialize()
 {
@@ -49,7 +52,7 @@ void F_W::Linux_Initialize()
 			m_Window, &m_AtomicCloseWindow, 1);
 
 	XSetWMProtocols(F_WM::GetDisplay(),
-			m_Window, &m_AtomicFullScreenState, 1);
+			m_Window, &m_AtomicFullScreenState, 1);	
 }
 
 void F_W::Linux_Shutdown()
@@ -170,6 +173,12 @@ void F_W::Linux_Focus(bool a_FocusState)
 	{
 		XUnmapWindow(F_WM::GetDisplay(), m_Window);
 	}
+}
+
+void F_W::SetVerticalSync(bool a_EnableSync)
+{
+	GLXDrawable l_Drawable = glXGetCurrentDrawable();
+	glXSwapIntervalEXT(F_WM::GetDisplay(),l_Drawable, a_EnableSync);
 }
 
 GLuint F_W::Linux_TranslateKey(GLuint a_KeySym)
@@ -436,6 +445,20 @@ void F_W::Linux_InitializeGL()
 			m_Window, &l_Attributes);
 	m_Position[0] = l_Attributes.x;
 	m_Position[1] = l_Attributes.y;
+
+	const char* l_ExtensionAvailable = 0;
+
+	l_ExtensionAvailable = glXQueryExtensionsString(F_WM::GetDisplay(), 0);
+
+	if(l_ExtensionAvailable)
+	{
+		printf("%s \n", l_ExtensionAvailable);
+	}
+
+	else
+	{
+		printf("no extensions wtf?\n");
+	}
 }
 
 void F_W::InitializeAtomics()
@@ -446,6 +469,7 @@ void F_W::InitializeAtomics()
 	m_AtomicMaximizedVertical = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_MAXIMIZED_VERT", False);
 	m_AtomicCloseWindow = XInternAtom(F_WM::GetDisplay(), "_NET_WM_CLOSE_WINDOW", False);
 	m_AtomicHidden = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_HIDDEN", False);
+
 }
 
 Window F_W::GetWindowHandle()

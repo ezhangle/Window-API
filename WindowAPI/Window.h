@@ -103,6 +103,9 @@ public:
 	//whether the window is obscured
 	bool GetIsObscured();
 
+	//enable vertical sync if supported
+	void SetVerticalSync(bool a_EnableSync);
+
 	void SetOnKeyEvent(OnKeyEvent a_OnKeyEvent);
 	void SetOnMouseButtonEvent(OnMouseButtonEvent a_OnButtonMouseEvent);
 	void SetOnMouseWheelEvent(OnMouseWheelEvent a_OnMouseWheelEvent);
@@ -173,6 +176,7 @@ private:
 	void Windows_InitializeGL();
 	void Windows_SetSwapInterval(bool a_SwapInterval);
 	void Windows_Shutdown();
+	void Windows_VerticalSync(bool a_EnableSync);
 
 	HWND GetWindowHandle();
 	void InitializePixelFormat();
@@ -205,6 +209,7 @@ private:
 	void Linux_InitializeGL();
 	void Linux_SetSwapInterval(GLuint a_SwapInterval);
 	void Linux_Shutdown();
+	void Linux_VerticalSync(bool a_EnableSync);
 
 	void InitializeAtomics();
 

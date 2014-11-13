@@ -5,7 +5,7 @@ void OnWindowKeyPressed(GLuint a_KeySym, bool a_KeyState)
 {
     if(a_KeySym == ' ' && a_KeyState == KEYSTATE_DOWN)
 	{
-		F_WM::SetFullScreen("Blarg", true);
+		F_WM::GetWindowByName("Blarg")->SetVerticalSync(true);
 	}
 
 	if(a_KeySym == KEY_ARROW_LEFT && a_KeyState == KEYSTATE_DOWN)
