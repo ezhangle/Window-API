@@ -23,7 +23,7 @@ F_W::F_W(const char*  a_WindowName,
 	m_Resolution[1] = a_Height;
 	m_Position[0] = 0;
 	m_Position[1] = 0;
-	WindowShouldClose = false;
+	m_ShouldClose = false;
 
 	if(!Foundation_Tools::IsValid(m_WindowName))
 	{
@@ -34,10 +34,8 @@ F_W::F_W(const char*  a_WindowName,
 	InitializeEvents();
 
 #if defined(CURRENT_OS_WINDOWS)
-	if (a_ShouldCreateTerminal)
-	{
-		CreateTerminal();
-	}
+	//Windows_Initialize(m_WindowName);
+	CreateTerminal();
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -61,6 +59,11 @@ void F_W::Shutdown()
 #endif
 }
 
+bool F_W::GetShouldClose()
+{
+	return m_ShouldClose;
+}
+
 void F_W::InitializeEvents()
 {
 	m_OnKeyEvent = NULL;
@@ -68,16 +71,14 @@ void F_W::InitializeEvents()
 	m_OnMouseWheel = NULL;
 	m_OnCreated = NULL;
 	m_OnDestroyed = NULL;
-	//m_OnFullscreen = NULL;
 	m_OnMaximized = NULL;
 	m_OnMinimized = NULL;
-	//m_OnNameChange = NULL;
 	m_OnMoved = NULL;
 	m_OnFocus = NULL;
 	m_OnMouseMove = NULL;
 }
 
-bool F_W::GetKey(GLuint a_Key)
+bool F_W::GetKeyState(GLuint a_Key)
 {
 	return m_Keys[a_Key];
 }
@@ -102,32 +103,10 @@ void F_W::CreateTerminal()
 	#endif
 }
 
-
-bool F_W::GetShouldClose()
-{
-	return WindowShouldClose;
-}
-
-void F_W::ShutDownWindow()
-{
-#if defined(CURRENT_OS_WINDOWS)
-	if (m_GLRenderingcontextHandle) {
-		wglMakeCurrent(NULL, NULL);
-		wglDeleteContext(m_GLRenderingcontextHandle);
-	}
-	if (m_PaletteHandle)
-	{
-		DeleteObject(m_PaletteHandle);
-	}
-	ReleaseDC(m_WindowHandle, m_DeviceContextHandle);
-	PostQuitMessage(0);
-#endif
-}
-
 void F_W::InitializeGL()
 {
 #if defined(CURRENT_OS_WINDOWS)
-	InitializeWin32(m_WindowName);
+	Windows_Initialize(m_WindowName);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -135,7 +114,7 @@ void F_W::InitializeGL()
 #endif
 }
 
-void F_W::SwapBuffers()
+void F_W::SwapDrawBuffers()
 {
 #if defined(CURRENT_OS_WINDOWS)
 	SwapBuffers(m_DeviceContextHandle);
@@ -160,25 +139,7 @@ void F_W::FullScreen(bool a_FullScreenState)
 #endif
 
 #if defined(CURRENT_OS_WINDOWS)
-	if (a_FullScreenState)
-	{
-		SetWindowLong(m_WindowHandle, GWL_USERDATA, WS_POPUPWINDOW);
-
-		SetWindowPos(m_WindowHandle, HWND_TOP, 0, 0,
-			F_WM::GetScreenResolution()[0],
-			F_WM::GetScreenResolution()[1],
-			SWP_SHOWWINDOW);
-	}
-
-	else
-	{
-		SetWindowLong(m_WindowHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
-
-		SetWindowPos(m_WindowHandle, HWND_TOP, 0, 0,
-			m_Resolution[0],
-			m_Resolution[1],
-			SWP_SHOWWINDOW);
-	}
+	Windows_FullScreen(m_IsFullScreen);
 #endif
 }
 
@@ -190,6 +151,10 @@ bool F_W::GetIsMinimized()
 void F_W::Minimize(bool a_MinimizeState)
 {
 	m_IsMinimised = a_MinimizeState;
+
+#if defined(CURRENT_OS_WINDOWS)
+	Windows_Minimize(m_IsMinimised);
+#endif
 
 #if defined(CURRENT_OS_LINUX)
 	Linux_Minimize(a_MinimizeState);
@@ -204,6 +169,11 @@ bool F_W::GetIsMaximised()
 void F_W::Maximise(bool a_MaximizeState)
 {
 	m_IsMaximised = a_MaximizeState;
+
+#if defined(CURRENT_OS_WINDOWS)
+	Windows_Maximize(m_IsMaximised);
+#endif
+
 #if defined(CURRENT_OS_LINUX)
 	Linux_Maximize(a_MaximizeState);
 #endif
@@ -226,10 +196,7 @@ void F_W::SetResolution(GLuint a_Width, GLuint a_Height)
 	m_Resolution[1] = a_Height;
 
 #if defined(CURRENT_OS_WINDOWS)
-	SetWindowPos(m_WindowHandle, HWND_TOP,
-		m_Position[0], m_Position[1],
-		a_Width, a_Height,
-		SWP_SHOWWINDOW);
+	Windows_SetResolution(m_Resolution[0], m_Resolution[1]);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -241,57 +208,25 @@ void F_W::SetResolution(GLuint a_Width, GLuint a_Height)
 
 void F_W::GetMousePosition(GLuint& a_X, GLuint& a_Y)
 {
-#if defined(CURRENT_OS_WINDOWS)
-	POINT l_Point;
-
-	if (GetCursorPos(&l_Point))
-	{
-		if (ScreenToClient(m_WindowHandle, &l_Point))
-		{
-			a_X = l_Point.x;
-			a_Y = l_Point.y;
-		}
-	}
-#endif
-
 	a_X = m_MousePosition[0];
 	a_Y = m_MousePosition[1];
 }
 
 GLuint* F_W::GetMousePosition()
 {
-#if defined(CURRENT_OS_WINDOWS)
-	POINT l_Point;
-	GLuint l_MousePositionInWindow[2];
-
-	if (GetCursorPos(&l_Point))
-	{
-		if (ScreenToClient(m_WindowHandle, &l_Point))
-		{
-			l_MousePositionInWindow[0] = l_Point.x;
-			l_MousePositionInWindow[1] = l_Point.y;
-		}
-	}
-
-	m_MousePosition[0] = l_MousePositionInWindow[0];
-	m_MousePosition[1] = l_MousePositionInWindow[1];
-
 	return m_MousePosition;
-#endif
-
-#if defined(CURRENT_OS_LINUX)
-return m_MousePosition;
-#endif
 }
 
 void F_W::SetMousePosition(GLuint a_X, GLuint a_Y)
 {
 #if defined(CURRENT_OS_WINDOWS)
-	POINT l_Point;
+	/*POINT l_Point;
 	l_Point.x = a_X;
 	l_Point.y = a_Y;
 	ClientToScreen(m_WindowHandle, &l_Point);
-	SetCursorPos(l_Point.x, l_Point.y);
+	SetCursorPos(l_Point.x, l_Point.y);*/
+
+	Windows_SetPosition(a_X, a_Y);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -316,10 +251,13 @@ void F_W::SetPosition(GLuint a_X, GLuint a_Y)
 	m_Position[1] = a_Y;
 
 #if defined(CURRENT_OS_WINDOWS)
-	SetWindowPos(m_WindowHandle, HWND_TOP,
+
+	Windows_SetPosition(m_Position[0], m_Position[1]);
+
+	/*SetWindowPos(m_WindowHandle, HWND_TOP,
 		m_Position[0], m_Position[1],
 		m_Resolution[0], m_Resolution[1],
-		SWP_SHOWWINDOW);
+		SWP_SHOWWINDOW);*/
 #endif
 	
 #if defined(CURRENT_OS_LINUX)
@@ -339,6 +277,10 @@ void F_W::SetName(const char* a_WindowName)
 		m_WindowName = a_WindowName;
 #if defined(CURRENT_OS_LINUX)
 		Linux_SetName(a_WindowName);
+#endif
+
+#if defined(CURRENT_OS_WINDOWS)
+		Windows_SetName(a_WindowName);
 #endif
 	}
 }
@@ -372,7 +314,6 @@ bool F_W::GetIsObscured()
 {
 	return m_IsObscured;
 }
-
 
 void F_W::SetOnKeyEvent(OnKeyEvent a_OnKeyPressed)
 {
@@ -414,14 +355,6 @@ void F_W::SetOnDestroyed(OnDestroyed a_OnDestroyed)
 	}
 }
 
-/*void F_W::SetOnFullScreen(OnFullscreen a_OnFullScreen)
-{
-	if(Foundation_Tools::IsValid(a_OnFullScreen))
-	{
-		m_OnFullscreen = a_OnFullScreen;
-	}
-}*/
-
 void F_W::SetOnMaximized(OnMaximized a_OnMaximized)
 {
 	if(Foundation_Tools::IsValid(a_OnMaximized))
@@ -437,14 +370,6 @@ void F_W::SetOnMinimized(OnMinimized a_OnMinimized)
 		m_OnMinimized = a_OnMinimized;
 	}
 }
-
-/*void F_W::SetOnNameChange(OnNameChange a_NameChanged)
-{
-	if(Foundation_Tools::IsValid(a_NameChanged))
-	{
-		m_OnNameChange = a_NameChanged;
-	}
-}*/
 
 void F_W::SetOnMoved(OnMoved a_OnMoved)
 {

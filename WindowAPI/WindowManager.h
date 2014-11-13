@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-#include <GL/glew.h>
 #if defined(CURRENT_OS_WINDOWS)
 	#include <Windows.h>
 #endif
@@ -22,6 +21,8 @@ class F_W;
 
 class F_WM
 {
+	friend F_W;
+
 	public:
 		F_WM();
 		~F_WM();
@@ -150,7 +151,7 @@ class F_WM
 		
 		static void Initialize();
 
-		friend F_W;
+		
 
 		static void PollForEvents();
 
@@ -172,10 +173,10 @@ class F_WM
 
 		static F_W* GetWindowByHandle(HWND a_WindowHandle);
 
-		void Windows_PollForEvents();
-		void Windows_Initialize();
-		void Windows_Shutdown();
-		void Windows_SetMousePositionInScreen(GLuint a_X, GLuint a_Y);
+		static void Windows_PollForEvents();
+		static void Windows_Initialize();
+		static void Windows_Shutdown();
+		static void Windows_SetMousePositionInScreen(GLuint a_X, GLuint a_Y);
 
 		MSG m_Message;
 		HDC m_DeviceContextHandle;
