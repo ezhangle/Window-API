@@ -1,31 +1,19 @@
 #include "WindowManager.h"
+#include "Window_Tools.h"
 
-Foundation_WindowManager::Foundation_WindowManager()
+F_WM::F_WM()
 {
-#if defined(__linux__)|| defined(__GNUC__) || defined(__GNUG__) || defined(__Clang__)
 
-
-#endif
 }
 
-void Foundation_WindowManager::Initialize()
+void F_WM::Initialize()
 {
-	GetInstance()->m_Display = XOpenDisplay(0);
-
-	if(!GetInstance()->m_Display)
-	{
-		printf("Cannot Connect to X server\n");
-		exit(0);
-	}
-
-	GetInstance()->m_ScreenResolution[0] = WidthOfScreen(XScreenOfDisplay(GetInstance()->m_Display, 
-				DefaultScreen(GetInstance()->m_Display)));
-
-	GetInstance()->m_ScreenResolution[1] = HeightOfScreen(XScreenOfDisplay(GetInstance()->m_Display,
-				DefaultScreen(GetInstance()->m_Display)));
+#if defined(CURRENT_OS_LINUX)
+	Linux_Initialize();
+#endif	
 }
 
-Foundation_WindowManager::~Foundation_WindowManager()
+F_WM::~F_WM()
 {
 	if(!GetInstance()->m_Windows.empty())
 	{
@@ -38,7 +26,7 @@ Foundation_WindowManager::~Foundation_WindowManager()
 	}
 }
 
-Foundation_Window* Foundation_WindowManager::GetWindowByName(const char* a_WindowName)
+F_W* F_WM::GetWindowByName(const char* a_WindowName)
 {
 	if(a_WindowName != NULL && a_WindowName != nullptr)
 	{
@@ -56,7 +44,7 @@ Foundation_Window* Foundation_WindowManager::GetWindowByName(const char* a_Windo
 	return nullptr;
 }
 
-Foundation_Window* Foundation_WindowManager::GetWindowByIndex(GLuint a_WindowIndex)
+F_W* F_WM::GetWindowByIndex(GLuint a_WindowIndex)
 {
 	if (a_WindowIndex <= GetInstance()->m_Windows.size())
 	{
@@ -66,86 +54,73 @@ Foundation_Window* Foundation_WindowManager::GetWindowByIndex(GLuint a_WindowInd
 	return nullptr;
 }
 
-Foundation_WindowManager* Foundation_WindowManager::AddWindow(Foundation_Window* a_Window)
+F_WM* F_WM::AddWindow(F_W* a_Window)
 {
-	GetInstance()->m_Windows.push_back(a_Window);
-	a_Window->m_WindowID = GetInstance()->m_Windows.size() - 1;
-	a_Window->InitializeGL();
-	return m_Instance;
+	if(a_Window != NULL || a_Window != nullptr)
+	{
+		GetInstance()->m_Windows.push_back(a_Window);
+		a_Window->m_WindowID = GetInstance()->m_Windows.size() - 1;
+		a_Window->InitializeGL();
+		return GetInstance();
+	}
+	return NULL;
 }
 
-Foundation_WindowManager* Foundation_WindowManager::GetInstance()
+F_WM* F_WM::GetInstance()
 {
-	if(!Foundation_WindowManager::m_Instance)
+	if(!F_WM::m_Instance)
 	{
-		Foundation_WindowManager::m_Instance = new Foundation_WindowManager();
-		return Foundation_WindowManager::m_Instance;
+		F_WM::m_Instance = new F_WM();
+		return F_WM::m_Instance;
 	}
 
 	else 
 	{		
-		return Foundation_WindowManager::m_Instance;
+		return F_WM::m_Instance;
 	}
 }
 
-GLuint Foundation_WindowManager::GetNumWindows()
+GLuint F_WM::GetNumWindows()
 {
 	return GetInstance()->m_Windows.size();
 }
 
-void Foundation_WindowManager::ShutDown()
-{
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+void F_WM::ShutDown()
+{	
 	for(GLuint l_CurrentWindow = 0; l_CurrentWindow < GetInstance()->m_Windows.size() - 1; l_CurrentWindow++)
 	{
 		delete GetInstance()->m_Windows[l_CurrentWindow];
 	}
 
+	GetInstance()->m_Windows.clear();
+#if defined(CURRENT_OS_LINUX)
 	XCloseDisplay(GetInstance()->m_Display);
-
 #endif
+
+	
 }
 
-void Foundation_WindowManager::GetMousePositionInScreen(GLuint& a_X, GLuint& a_Y)
+void F_WM::GetMousePositionInScreen(GLuint& a_X, GLuint& a_Y)
 {
-#if defined(_MSC_VER_) || defined(_WIN32) || defined(_WIN64)
-	POINT l_Point;
-
-	if (GetCursorPos(&l_Point))
-	{
-		a_X = l_Point.x;
-		a_Y = l_Point.y;
-	}
-
-#endif
-
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-
 	a_X = GetInstance()->m_ScreenMousePosition[0];
 	a_Y = GetInstance()->m_ScreenMousePosition[1];
-
-#endif
 }
 
-GLuint* Foundation_WindowManager::GetMousePositionInScreen()
+GLuint* F_WM::GetMousePositionInScreen()
 {
 	return GetInstance()->m_ScreenMousePosition;
 }
 
-void Foundation_WindowManager::SetMousePositionInScreen(GLuint a_X, GLuint a_Y)
+void F_WM::SetMousePositionInScreen(GLuint a_X, GLuint a_Y)
 {
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-
-	XWarpPointer(GetInstance()->m_Display, None, XDefaultRootWindow(GetInstance()->m_Display),
-		   	0, 0, GetScreenResolution()[0], GetScreenResolution()[1], a_X, a_Y);
-
-
+#if defined(CURRENT_OS_LINUX)
+	Linux_SetMousePositionInScreen(a_X, a_Y);
 #endif
 }
 
-GLuint* Foundation_WindowManager::GetScreenResolution()
+GLuint* F_WM::GetScreenResolution()
 {
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+#if defined(CURRENT_OS_WINDOWS)
 	RECT l_Screen;
 	HWND m_Desktop = GetDesktopWindow();
 	GetWindowRect(m_Desktop, &l_Screen);
@@ -156,7 +131,7 @@ GLuint* Foundation_WindowManager::GetScreenResolution()
 
 #endif
 
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+#if defined(CURRENT_OS_LINUX)
 	GetInstance()->m_ScreenResolution[0] = WidthOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
 	GetInstance()->m_ScreenResolution[1] = HeightOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
 	//
@@ -165,24 +140,20 @@ GLuint* Foundation_WindowManager::GetScreenResolution()
 #endif
 }
 
-void Foundation_WindowManager::PollForEvents()
+void F_WM::PollForEvents()
 {
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-
+#if defined(CURRENT_OS_WINDOWS)
 	GetInstance()->Win32PollForEvents();
-
 #endif
 
-
-#if defined (__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-
+#if defined (CURRENT_OS_LINUX)
 	GetInstance()->Linux_PollForEvents();
 #endif
 }
 
-void Foundation_WindowManager::GetScreenResolution(GLuint& a_Width, GLuint& a_Height)
+void F_WM::GetScreenResolution(GLuint& a_Width, GLuint& a_Height)
 {
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+#if defined(CURRENT_OS_WINDOWS)
 
 	RECT l_Screen;
 	HWND m_Desktop = GetDesktopWindow();
@@ -191,7 +162,7 @@ void Foundation_WindowManager::GetScreenResolution(GLuint& a_Width, GLuint& a_He
 	a_Height = l_Screen.bottom;
 #endif
 
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+#if defined(CURRENT_OS_LINUX)
 
 	a_Width = WidthOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
 	a_Height = HeightOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
@@ -202,499 +173,15 @@ void Foundation_WindowManager::GetScreenResolution(GLuint& a_Width, GLuint& a_He
 #endif
 }
 
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-Foundation_Window* Foundation_WindowManager::GetWindowByHandle(HWND a_WindowHandle)
+void F_WM::GetWindowResolution(const char* a_WindowName, GLuint& a_Width, GLuint& a_Height)
 {
-	for (GLuint l_Iter = 0; l_Iter < GetInstance()->m_Windows.size() - 1; l_Iter++)
-	{
-		if (GetInstance()->m_Windows[l_Iter]->GetWindowHandle() == a_WindowHandle)
-		{
-			return GetInstance()->m_Windows[l_Iter];
-		}
-	}
-
-	return nullptr;
-}
-
-LRESULT CALLBACK Foundation_WindowManager::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPARAM a_WordParam, LPARAM a_LongParam)
-{
-	switch (a_Message)
-	{
-	case WM_CREATE:
-	{
-		GetWindowByIndex(m_Windows.size() - 1)->m_WindowHandle = a_WindowHandle;
-		GetWindowByHandle(a_WindowHandle)->m_DeviceContextHandle = GetDC(GetWindowByHandle(a_WindowHandle)->m_WindowHandle);
-		GetWindowByHandle(a_WindowHandle)->InitializePixelFormat();
-		GetWindowByHandle(a_WindowHandle)->m_GLRenderingcontextHandle = wglCreateContext(GetWindowByHandle(a_WindowHandle)->m_DeviceContextHandle);
-		wglMakeCurrent(GetWindowByHandle(a_WindowHandle)->m_DeviceContextHandle, GetWindowByHandle(a_WindowHandle)->m_GLRenderingcontextHandle);
-		//GetWindowByHandle(a_WindowHandle)->InitializeGL();
-		break;
-	}
-	case WM_DESTROY:
-	{
-		GetWindowByHandle(a_WindowHandle)->WindowShouldClose = true;
-		GetWindowByHandle(a_WindowHandle)->ShutDownWindow();
-		break;
-	}
-	case WM_MOVE:
-	{
-		GetWindowByHandle(a_WindowHandle)->m_Position[0] = LOWORD(a_LongParam);
-		GetWindowByHandle(a_WindowHandle)->m_Position[1] = HIWORD(a_LongParam);
-		
-		break;
-	}
-
-	case WM_SIZE:
-	{
-		if (GetWindowByHandle(a_WindowHandle)->m_GLRenderingcontextHandle)
-		{	
-			GetWindowByHandle(a_WindowHandle)->m_Resolution[0] = (GLuint)LOWORD(a_LongParam);
-			GetWindowByHandle(a_WindowHandle)->m_Resolution[1] =(GLuint)HIWORD(a_LongParam);
-			break;
-		}
-		break;
-	}
-
-	case WM_SIZING:
-	{
-		if (GetWindowByHandle(a_WindowHandle)->m_GLRenderingcontextHandle)
-		{
-			GetWindowByHandle(a_WindowHandle)->m_Resolution[0] = (GLuint)LOWORD(a_LongParam);
-			GetWindowByHandle(a_WindowHandle)->m_Resolution[1] = (GLuint)HIWORD(a_LongParam);
-			break;
-		}
-		break;
-	}
-
-	case WM_KEYDOWN:
-	{
-		GetWindowByHandle(a_WindowHandle)->Win32TranslateKey(a_WordParam, a_LongParam, KEYSTATE_DOWN);
-
-		break;
-	}
-
-	case WM_KEYUP:
-	{
-		GetWindowByHandle(a_WindowHandle)->Win32TranslateKey(a_WordParam, a_LongParam, KEYSTATE_UP);
-		break;
-	}
-
-	case WM_MOUSEMOVE:
-	{
-		GetWindowByHandle(a_WindowHandle)->m_MousePosition[0] = (GLuint)LOWORD(a_LongParam);
-		GetWindowByHandle(a_WindowHandle)->m_MousePosition[1] = (GLuint)HIWORD(a_LongParam);
-		break;
-	}
-
-	case WM_LBUTTONDOWN:
-	{
-		GetWindowByHandle(a_WindowHandle)->m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONDOWN;
-		break;
-	}
-
-	case WM_LBUTTONUP:
-	{
-		GetWindowByHandle(a_WindowHandle)->m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
-		break;
-	}
-
-	case WM_RBUTTONDOWN:
-	{
-		GetWindowByHandle(a_WindowHandle)->m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
-		break;
-	}
-
-	case WM_RBUTTONUP:
-	{
-		GetWindowByHandle(a_WindowHandle)->m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
-		break;
-	}
-
-	case WM_MBUTTONDOWN:
-	{
-		GetWindowByHandle(a_WindowHandle)->m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
-		break;
-	}
-
-	case WM_MBUTTONUP:
-	{
-		GetWindowByHandle(a_WindowHandle)->m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONUP;
-		break;
-	}
-
-	case WM_MOUSEWHEEL:
-	{
-		printf("%i %i\n", (GLint)HIWORD(a_WordParam), (GLint)HIWORD(a_WordParam) % WHEEL_DELTA);
-		break;
-	}
-
-	case WM_MOUSELEAVE:
-	{
-		printf("Mouse had left");
-		break;
-	}
-
-	default:
-	{
-		return DefWindowProc(a_WindowHandle, a_Message, a_WordParam, a_LongParam);
-	}
-	}
-	return 0;
-}
-
-LRESULT CALLBACK Foundation_WindowManager::StaticWindowProcedure(HWND a_WindowHandle, UINT a_Message, WPARAM a_WordParam, LPARAM a_LongParam)
-{
-	return Foundation_WindowManager::GetInstance()->WindowProcedure(a_WindowHandle, a_Message, a_WordParam, a_LongParam);
-}
-
-void Foundation_WindowManager::Win32PollForEvents()
-{
-	GetMessage(&m_Message, 0, 0, 0);
-	TranslateMessage(&m_Message);
-	DispatchMessage(&m_Message);
-}
-
-#endif
-
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-Foundation_Window* Foundation_WindowManager::GetWindowByHandle(Window a_WindowHandle)
-{
-	for (GLuint l_Iter = 0; l_Iter < GetInstance()->m_Windows.size(); l_Iter++)
-	{
-		if (GetInstance()->m_Windows[l_Iter]->GetWindowHandle() == a_WindowHandle)
-		{
-			return GetInstance()->m_Windows[l_Iter];
-		}
-	}
-
-	return nullptr;
-}
-
-Display* Foundation_WindowManager::GetDisplay()
-{
-	return GetInstance()->m_Display;
-}
-
-void Foundation_WindowManager::Linux_PollForEvents()
-{
-	XNextEvent(GetInstance()->m_Display, &GetInstance()->m_Event);
-
-	switch (GetInstance()->m_Event.type)
-	{
-		case Expose:
-		{
-			printf("window was exposed\n");
-			XGetWindowAttributes(GetInstance()->m_Display,
-				GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Window,
-				&GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_WindowAttributes);
-				
-			/*if(GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->GetIsFullScreen())
-			{
-				glViewport(0, 0, 
-					GetScreenResolution()[0],
-					GetScreenResolution()[1]);	
-			}
-
-			else
-			{
-				glViewport(0, 0, 
-						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Resolution[0],
-						GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Resolution[1]);
-			}*/
-
-				/*GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Position[0] = GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_WindowAttributes.x;
-
-				GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_Position[1] = GetWindowByHandle(GetInstance()->m_Event.xexpose.window)->m_WindowAttributes.y;*/
-			break;
-		}
-
-		case DestroyNotify:
-		{
-			GetWindowByHandle(GetInstance()->m_Event.xdestroywindow.window)->ShutDownWindow();
-			printf("Window was destroyed\n");
-			break;
-		}
-
-		case CreateNotify:
-		{	
-			printf("Window was created\n");
-			GetWindowByHandle(GetInstance()->m_Event.xcreatewindow.window)->InitializeGL();
-			break;
-		}
-
-		case KeyPress:
-		{			
-
-			GLuint l_FunctionKeysym = XKeycodeToKeysym(
-					GetInstance()->m_Display, GetInstance()->m_Event.xkey.keycode, 1);
-			
-			if(l_FunctionKeysym <= 255)
-			{
-				GetWindowByHandle(GetInstance()->m_Event.xkey.window)->m_Keys[l_FunctionKeysym] = KEYSTATE_DOWN;
-				printf("%c\n", l_FunctionKeysym);		
-			}
-			
-			else
-			{
-				GetWindowByHandle(GetInstance()->m_Event.xkey.window)->Linux_TranslateKey(l_FunctionKeysym, KEYSTATE_DOWN);
-			}
-
-			break;
-		}
-
-		case KeyRelease:
-		{
-			bool l_IsRetriggered = false;
-			if(XEventsQueued(GetInstance()->m_Display, QueuedAfterReading))
-			{
-				XEvent l_NextEvent;
-				XPeekEvent(GetInstance()->m_Display, &l_NextEvent);
-
-				if(l_NextEvent.type == KeyPress && 
-						l_NextEvent.xkey.time == GetInstance()->m_Event.xkey.time && 
-						l_NextEvent.xkey.keycode == GetInstance()->m_Event.xkey.keycode)
-				{
-					printf("Key was retriggered\n");
-					XNextEvent(GetInstance()->m_Display, &GetInstance()->m_Event);
-					l_IsRetriggered = true;
-				}
-			}
-
-			if(!l_IsRetriggered)
-			{
-				GLuint l_FunctionKeysym = XKeycodeToKeysym(GetInstance()->m_Display,
-					   GetInstance()->m_Event.xkey.keycode, 1);
-
-				if(l_FunctionKeysym <= 255)
-				{
-					printf("Key %c was released", l_FunctionKeysym);
-					GetWindowByHandle(GetInstance()->m_Event.xkey.window)->m_Keys[l_FunctionKeysym] = KEYSTATE_UP;
-				}
-
-				else
-				{
-					GetWindowByHandle(GetInstance()->m_Event.xkey.window)->Linux_TranslateKey(l_FunctionKeysym, KEYSTATE_UP);
-				}
-			}
-
-			break;	
-		}
-
-		case ButtonPress:
-		{
-			printf("%i\n", GetInstance()->m_Event.xbutton.button);
-			
-			switch(GetInstance()->m_Event.xbutton.button)
-			{
-				case 1:
-					{
-						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONDOWN;
-						break;
-					}
-
-				case 2:
-					{
-						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
-						break;
-					}
-
-				case 3:
-					{
-						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
-						break;
-					}
-
-				case 4:
-					{
-						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_SCROLL_UP] = MOUSE_BUTTONDOWN;
-						break;
-					}
-
-				case 5:
-					{
-						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_SCROLL_DOWN] = MOUSE_BUTTONDOWN;
-						break;
-					}
-
-				default:
-					{
-						break;
-					}
-			}
-			break;
-		}
-
-		case ButtonRelease:
-		{
-			printf("Button released %i\n", GetInstance()->m_Event.xbutton.button);
-			switch(GetInstance()->m_Event.xbutton.button)
-			{
-				case 1:
-					{
-						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
-						break;
-					}
-
-				case 2:
-					{
-						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONUP;
-						break;
-					}
-
-				case 3:
-					{
-						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONUP;
-						break;
-					}
-
-				case 4:
-					{
-						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_SCROLL_UP] = MOUSE_BUTTONDOWN;
-						break;
-					}
-
-				case 5:
-					{
-						GetWindowByHandle(GetInstance()->m_Event.xbutton.window)->m_MouseEvents[MOUSE_SCROLL_DOWN] = MOUSE_BUTTONDOWN;
-						break;
-					}
-
-				default:
-					{
-						break;
-					}
-			}
-			break;
-		}
-
-		case MotionNotify:
-		{ 
-			GetWindowByHandle(GetInstance()->m_Event.xmotion.window)->m_MousePosition[0] = 
-				GetInstance()->m_Event.xmotion.x;
-
-			GetWindowByHandle(GetInstance()->m_Event.xmotion.window)->m_MousePosition[1] = 
-				GetInstance()->m_Event.xmotion.y;
-
-			GetInstance()->m_ScreenMousePosition[0] = GetInstance()->m_Event.xmotion.x_root;
-			GetInstance()->m_ScreenMousePosition[1] = GetInstance()->m_Event.xmotion.y_root;
-			break;
-		}
-
-		case FocusOut:
-		{
-			//printf("window now out of  focus");
-			GetWindowByHandle(GetInstance()->m_Event.xfocus.window)->m_InFocus = false;
-			break;
-		}
-
-		case FocusIn:
-		{
-			//printf("window now in focus");
-			GetWindowByHandle(GetInstance()->m_Event.xfocus.window)->m_InFocus = true;
-			break;
-		}
-
-		case ResizeRequest:
-		{
-			printf("window was resized\n");
-			/*printf("%i %i\n",
-			GetInstance()->m_Event.xresizerequest.width,
-			GetInstance()->m_Event.xresizerequest.height);*/
-
-			glViewport(0, 0,
-					GetWindowByHandle(GetInstance()->m_Event.xresizerequest.window)->GetResolution()[0],
-					GetWindowByHandle(GetInstance()->m_Event.xresizerequest.window)->GetResolution()[1]);
-
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-
-			
-			break;
-		}
-
-		case ConfigureNotify:
-		{
-			//GetWindowByIndex(0)->m_Position[0] = GetInstance()->m_Event.xconfigure.x;
-
-			//GetWindowByIndex(0)->m_Position[1] = GetInstance()->m_Event.xconfigure.y;
-			//
-			//XClearWindow(GetInstance()->m_Display, GetInstance()->m_Event.xconfigure.window);
-
-			glViewport(0, 0, GetInstance()->m_Event.xconfigure.width,
-						GetInstance()->m_Event.xconfigure.height);
-
-		printf("%i %i %i %i\n", GetInstance()->m_Event.xconfigure.x, GetInstance()->m_Event.xconfigure.y,
-				GetInstance()->m_Event.xconfigure.width, GetInstance()->m_Event.xconfigure.height);
-			break;
-		}
-
-		case GravityNotify:
-		{
-			//window has moved
-			printf("window has moved");
-			break;
-		}
-
-		case ClientMessage:
-		{
-			printf("ClientMessage\n");
-			if((Atom)GetInstance()->m_Event.xclient.data.l[1] == Foundation_WindowManager::GetWindowByHandle(GetInstance()->m_Event.xclient.window)->m_ACloseWindow)
-			{
-				printf("window closed\n");
-				GetWindowByHandle(GetInstance()->m_Event.xclient.window)->WindowShouldClose = true;
-				XDestroyWindow(GetInstance()->m_Display, GetInstance()->m_Event.xclient.window);
-				break;
-			}
-
-			if((Atom)GetInstance()->m_Event.xclient.data.l[1] == GetWindowByHandle(GetInstance()->m_Event.xclient.window)->m_AFullScreenState)
-			{
-				printf("resized window \n");
-				break;
-			}
-			break;
-		}
-
-		case VisibilityNotify:
-		{
-			if(GetInstance()->m_Event.xvisibility.state == VisibilityUnobscured)
-			{
-				printf("window not obscured \n");
-				GetWindowByHandle(GetInstance()->m_Event.xany.window)->m_IsObscured = false;
-			}
-
-			else
-			{
-				printf("window obscured\n");
-				GetWindowByHandle(GetInstance()->m_Event.xany.window)->m_IsObscured = true;
-			}
-		}
-
-		default:
-		{
-			break;
-		}
-	}
-}
-
-#endif
-
-/*void Foundation_WindowManager::GetWindowResolution(Foundation_Window* a_Window, GLuint& a_Width, GLuint& a_Height)
-{
-	if(a_Window != NULL || a_Window != nullptr)
-	{
-		a_Window->GetResolution(a_Width, a_Height);
-	}
-}*/
-
-void Foundation_WindowManager::GetWindowResolution(const char* a_WindowName, GLuint& a_Width, GLuint& a_Height)
-{
-	if(a_WindowName != NULL || a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		GetWindowByName(a_WindowName)->GetResolution(a_Width, a_Height);
 	}
 }
 
-void Foundation_WindowManager::GetWindowResolution(GLuint a_WindowIndex, GLuint& a_Width, GLuint& a_Height)
+void F_WM::GetWindowResolution(GLuint a_WindowIndex, GLuint& a_Width, GLuint& a_Height)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -702,19 +189,9 @@ void Foundation_WindowManager::GetWindowResolution(GLuint a_WindowIndex, GLuint&
 	}
 }
 
-/*GLuint* Foundation_WindowManager::GetWindowResolution(Foundation_Window* a_Window)
+GLuint* F_WM::GetWindowResolution(const char* a_WindowName)
 {
-	if(a_Window != NULL || a_Window != nullptr)
-	{
-		return a_Window->GetResolution();
-	}
-
-	return nullptr;
-}*/
-
-GLuint* Foundation_WindowManager::GetWindowResolution(const char* a_WindowName)
-{
-	if(a_WindowName != NULL || a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		return GetWindowByName(a_WindowName)->GetResolution();
 	}
@@ -722,7 +199,7 @@ GLuint* Foundation_WindowManager::GetWindowResolution(const char* a_WindowName)
 	return nullptr;
 }
 
-GLuint* Foundation_WindowManager::GetWindowResolution(GLuint a_WindowIndex)
+GLuint* F_WM::GetWindowResolution(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -732,23 +209,15 @@ GLuint* Foundation_WindowManager::GetWindowResolution(GLuint a_WindowIndex)
 	return nullptr;
 }
 
-/*void Foundation_WindowManager::SetWindowResolution(Foundation_Window* a_Window, GLuint a_Width, GLuint a_Height)
+void F_WM::SetWindowResolution(const char* a_WindowName, GLuint a_Width, GLuint a_Height)
 {
-	if(a_Window != NULL || a_Window != nullptr)
-	{
-		a_Window->SetResolution(a_Width, a_Height);
-	}
-}*/
-
-void Foundation_WindowManager::SetWindowResolution(const char* a_WindowName, GLuint a_Width, GLuint a_Height)
-{
-	if(a_WindowName != NULL || a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		GetWindowByName(a_WindowName)->SetResolution(a_Width, a_Height);
 	}
 }
 
-void Foundation_WindowManager::SetWindowResolution(GLuint a_WindowIndex, GLuint a_Width, GLuint a_Height)
+void F_WM::SetWindowResolution(GLuint a_WindowIndex, GLuint a_Width, GLuint a_Height)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -756,23 +225,15 @@ void Foundation_WindowManager::SetWindowResolution(GLuint a_WindowIndex, GLuint 
 	}
 }
 
-/*void Foundation_WindowManager::GetWindowPosition(Foundation_Window* a_Window, GLuint& a_X, GLuint& a_Y)
+void F_WM::GetWindowPosition(const char* a_WindowName, GLuint& a_X, GLuint& a_Y)
 {
-	if(a_Window != NULL || a_Window != nullptr)
-	{
-		a_Window->GetPosition(a_X, a_Y);
-	}
-}*/
-
-void Foundation_WindowManager::GetWindowPosition(const char* a_WindowName, GLuint& a_X, GLuint& a_Y)
-{
-	if(a_WindowName != NULL || a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		GetWindowByName(a_WindowName)->GetPosition(a_X, a_Y);
 	}
 }
 
-void Foundation_WindowManager::GetWindowPosition(GLuint a_WindowIndex, GLuint& a_X, GLuint& a_Y)
+void F_WM::GetWindowPosition(GLuint a_WindowIndex, GLuint& a_X, GLuint& a_Y)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -780,19 +241,9 @@ void Foundation_WindowManager::GetWindowPosition(GLuint a_WindowIndex, GLuint& a
 	}
 }
 
-/*GLuint* Foundation_WindowManager::GetWindowPosition(Foundation_Window* a_Window)
+GLuint* F_WM::GetWindowPosition(const char* a_WindowName)
 {
-	if(a_Window != NULL || a_Window != nullptr)
-	{
-		return a_Window->GetPosition();
-	}
-
-	return NULL;
-}*/
-
-GLuint* Foundation_WindowManager::GetWindowPosition(const char* a_WindowName)
-{
-	if(a_WindowName != NULL || a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		return GetWindowByName(a_WindowName)->GetPosition();
 	}
@@ -800,7 +251,7 @@ GLuint* Foundation_WindowManager::GetWindowPosition(const char* a_WindowName)
 	return NULL;
 }
 
-GLuint* Foundation_WindowManager::GetWindowPosition(GLuint a_WindowIndex)
+GLuint* F_WM::GetWindowPosition(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() -1)
 	{
@@ -810,23 +261,15 @@ GLuint* Foundation_WindowManager::GetWindowPosition(GLuint a_WindowIndex)
 	return NULL;
 }
 
-/*void Foundation_WindowManager::SetWindowPosition(Foundation_Window* a_Window, GLuint a_X, GLuint a_Y)
+void F_WM::SetWindowPosition(const char* a_WindowName, GLuint a_X, GLuint a_Y)
 {
-	if(a_Window != NULL && a_Window != nullptr)
-	{
-		a_Window->SetPosition(a_X, a_Y);
-	}
-}*/
-
-void Foundation_WindowManager::SetWindowPosition(const char* a_WindowName, GLuint a_X, GLuint a_Y)
-{
-	if(a_WindowName != NULL || a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		GetWindowByName(a_WindowName)->SetPosition(a_X, a_Y);
 	}
 }
 
-void Foundation_WindowManager::SetWindowPosition(GLuint a_WindowIndex, GLuint a_X, GLuint a_Y)
+void F_WM::SetWindowPosition(GLuint a_WindowIndex, GLuint a_X, GLuint a_Y)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() -1)
 	{
@@ -834,97 +277,61 @@ void Foundation_WindowManager::SetWindowPosition(GLuint a_WindowIndex, GLuint a_
 	}
 }
 
-/*void Foundation_WindowManager::GetMousePositionInWindow(Foundation_Window* a_Window, GLuint& a_X, GLuint& a_Y)
+void F_WM::GetMousePositionInWindow(const char* a_WindowName, GLuint& a_X, GLuint& a_Y)
 {
-	if(a_Window != NULL || a_Window != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
-		a_Window->GetMousePositionInWindow(a_X, a_Y);
-	}
-}*/
-
-void Foundation_WindowManager::GetMousePositionInWindow(const char* a_WindowName, GLuint& a_X, GLuint& a_Y)
-{
-	if(a_WindowName != NULL || a_WindowName != nullptr)
-	{
-		GetWindowByName(a_WindowName)->GetMousePositionInWindow(a_X, a_Y);
+		GetWindowByName(a_WindowName)->GetMousePosition(a_X, a_Y);
 	}
 }
 
-void Foundation_WindowManager::GetMousePositionInWindow(GLuint a_WindowIndex, GLuint& a_X, GLuint& a_Y)
+void F_WM::GetMousePositionInWindow(GLuint a_WindowIndex, GLuint& a_X, GLuint& a_Y)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-		GetWindowByIndex(a_WindowIndex)->GetPosition(a_X, a_Y);
+		GetWindowByIndex(a_WindowIndex)->GetMousePosition(a_X, a_Y);
 	}
 }
 
-/*GLuint* Foundation_WindowManager::GetMousePositionInWindow(Foundation_Window* a_Window)
+GLuint* F_WM::GetMousePositionInWindow(const char* a_WindowName)
 {
-	if(a_Window != NULL || a_Window != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
-		return a_Window->GetMousePositionInWindow();
-	}
-
-	return NULL;
-}*/
-
-GLuint* Foundation_WindowManager::GetMousePositionInWindow(const char* a_WindowName)
-{
-	if(a_WindowName != NULL || a_WindowName != nullptr)
-	{
-		return GetWindowByName(a_WindowName)->GetMousePositionInWindow();
+		return GetWindowByName(a_WindowName)->GetMousePosition();
 	}
 
 	return NULL;
 }
 
-GLuint* Foundation_WindowManager::GetMousePositionInWindow(GLuint a_WindowIndex)
+GLuint* F_WM::GetMousePositionInWindow(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-		return GetWindowByIndex(a_WindowIndex)->GetMousePositionInWindow();
+		return GetWindowByIndex(a_WindowIndex)->GetMousePosition();
 	}
 
 	return NULL;
 }
 
-/*void Foundation_WindowManager::SetMousePositionInWindow(Foundation_Window* a_Window, GLuint a_X, GLuint a_Y)
+void F_WM::SetMousePositionInWindow(const char* a_WindowName, GLuint a_X, GLuint a_Y)
 {
-	if(a_Window != NULL || a_Window != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
-		a_Window->SetMousePositionInWindow(a_X, a_Y);
-	}
-}*/
-
-void Foundation_WindowManager::SetMousePositionInWindow(const char* a_WindowName, GLuint a_X, GLuint a_Y)
-{
-	if(a_WindowName != NULL || a_WindowName != nullptr)
-	{
-		GetWindowByName(a_WindowName)->SetMousePositionInWindow(a_X, a_Y);
+		GetWindowByName(a_WindowName)->SetMousePosition(a_X, a_Y);
 	}
 }
 
-void Foundation_WindowManager::SetMousePositionInWindow(GLuint a_WindowIndex, GLuint a_X, GLuint a_Y)
+void F_WM::SetMousePositionInWindow(GLuint a_WindowIndex, GLuint a_X, GLuint a_Y)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-		GetWindowByIndex(a_WindowIndex)->SetMousePositionInWindow(a_X, a_Y);
+		GetWindowByIndex(a_WindowIndex)->SetMousePosition(a_X, a_Y);
 	}
 }
 
-/*bool Foundation_WindowManager::WindowGetKey(Foundation_Window* a_Window, GLuint a_Key)
+bool F_WM::WindowGetKey(const char* a_WindowName, GLuint a_Key)
 {
-	if(a_Window != NULL || a_Window != nullptr)
-	{
-		return a_Window->GetKey(a_Key);
-	}
-
-	return false;
-}*/
-
-bool Foundation_WindowManager::WindowGetKey(const char* a_WindowName, GLuint a_Key)
-{
-	if(a_WindowName != NULL || a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		return GetWindowByName(a_WindowName)->GetKey(a_Key);
 	}
@@ -932,7 +339,7 @@ bool Foundation_WindowManager::WindowGetKey(const char* a_WindowName, GLuint a_K
 	return false;
 }
 
-bool Foundation_WindowManager::WindowGetKey(GLuint a_WindowIndex, GLuint a_Key)
+bool F_WM::WindowGetKey(GLuint a_WindowIndex, GLuint a_Key)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -942,19 +349,9 @@ bool Foundation_WindowManager::WindowGetKey(GLuint a_WindowIndex, GLuint a_Key)
 	return false;
 }
 
-/*bool Foundation_WindowManager::GetWindowShouldClose(Foundation_Window* a_Window)
+bool F_WM::GetWindowShouldClose(const char* a_WindowName)
 {
-	if(a_Window != NULL || a_Window != nullptr)
-	{
-		return a_Window->GetShouldClose();
-	}
-
-	return false;
-}*/
-
-bool Foundation_WindowManager::GetWindowShouldClose(const char* a_WindowName)
-{
-	if(a_WindowName != NULL || a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		return GetWindowByName(a_WindowName)->GetShouldClose();
 	}
@@ -962,7 +359,7 @@ bool Foundation_WindowManager::GetWindowShouldClose(const char* a_WindowName)
 	return false;
 }
 
-bool Foundation_WindowManager::GetWindowShouldClose(GLuint a_WindowIndex)
+bool F_WM::GetWindowShouldClose(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -972,23 +369,15 @@ bool Foundation_WindowManager::GetWindowShouldClose(GLuint a_WindowIndex)
 	return false;
 }
 
-/*void Foundation_WindowManager::WindowSwapBuffers(Foundation_Window* a_Window)
+void F_WM::WindowSwapBuffers(const char* a_WindowName)
 {
-	if(a_Window != NULL || a_Window != nullptr)
-	{
-		a_Window->SwapBuffers();
-	}
-}*/
-
-void Foundation_WindowManager::WindowSwapBuffers(const char* a_WindowName)
-{
-	if(a_WindowName != NULL && a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		GetWindowByName(a_WindowName)->SwapBuffers();
 	}
 }
 
-void Foundation_WindowManager::WindowSwapBuffers(GLuint a_WindowIndex)
+void F_WM::WindowSwapBuffers(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -996,14 +385,9 @@ void Foundation_WindowManager::WindowSwapBuffers(GLuint a_WindowIndex)
 	}
 }
 
-/*bool Foundation_WindowManager::GetWindowIsFullScreen(Foundation_Window* a_Window)
+bool F_WM::GetWindowIsFullScreen(const char* a_WindowName)
 {
-	return a_Window->GetIsFullScreen();
-}*/
-
-bool Foundation_WindowManager::GetWindowIsFullScreen(const char* a_WindowName)
-{
-	if(a_WindowName != NULL && a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		return GetWindowByName(a_WindowName)->GetIsFullScreen();
 	}
@@ -1011,7 +395,7 @@ bool Foundation_WindowManager::GetWindowIsFullScreen(const char* a_WindowName)
 	return false;
 }
 
-bool Foundation_WindowManager::GetWindowIsFullScreen(GLuint a_WindowIndex)
+bool F_WM::GetWindowIsFullScreen(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() -1)
 	{
@@ -1021,20 +405,15 @@ bool Foundation_WindowManager::GetWindowIsFullScreen(GLuint a_WindowIndex)
 	return false;
 }
 
-/*void Foundation_WindowManager::SetFullScreen(Foundation_Window* a_Window, bool a_FullScreenState)
+void F_WM::SetFullScreen(const char* a_WindowName, bool a_FullScreenState)
 {
-	a_Window->FullScreen(a_FullScreenState); 
-}*/
-
-void Foundation_WindowManager::SetFullScreen(const char* a_WindowName, bool a_FullScreenState)
-{
-	if(a_WindowName != NULL && a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		GetWindowByName(a_WindowName)->FullScreen(a_FullScreenState);
 	}
 }
 
-void Foundation_WindowManager::SetFullScreen(GLuint a_WindowIndex, bool a_FullScreenState)
+void F_WM::SetFullScreen(GLuint a_WindowIndex, bool a_FullScreenState)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -1042,14 +421,9 @@ void Foundation_WindowManager::SetFullScreen(GLuint a_WindowIndex, bool a_FullSc
 	}
 }
 
-/*bool Foundation_WindowManager::GetWindowIsMinimized(Foundation_Window* a_Window)
+bool F_WM::GetWindowIsMinimized(const char* a_WindowName)
 {
-	return a_Window->GetIsMinimized();
-}*/
-
-bool Foundation_WindowManager::GetWindowIsMinimized(const char* a_WindowName)
-{
-	if(a_WindowName != NULL && a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		return GetWindowByName(a_WindowName)->GetIsMinimized();
 	}
@@ -1057,7 +431,7 @@ bool Foundation_WindowManager::GetWindowIsMinimized(const char* a_WindowName)
 	return false;
 }
 
-bool Foundation_WindowManager::GetWindowIsMinimized(GLuint a_WindowIndex)
+bool F_WM::GetWindowIsMinimized(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -1065,20 +439,15 @@ bool Foundation_WindowManager::GetWindowIsMinimized(GLuint a_WindowIndex)
 	}
 }
 
-/*void Foundation_WindowManager::MinimizeWindow(Foundation_Window* a_Window, bool a_MinimizeState)
+void F_WM::MinimizeWindow(const char* a_WindowName, bool a_MinimizeState)
 {
-	a_Window->Minimize(a_MinimizeState);
-}*/
-
-void Foundation_WindowManager::MinimizeWindow(const char* a_WindowName, bool a_MinimizeState)
-{
-	if(a_WindowName != NULL && a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		GetWindowByName(a_WindowName)->Minimize(a_MinimizeState);
 	}
 }
 
-void Foundation_WindowManager::MinimizeWindow(GLuint a_WindowIndex, bool a_MinimizeState)
+void F_WM::MinimizeWindow(GLuint a_WindowIndex, bool a_MinimizeState)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -1086,14 +455,9 @@ void Foundation_WindowManager::MinimizeWindow(GLuint a_WindowIndex, bool a_Minim
 	}
 }
 
-/*bool Foundation_WindowManager::GetWindowIsMaximized(Foundation_Window* a_Window)
+bool F_WM::GetWindowIsMaximized(const char* a_WindowName)
 {
-	return a_Window->GetIsMaximised();
-}*/
-
-bool Foundation_WindowManager::GetWindowIsMaximized(const char* a_WindowName)
-{
-	if(a_WindowName != NULL && a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		return GetWindowByName(a_WindowName)->GetIsMaximised();
 	}
@@ -1101,7 +465,7 @@ bool Foundation_WindowManager::GetWindowIsMaximized(const char* a_WindowName)
 	return false;
 }
 
-bool Foundation_WindowManager::GetWindowIsMaximized(GLuint a_WindowIndex)
+bool F_WM::GetWindowIsMaximized(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -1111,20 +475,15 @@ bool Foundation_WindowManager::GetWindowIsMaximized(GLuint a_WindowIndex)
 	return false;
 }
 
-/*void Foundation_WindowManager::MaximizeWindow(Foundation_Window* a_Window, bool a_MaximizeState)
+void F_WM::MaximizeWindow(const char* a_WindowName, bool a_MaximizeState)
 {
-	a_Window->Maximise(a_MaximizeState);
-}*/
-
-void Foundation_WindowManager::MaximizeWindow(const char* a_WindowName, bool a_MaximizeState)
-{
-	if(a_WindowName != NULL && a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		GetWindowByName(a_WindowName)->Maximise(a_MaximizeState);
 	}
 }
 
-void Foundation_WindowManager::MaximizeWindow(GLuint a_WindowIndex, bool a_MaximizeState)
+void F_WM::MaximizeWindow(GLuint a_WindowIndex, bool a_MaximizeState)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -1132,14 +491,9 @@ void Foundation_WindowManager::MaximizeWindow(GLuint a_WindowIndex, bool a_Maxim
 	}
 }
 
-/*const char* Foundation_WindowManager::GetWindowName(Foundation_Window* a_Window)
+const char* F_WM::GetWindowName(GLuint a_WindowIndex)
 {
-	return a_Window->GetWindowName();
-}*/
-
-const char* Foundation_WindowManager::GetWindowName(GLuint a_WindowIndex)
-{
-	if(a_WindowIndex <= GetInstance()->m_Windows.size())
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
 		return GetWindowByIndex(a_WindowIndex)->GetWindowName();
 	}
@@ -1147,9 +501,9 @@ const char* Foundation_WindowManager::GetWindowName(GLuint a_WindowIndex)
 	return nullptr;
 }
 
-GLuint Foundation_WindowManager::GetWindowIndex(const char* a_WindowName)
+GLuint F_WM::GetWindowIndex(const char* a_WindowName)
 {
-	if(a_WindowName != NULL && a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		return GetWindowByName(a_WindowName)->m_WindowID;
 	}
@@ -1157,35 +511,25 @@ GLuint Foundation_WindowManager::GetWindowIndex(const char* a_WindowName)
 	return 0;
 }
 
-/*void Foundation_WindowManager::SetWindowName(Foundation_Window* a_Window, const char* a_NewName)
+void F_WM::SetWindowName(const char* a_WindowName, const char* a_NewName)
 {
-	a_Window->SetName(a_NewName);
-}*/
-
-void Foundation_WindowManager::SetWindowName(const char* a_WindowName, const char* a_NewName)
-{
-	if((a_WindowName != NULL && a_WindowName != nullptr) && (a_NewName != NULL && a_NewName != nullptr))
+	if(Foundation_Tools::IsValid(a_WindowName) && Foundation_Tools::IsValid(a_NewName))
 	{
 		GetWindowByName(a_WindowName)->SetName(a_NewName);
 	}
 }
 
-void Foundation_WindowManager::SetWindowName(GLuint a_WindowIndex, const char* a_NewName)
+void F_WM::SetWindowName(GLuint a_WindowIndex, const char* a_NewName)
 {
-	if(a_WindowIndex <= GetInstance()->m_Windows.size() && (a_NewName != NULL && a_NewName != nullptr))
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1 && Foundation_Tools::IsValid(a_NewName))
 	{
 		GetWindowByIndex(a_WindowIndex)->SetName(a_NewName);
 	}
 }
 
-/*bool Foundation_WindowManager::GetWindowIsInFocus(Foundation_Window* a_Window)
+bool F_WM::GetWindowIsInFocus(const char* a_WindowName)
 {
-	return a_Window->GetInFocus();
-}*/
-
-bool Foundation_WindowManager::GetWindowIsInFocus(const char* a_WindowName)
-{
-	if(a_WindowName != NULL && a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		return GetWindowByName(a_WindowName)->GetInFocus();
 	}
@@ -1193,7 +537,7 @@ bool Foundation_WindowManager::GetWindowIsInFocus(const char* a_WindowName)
 	return false;
 }
 
-bool Foundation_WindowManager::GetWindowIsInFocus(GLuint a_WindowIndex)
+bool F_WM::GetWindowIsInFocus(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -1203,22 +547,16 @@ bool Foundation_WindowManager::GetWindowIsInFocus(GLuint a_WindowIndex)
 	return false;
 }
 
-/*void Foundation_WindowManager::FocusWindow(Foundation_Window* a_Window, bool a_FocusState)
+void F_WM::FocusWindow(const char* a_WindowName, bool a_FocusState)
 {
-	//implement window focusing
-	//a_Window->Focu
-}*/
-
-void Foundation_WindowManager::FocusWindow(const char* a_WindowName, bool a_FocusState)
-{
-	if(a_WindowName != NULL && a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 
 	}
 	//implement window focusing
 }
 
-void Foundation_WindowManager::FocusWindow(GLuint a_WindowIndex, bool a_FocuState)
+void F_WM::FocusWindow(GLuint a_WindowIndex, bool a_FocuState)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -1227,14 +565,9 @@ void Foundation_WindowManager::FocusWindow(GLuint a_WindowIndex, bool a_FocuStat
 	//implement window focusing
 }
 
-/*bool Foundation_WindowManager::GetWindowIsObscured(Foundation_Window* a_Window)
+bool F_WM::GetWindowIsObscured(const char* a_WindowName)
 {
-	return a_Window->GetIsObscured();
-}*/
-
-bool Foundation_WindowManager::GetWindowIsObscured(const char* a_WindowName)
-{
-	if(a_WindowName != NULL && a_WindowName != nullptr)
+	if(Foundation_Tools::IsValid(a_WindowName))
 	{
 		return GetWindowByName(a_WindowName)->GetIsObscured();
 	}
@@ -1242,7 +575,7 @@ bool Foundation_WindowManager::GetWindowIsObscured(const char* a_WindowName)
 	return false;
 }
 
-bool Foundation_WindowManager::GetWindowIsObscured(GLuint a_WindowIndex)
+bool F_WM::GetWindowIsObscured(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -1252,4 +585,4 @@ bool Foundation_WindowManager::GetWindowIsObscured(GLuint a_WindowIndex)
 	return false;
 }
 
-Foundation_WindowManager* Foundation_WindowManager::m_Instance = 0;
+F_WM* F_WM::m_Instance = 0;

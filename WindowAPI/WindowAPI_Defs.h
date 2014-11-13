@@ -1,3 +1,15 @@
+#include <GL/glew.h>
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+#define CURRENT_OS_WINDOWS
+#endif
+
+#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+#define CURRENT_OS_LINUX
+#endif
+
+#define GLX_GLXEXT_PROTOTYPES
+
 #define KEYSTATE_DOWN 1
 #define KEYSTATE_UP 0
 #define KEYSTATE_IDLE 2
@@ -75,3 +87,17 @@
 #define WINDOWSTYLE_BARE 1
 #define WINDOWSTYLE_DEFAULT 2
 #define WINDOWSTYLE_POPUP 3
+
+typedef void (*OnKeyEvent)(GLuint a_Key, bool a_KeyState);
+typedef void (*OnMouseButtonEvent)(GLuint a_Button, bool a_ButtonState);
+typedef void (*OnMouseWheelEvent)(GLuint a_WheelDirection);
+typedef void (*OnCreated)();
+typedef void (*OnDestroyed)();
+//typedef void (*OnFullscreen)(bool a_FullScreenState);
+typedef void (*OnMaximized)(bool a_MaximizeState);
+typedef void (*OnMinimized)(bool a_MinimizeState);
+//typedef void (*OnNameChange)(const char* a_NewName);
+typedef void (*OnMoved)(GLuint a_X, GLuint a_Y);
+typedef void (*OnResize)(GLuint a_Width, GLuint a_Height);
+typedef void (*OnFocus)(bool a_FocusState);
+typedef void (*OnMouseMove)(GLuint a_X, GLuint a_Y);

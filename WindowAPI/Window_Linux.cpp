@@ -30,7 +30,7 @@ void F_W::Linux_Initialize()
 	   	| KeyReleaseMask | MotionNotify | ButtonPressMask | ButtonReleaseMask
 	   	| FocusIn | FocusOut | Button1MotionMask | Button2MotionMask | Button3MotionMask | 
 		Button4MotionMask | Button5MotionMask | PointerMotionMask | FocusChangeMask
-		| SubstructureNotifyMask | VisibilityChangeMask;
+		| VisibilityChangeMask | PropertyChangeMask | SubstructureNotifyMask;
 
 	m_Window = XCreateWindow(F_WM::GetInstance()->m_Display,
 		XDefaultRootWindow(F_WM::GetInstance()->m_Display), 0, 0,
@@ -46,10 +46,10 @@ void F_W::Linux_Initialize()
 	InitializeAtomics();
 
 	XSetWMProtocols(F_WM::GetDisplay(), 
-			m_Window, &m_ACloseWindow, 1);
+			m_Window, &m_AtomicCloseWindow, 1);
 
 	XSetWMProtocols(F_WM::GetDisplay(),
-		m_Window, &m_AFullScreenState, 1);
+			m_Window, &m_AtomicFullScreenState, 1);
 }
 
 void F_W::Linux_Shutdown()
@@ -96,11 +96,11 @@ void F_W::Linux_FullScreen(bool a_FullScreenState)
 	memset(&l_Event, 0, sizeof(l_Event));
 
 	l_Event.xany.type = ClientMessage;
-	l_Event.xclient.message_type = m_AState;
+	l_Event.xclient.message_type = m_AtomicState;
 	l_Event.xclient.format = 32;
 	l_Event.xclient.window = m_Window;
 	l_Event.xclient.data.l[0] = m_IsFullScreen;
-	l_Event.xclient.data.l[1] = m_AFullScreenState;
+	l_Event.xclient.data.l[1] = m_AtomicFullScreenState;
 
 	XSendEvent(F_WM::GetDisplay(),
 			XDefaultRootWindow(F_WM::GetDisplay()),
@@ -126,18 +126,19 @@ void F_W::Linux_Minimize(bool a_MinimizeState)
 
 void F_W::Linux_Maximize(bool a_MaximizeState)
 {
+
 	m_IsMaximised = a_MaximizeState;
 	
 	XEvent l_Event;
 	memset(&l_Event, 0, sizeof(l_Event));
 
 	l_Event.xany.type = ClientMessage;
-	l_Event.xclient.message_type = m_AState;
+	l_Event.xclient.message_type = m_AtomicState;
 	l_Event.xclient.format = 32;
 	l_Event.xclient.window = m_Window;
 	l_Event.xclient.data.l[0] = m_IsMaximised;
-	l_Event.xclient.data.l[1] = m_AMaximizedVertical;
-	l_Event.xclient.data.l[2] = m_AMaximizedHorizontal;
+	l_Event.xclient.data.l[1] = m_AtomicMaximizedVertical;
+	l_Event.xclient.data.l[2] = m_AtomicMaximizedHorizontal;
 
 	XSendEvent(F_WM::GetDisplay(),
 			XDefaultRootWindow(F_WM::GetDisplay()),
@@ -171,289 +172,243 @@ void F_W::Linux_Focus(bool a_FocusState)
 	}
 }
 
-void F_W::Linux_TranslateKey(GLuint a_KeySym, bool a_KeyState)
+GLuint F_W::Linux_TranslateKey(GLuint a_KeySym)
 {
 	switch(a_KeySym)
 	{
 		case XK_Escape:
 			{
-				m_Keys[KEY_ESCAPE] = a_KeyState;
-				break;
+				return KEY_ESCAPE;
 			}
 
 		case XK_Home:
 			{
-				m_Keys[KEY_HOME] = a_KeyState;
-				break;
+				return KEY_HOME;
 			}
 
 		case XK_Left:
 			{
-				m_Keys[KEY_ARROW_LEFT] = a_KeyState;
-				break;
+				return KEY_ARROW_LEFT;
 			}
 
 		case XK_Right:
 			{
-				m_Keys[KEY_ARROW_RIGHT] = a_KeyState;
-				break;
+				return KEY_ARROW_RIGHT;
 			}
 
 		case XK_Up:
 			{
-				m_Keys[KEY_ARROW_UP] = a_KeyState;
-				break;
+				return KEY_ARROW_UP;
 			}
 
 		case XK_Down:
 			{
-				m_Keys[KEY_ARROW_DOWN] = a_KeyState;
-				break;
+				return KEY_ARROW_DOWN;
 			}
 
 		case XK_Page_Up:
 			{
-				m_Keys[KEY_PAGEUP] = a_KeyState;
-				break;
+				return KEY_PAGEUP;
 			}
 
 		case XK_Page_Down:
 			{
-				m_Keys[KEY_PAGEDOWN] = a_KeyState;
-				break;
+				return KEY_PAGEDOWN;
 			}
 
 		case XK_End:
 			{
-				m_Keys[KEY_END] = a_KeyState;
-				break;
+				return KEY_END;
 			}
 
 		case XK_Print:
 			{
-				m_Keys[KEY_PRINTSCREEN] = a_KeyState;
-				break;
+				return KEY_PRINTSCREEN;
 			}
 
 		case XK_Insert:
 			{
-				m_Keys[KEY_INSERT] = a_KeyState;
-				break;
+				return KEY_INSERT;
 			}
 
 		case XK_Num_Lock:
 			{
-				m_Keys[KEY_NUMLOCK] = a_KeyState;
-				break;
+				return KEY_NUMLOCK;
 			}
 
 		case XK_KP_Multiply:
 			{
-				m_Keys[KEY_KEYPAD_MULTIPLY] = a_KeyState;
-				break;
+				return KEY_KEYPAD_MULTIPLY;
 			}
 
 		case XK_KP_Add:
 			{
-				m_Keys[KEY_KEYPAD_ADD] = a_KeyState;
-				break;
+				return KEY_KEYPAD_ADD;
 			}
 
 		case XK_KP_Subtract:
 			{
-				m_Keys[KEY_KEYPAD_SUBTRACT] = a_KeyState;
-				break;
+				return KEY_KEYPAD_SUBTRACT;
 			}
 
 		case XK_KP_Decimal:
 			{
-				m_Keys[KEY_KEYPAD_PERIOD] = a_KeyState;
-				break;
+				return KEY_KEYPAD_PERIOD;
 			}
 
 		case XK_KP_Divide:
 			{
-				m_Keys[KEY_KEYPAD_DIVIDE] = a_KeyState;
-				break;
+				return KEY_KEYPAD_DIVIDE;
 			}
 
 		case XK_KP_0:
 			{
-				m_Keys[KEY_KEYPAD_0] = a_KeyState;
-				break;
+				return KEY_KEYPAD_0;
 			}
 
 		case XK_KP_1:
 			{
-				m_Keys[KEY_KEYPAD_1] = a_KeyState;
-				break;
+				return KEY_KEYPAD_1;
 			}
 
 		case XK_KP_2:
 			{
-				m_Keys[KEY_KEYPAD_2] = a_KeyState;
-				break;
+				return KEY_KEYPAD_2;
 			}
 
 		case XK_KP_3:
 			{
-				m_Keys[KEY_KEYPAD_3] = a_KeyState;
-				break;
+				return KEY_KEYPAD_3;
 			}
 
 		case XK_KP_4:
 			{
-				m_Keys[KEY_KEYPAD_4] = a_KeyState;
-				break;
+				return KEY_KEYPAD_4;
 			}
 
 		case XK_KP_5:
 			{
-				m_Keys[KEY_KEYPAD_5] = a_KeyState;
-				break;
+				return KEY_KEYPAD_5;
 			}
 
 		case XK_KP_6:
 			{
-				m_Keys[KEY_KEYPAD_6] = a_KeyState;
-				break;
+				return KEY_KEYPAD_6;
 			}
 
 		case XK_KP_7:
 			{
-				m_Keys[KEY_KEYPAD_7] = a_KeyState;
-				break;
+				return KEY_KEYPAD_7;
 			}
 
 		case XK_KP_8:
 			{
-				m_Keys[KEY_KEYPAD_8] = a_KeyState;
-				break;
+				return KEY_KEYPAD_8;
 			}
 
 		case XK_KP_9:
 			{
-				m_Keys[KEY_KEYPAD_9] = a_KeyState;
-				break;
+				return KEY_KEYPAD_9;
 			}
 
 		case XK_F1:
 			{
-				m_Keys[KEY_F1] = a_KeyState;
-				break;
+				return KEY_F1;
 			}
 
 		case XK_F2:
 			{
-				m_Keys[KEY_F2] = a_KeyState;
-				break;
+				return KEY_F2;
 			}
 
 		case XK_F3:
 			{
-				m_Keys[KEY_F3] = a_KeyState;
-				break;
+				return KEY_F3;
 			}
 
 		case XK_F4:
 			{
-				m_Keys[KEY_F4] = a_KeyState;
-				break;
+				return KEY_F4;
 			}
 
 		case XK_F5:
 			{
-				m_Keys[KEY_F5] = a_KeyState;
-				break;
+				return KEY_F5;
 			}
 
 		case XK_F6:
 			{
-				m_Keys[KEY_F6] = a_KeyState;
-				break;
+				return KEY_F6;
 			}
 
 		case XK_F7:
 			{
-				m_Keys[KEY_F7] = a_KeyState;
-				break;
+				return KEY_F7;
 			}
 
 		case XK_F8:
 			{
-				m_Keys[KEY_F8] = a_KeyState;
-				break;
+				return KEY_F8;
 			}
 
 		case XK_F9:
 			{
-				m_Keys[KEY_F9] = a_KeyState;
-				break;
+				return KEY_F9;
 			}
 
 		case XK_F10:
 			{
-				m_Keys[KEY_F10] = a_KeyState;
-				break;
+				return KEY_F10;
 			}
 
 		case XK_F11:
 			{
-				m_Keys[KEY_F11] = a_KeyState;
-				break;
+				return KEY_F11;
 			}
 
 		case XK_F12:
 			{
-				m_Keys[KEY_F12] = a_KeyState;
-				break;
+				return KEY_F12;
 			}
 
 		case XK_Shift_L:
 			{
-				m_Keys[KEY_LEFTSHIFT] = a_KeyState;
-				break;
+				return KEY_LEFTSHIFT;
 			}
 
 		case XK_Shift_R:
 			{
-				m_Keys[KEY_RIGHTSHIFT] = a_KeyState;
-				break;
+				return KEY_RIGHTSHIFT;
 			}
 
 		case XK_Control_R:
 			{
-				m_Keys[KEY_RIGHTCONTROL] = a_KeyState;
-				break;
+				return KEY_RIGHTCONTROL;
 			}
 
 		case XK_Control_L:
 			{
-				m_Keys[KEY_LEFTCONTROL] = a_KeyState;
-				break;
+				return KEY_LEFTCONTROL;
 			}
 
 		case XK_Caps_Lock:
 			{
-				m_Keys[KEY_CAPSLOCK] = a_KeyState;
-				break;
+				return KEY_CAPSLOCK;
 			}
 
 		case XK_Alt_L:
 			{
-				m_Keys[KEY_LEFTALT] = a_KeyState;
-				break;
+				return KEY_LEFTALT;
 			}
 
 		case XK_Alt_R:
 			{
-				m_Keys[KEY_RIGHTALT] = a_KeyState;
-				break;
+				return KEY_RIGHTALT;
 			}
 
 		default:
 			{
-				break;
+				return 0;
 			}
 	}
 }
@@ -485,16 +440,12 @@ void F_W::Linux_InitializeGL()
 
 void F_W::InitializeAtomics()
 {
-	m_AState = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE", False);
-	m_AAddState = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_ADD", False);
-	m_ARemoveState = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_REMOVE", False);
-	m_AFullScreenState = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_FULLSCREEN", False);
-	m_AMaximizedHorizontal = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_MAXIMIZED_HORZ", False);
-	m_AMaximizedVertical = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_MAXIMIZED_VERT", False);
-	m_AWindowMotifs = XInternAtom(F_WM::GetDisplay(), "_MOTIF_WM_MOTIFS", False);
-	m_ABypassCompositor = XInternAtom(F_WM::GetDisplay(), "_NET_WM_BYPASS_COMPOSITOR", False);
-	m_AActiveWindow = XInternAtom(F_WM::GetDisplay(), "_NET_ACTIVE_WINDOW", False);
-	m_ACloseWindow = XInternAtom(F_WM::GetDisplay(), "_NET_CLOSE_WINDOW", False);
+	m_AtomicState = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE", False);
+	m_AtomicFullScreenState = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_FULLSCREEN", False);
+	m_AtomicMaximizedHorizontal = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+	m_AtomicMaximizedVertical = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_MAXIMIZED_VERT", False);
+	m_AtomicCloseWindow = XInternAtom(F_WM::GetDisplay(), "_NET_WM_CLOSE_WINDOW", False);
+	m_AtomicHidden = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_HIDDEN", False);
 }
 
 Window F_W::GetWindowHandle()

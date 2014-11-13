@@ -1,9 +1,17 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+#include <GL/glew.h>
+#include <GL/glxew.h>
+#include <GL/glext.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <fcntl.h>
+#include "WindowAPI_Defs.h"
+
+#if defined(CURRENT_OS_WINDOWS)
 #include <windows.h>
-#include <gl/GL.h>
 #include <io.h>
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -12,48 +20,41 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #endif
 
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+#if defined(CURRENT_OS_LINUX)
 #include <GL/glx.h>
 #include <GL/glu.h>
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
-#include <GL/gl.h>
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
+class F_WM;
 
-#include <fcntl.h>
-#include "WindowAPI_Defs.h"
-
-class Foundation_WindowManager;
-
-class Foundation_Window
+class F_W
 {
 public:
 	//window constructor
-	Foundation_Window(const char*  a_WindowName, GLuint a_Width = 1280, GLuint a_Height = 720, GLuint a_ColourBits = 32,
+	F_W(const char*  a_WindowName, GLuint a_Width = 1280, GLuint a_Height = 720, GLuint a_ColourBits = 32,
 		GLuint a_DepthBits = 8, GLuint a_StencilBits = 8, bool a_ShouldCreateTerminal = true);
 
 	//window deconstructor
-	~Foundation_Window();
+	~F_W();
 
+	//shut down respective OpenGL context
 	void Shutdown();
 
-	//gets and set for window resolution(NOT IMPLEMENTED)
+	//gets and set for window resolution
 	void GetResolution(GLuint& a_Width, GLuint& a_Height);
 	GLuint* GetResolution();
 	void SetResolution(GLuint a_Width, GLuint a_Height);
 
-	//gets and set for mouse position relative to window space(COMPLETED)
-	void GetMousePositionInWindow(GLuint& a_X, GLuint& a_Y);
-	GLuint* GetMousePositionInWindow();
-	void SetMousePositionInWindow(GLuint a_X, GLuint a_Y);
+	//gets and set for mouse position relative to window space
+	void GetMousePosition(GLuint& a_X, GLuint& a_Y);
+	GLuint* GetMousePosition();
+	void SetMousePosition(GLuint a_X, GLuint a_Y);
 
-	//gets and sets for window position(TESTING NEEDED)
+	//gets and sets for window position
 	void GetPosition(GLuint& a_X, GLuint& a_Y);
 	GLuint* GetPosition();
 	void SetPosition(GLuint a_X, GLuint a_Y);
@@ -70,35 +71,50 @@ public:
 	//make the window swap drawbuffers
 	void SwapBuffers();
 
-	//get and set for triggering fullscreen mode (SEMI FUNCTIONAL)
+	//get and set for triggering fullscreen mode
 	void FullScreen(bool a_FullScreenState);
 	bool GetIsFullScreen();
 
-	//set and get for minimising a window(SEMI FUNCTIONAL)
+	//set and get for minimizing a window
 	void Minimize(bool a_MinimizeState);
 	bool GetIsMinimized();
 
-	// set and get for maxmising a window(NOT  IMPLEMENTED)
+	// set and get for maximizing a window
 	void Maximise(bool a_MaximizeState);
 	bool GetIsMaximised();
 
 	//creates on OpenGL Context
 	void InitializeGL();
 
-	//get and set for window Name(NOT IMPLEMENTED)
+	//get and set for window name
 	const char* GetWindowName();
 	void SetName(const char* a_WindowName);
 
 	//make the window thr current OpenGL context to be drawn
 	void MakeCurrentContext();
 
-	//wether the window is in focus(WINDOWS NOT IMPLEMENTED)
+	//wether the window is in focus
 	bool GetInFocus();
+	void Focus(bool a_FocuState);
 
-	//wether the window is obscured(NOT IMPLEMENTED)
+	//wether the window is obscured
 	bool GetIsObscured();
 
-	friend Foundation_WindowManager;
+	void SetOnKeyEvent(OnKeyEvent a_OnKeyEvent);
+	void SetOnMouseButtonEvent(OnMouseButtonEvent a_OnButtonMouseEvent);
+	void SetOnMouseWheelEvent(OnMouseWheelEvent a_OnMouseWheelEvent);
+	void SetOnCreated(OnCreated a_OnCreated);
+	void SetOnDestroyed(OnDestroyed a_OnDestroyed);
+//	void SetOnFullScreen(OnFullscreen a_OnFullScreen);
+	void SetOnMaximized(OnMaximized a_OnMaximized);
+	void SetOnMinimized(OnMinimized a_OnMinimized);
+//	void SetOnNameChange(OnNameChange a_NameChanged);
+	void SetOnMoved(OnMoved a_OnMoved);
+	void SetOnResize(OnResize a_OnResize);
+	void SetOnFocus(OnFocus a_OnFocus);
+	void SetOnMouseMove(OnMouseMove a_OnMouseMove);
+
+	friend F_WM;
 
 private:
 
@@ -113,23 +129,57 @@ private:
 	GLuint m_MousePosition[2];
 	bool WindowShouldClose;
 	GLuint m_WindowID;
+
 	bool m_InFocus;
 	bool m_IsObscured;
-
 	bool m_IsFullScreen;
 	bool m_IsMinimised;
 	bool m_IsMaximised;
 
-	void AddSelfToManager();
-
 	void ShutDownWindow();	
 	void InitializePixelFormat();
+	void InitializeEvents();
+
+	OnKeyEvent m_OnKeyEvent;
+	OnMouseButtonEvent m_OnMouseButtonEvent;
+	OnMouseWheelEvent m_OnMouseWheel;
+	OnCreated m_OnCreated;
+	OnDestroyed m_OnDestroyed;
+	OnMaximized m_OnMaximized;
+	OnMinimized m_OnMinimized;
+	OnMoved m_OnMoved;
+	OnResize m_OnResize;
+	OnFocus m_OnFocus;
+	OnMouseMove m_OnMouseMove;
 	
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+#if defined(CURRENT_OS_WINDOWS)
 
 public:
 	HWND GetWindowHandle();
 private:
+
+	void Windows_SetResolution();
+	void Windows_SetPosition(GLuint a_X, GLuint a_Y);
+	void Windows_SetMousePositionInWindow(GLuint a_X, GLuint& a_Y);
+	void Windows_FullScreen(bool a_FullScreenState);
+	void Windows_Minimize(bool a_MinimizeState);
+	void Windows_Maximize(bool a_MaximizeState);
+	void Windows_SetWindowName(const char* a_NewName);
+	void Windows_Focus(bool a_FocusState);
+	void Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam,  bool a_KeyState);
+	void Windows_InitializeGL();
+	void Windows_Shutdown();
+
+	//void Win32TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeyState);
+
+	void InitializeWin32(LPCSTR a_MenuName,
+		UINT a_Style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW,
+		int a_ClearScreenExtra = 0, int a_WindowExtra = 0,
+		HINSTANCE a_Instance = GetModuleHandle(0),
+		HICON a_Icon = LoadIcon(0, IDI_APPLICATION),
+		HCURSOR a_Cursor = LoadCursor(0, IDC_ARROW),
+		HBRUSH a_Brush = (HBRUSH)BLACK_BRUSH);
+
 
 	//HDC m_DeviceContextHandle;
 	HGLRC m_GLRenderingcontextHandle;
@@ -142,41 +192,26 @@ private:
 
 	LPARAM m_LongParam;
 	WPARAM m_WordParam;
-
-	void Win32TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeyState);
-
-	void InitializeWin32(LPCSTR a_MenuName,
-		UINT a_Style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW,
-		int a_ClearScreenExtra = 0, int a_WindowExtra = 0,
-		HINSTANCE a_Instance = GetModuleHandle(0),
-		HICON a_Icon = LoadIcon(0, IDI_APPLICATION),
-		HCURSOR a_Cursor = LoadCursor(0, IDC_ARROW),
-		HBRUSH a_Brush = (HBRUSH)BLACK_BRUSH);
+	
 #endif
 
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
+#if defined(CURRENT_OS_LINUX)
 
-	void Linux_SetResolution();
-
+	void Linux_Initialize();
+	void Linux_SetResolution(GLuint a_Width, GLuint a_Height);
 	void Linux_SetPosition(GLuint a_X, GLuint a_Y);
-
-	void Linux_SetMousePositionInWindow(GLuint a_X, GLuint a_Y);
-	
+	void Linux_SetMousePosition(GLuint a_X, GLuint a_Y);
 	void Linux_FullScreen(bool a_FullScreenState);
-
 	void Linux_Minimize(bool a_MinimizeState);
-
 	void Linux_Maximize(bool a_MaximizeState);
-
-	void Linux_SetWindowName();
-
-	void Linux_FocusWindow(bool a_FocusState);
-
-	void Linux_TranslateKey(GLuint a_KeySym, bool a_KeyState);
+	void Linux_SetName(const char* a_NewName);
+	void Linux_Focus(bool a_FocusState);
+	GLuint Linux_TranslateKey(GLuint a_KeySym);
+	void Linux_InitializeGL();
+	void Linux_SetSwapInterval(GLuint a_SwapInterval);
+	void Linux_Shutdown();
 
 	void InitializeAtomics();
-
-	void Linux_InitializeGL();
 
 	Window GetWindowHandle();
 	Window m_Window;
@@ -188,16 +223,13 @@ private:
 	XSetWindowAttributes m_SetAttributes;
 	XWindowAttributes m_WindowAttributes;
 
-	Atom m_AState; //_NET_WM_STATE
-	Atom m_AAddState; //_NET_WM_STATE_ADD
-	Atom m_ARemoveState; // _NET_WM_STATE_REMOVE
-	Atom m_AFullScreenState; //NET_WM_STATE_FULLSCREEN
-	Atom m_AMaximizedHorizontal; // _NET_WM_STATE_MAXIMIZED_HORZ
-	Atom m_AMaximizedVertical; // _NET_WM_STATE_MAXIMIZED_VERT
-	Atom m_AWindowMotifs; // _MOTIF_WM_HINTS
-	Atom m_ABypassCompositor; // _NET_WM_BYPASS_COMPOSITOR
-	Atom m_AActiveWindow; // _NET_ACTIVE_WINDOW
-	Atom m_ACloseWindow; // _NET_CLOSE_WINDOW
+	//these atomics are needed to change window states programatically
+	Atom m_AtomicState; //_NET_WM_STATE
+	Atom m_AtomicHidden;// _NET_WM_STATE_HIDDEN
+	Atom m_AtomicFullScreenState; //NET_WM_STATE_FULLSCREEN
+	Atom m_AtomicMaximizedHorizontal; // _NET_WM_STATE_MAXIMIZED_HORZ
+	Atom m_AtomicMaximizedVertical; // _NET_WM_STATE_MAXIMIZED_VERT
+	Atom m_AtomicCloseWindow; // _NET_CLOSE_WINDOW
 
 	bool m_OverrideRedirect; //wether to use window manager or not	
 

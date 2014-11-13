@@ -1,27 +1,38 @@
 #include <stdio.h>
 #include "WindowManager.h"
 
+void OnWindowKeyPressed(GLuint a_KeySym, bool a_KeyState)
+{
+	if(a_KeySym == ' ' && a_KeyState == KEYSTATE_DOWN)
+	{
+		F_WM::SetFullScreen("Blarg", true);
+	}
+
+	if(a_KeySym == KEY_ARROW_LEFT && a_KeyState == KEYSTATE_DOWN)
+	{
+		F_WM::SetFullScreen("Blarg", false);
+	}
+}
+
 int main()
 {
-	Foundation_WindowManager::Initialize();
-	Foundation_WindowManager::AddWindow(new Foundation_Window("Blarg"));
-	printf("Renderer: %s Version: %s\n", glGetString(GL_RENDERER), glGetString(GL_VERSION));
-	while (!Foundation_WindowManager::WindowGetKey("Blarg", KEY_ESCAPE) ||
-		!Foundation_WindowManager::GetWindowShouldClose("Blarg"))
+	F_WM::Initialize();
+	F_WM::AddWindow(new F_W("Blarg"));
+
+	F_WM::GetWindowByName("Blarg")->SetOnKeyEvent(&OnWindowKeyPressed);
+
+	while (!F_WM::WindowGetKey("Blarg", KEY_ESCAPE) ||
+		!F_WM::GetWindowShouldClose("Blarg"))
 	{
-		Foundation_WindowManager::PollForEvents();
-		for (GLuint i = 0; i < Foundation_WindowManager::GetNumWindows(); i++)
+		F_WM::PollForEvents();
+		for (GLuint i = 0; i < F_WM::GetNumWindows(); i++)
 		{
-			Foundation_WindowManager::GetWindowByIndex(i)->MakeCurrentContext();
-
-			//Foundation_WindowManager::GetWindowByIndex(i)->SetWindowName("Penish");
-
+			F_WM::GetWindowByIndex(i)->MakeCurrentContext();
 			glClearColor(1.0f, 0.25f, 0.25f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
-			Foundation_WindowManager::WindowSwapBuffers("Blarg");
+			F_WM::WindowSwapBuffers("Blarg");
 		}
-	}
-	
+	}	
 	return 0;
 }
