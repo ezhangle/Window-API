@@ -31,12 +31,15 @@ Debug/WindowAPI.tlog/link.command.1.tlog
 Debug/WindowAPI.tlog/link.read.1.tlog
 Debug/WindowAPI.tlog/link.write.1.tlog
 Debug/vc120.idb
+<<<<<<< HEAD
 glew-1.11.0/build/vc12/glew.sdf
 glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/Win32/glew.res
 glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/Win32/glew_shared.tlog/CL.read.1.tlog
 glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/Win32/glew_shared.tlog/CL.write.1.tlog
 glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/Win32/glew_shared.tlog/cl.command.1.tlog
 glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/Win32/glew_shared.tlog/glew_shared.lastbuildstate
+=======
+>>>>>>> new-branch
 glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/Win32/glew_shared.tlog/glew_shared.write.1u.tlog
 glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/Win32/glew_shared.tlog/link.command.1.tlog
 glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/Win32/glew_shared.tlog/link.read.1.tlog
@@ -57,6 +60,7 @@ glew-1.11.0/build/vc12/tmp/glew_shared/Debug/Win32/glew_shared.tlog/rc.command.1
 glew-1.11.0/build/vc12/tmp/glew_shared/Debug/Win32/glew_shared.tlog/rc.read.1.tlog
 glew-1.11.0/build/vc12/tmp/glew_shared/Debug/Win32/glew_shared.tlog/rc.write.1.tlog
 glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew.res
+<<<<<<< HEAD
 glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/CL.read.1.tlog
 glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/CL.write.1.tlog
 glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/cl.command.1.tlog
@@ -101,6 +105,9 @@ glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/glew_static.
 glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/lib.command.1.tlog
 glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/rc.command.1.tlog
 glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/rc.read.1.tlog
+=======
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/rc.command.1.tlog
+>>>>>>> new-branch
 glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/rc.write.1.tlog
 glew-1.11.0/build/vc12/tmp/glew_static/Release MX/Win32/glew.res
 glew-1.11.0/build/vc12/tmp/glew_static/Release MX/Win32/glew_static.tlog/CL.read.1.tlog
@@ -183,4 +190,57 @@ glew-1.11.0/build/vc12/tmp/visualinfo/Release/Win32/visualinfo.tlog/visualinfo.l
 glew-1.11.0/lib/Debug MX/Win32/glew32mxd.exp
 glew-1.11.0/lib/Debug/Win32/glew32d.exp
 glew-1.11.0/lib/Release MX/Win32/glew32mx.exp
+<<<<<<< HEAD
 glew-1.11.0/lib/Release/Win32/glew32.exp
+=======
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/Win32/glew.res
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/Win32/glew_shared.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/Win32/glew_shared.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/Win32/glew_shared.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/Win32/glew_shared.tlog/glew_shared.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/glew_shared.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/glew_shared.write.1u.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/rc.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/rc.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/Win32/glew_shared.tlog/rc.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/Win32/glew.res
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/Win32/glew_shared.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/Win32/glew_shared.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/Win32/glew_shared.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/Win32/glew_shared.tlog/glew_shared.write.1u.tlog
+glew-1.11.0/lib/Release/Win32/glew32.exp
+glew-1.11.0/build/vc12/glew.sdf
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/Win32/glew_shared.tlog/glew_shared.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/Win32/glew_shared.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/Win32/glew_shared.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/Win32/glew_shared.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/Win32/glew_shared.tlog/rc.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/Win32/glew_shared.tlog/rc.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/Win32/glew_shared.tlog/rc.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/Win32/glew.res
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/Win32/glew_static.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/Win32/glew_static.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/Win32/glew_static.tlog/Lib-link-cvtres.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/Win32/glew_static.tlog/Lib-link-cvtres.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/Win32/glew_static.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/Win32/glew_static.tlog/glew_static.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/Win32/glew_static.tlog/lib.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/Win32/glew_static.tlog/rc.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/Win32/glew_static.tlog/rc.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/Win32/glew_static.tlog/rc.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew.res
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/Lib-link-cvtres.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/Lib.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/glew_static.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/lib.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/rc.read.1.tlog
+>>>>>>> new-branch

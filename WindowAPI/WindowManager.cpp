@@ -11,6 +11,10 @@ void F_WM::Initialize()
 #if defined(CURRENT_OS_LINUX)
 	Linux_Initialize();
 #endif	
+
+#if defined(CURRENT_OS_WINDOWS)
+	Windows_Initialize();
+#endif
 }
 
 F_WM::~F_WM()
@@ -46,7 +50,7 @@ F_W* F_WM::GetWindowByName(const char* a_WindowName)
 
 F_W* F_WM::GetWindowByIndex(GLuint a_WindowIndex)
 {
-	if (a_WindowIndex <= GetInstance()->m_Windows.size())
+	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
 		return GetInstance()->m_Windows[a_WindowIndex];
 	}
@@ -143,7 +147,7 @@ GLuint* F_WM::GetScreenResolution()
 void F_WM::PollForEvents()
 {
 #if defined(CURRENT_OS_WINDOWS)
-	GetInstance()->Win32PollForEvents();
+	GetInstance()->Windows_PollForEvents();
 #endif
 
 #if defined (CURRENT_OS_LINUX)
@@ -333,7 +337,7 @@ bool F_WM::WindowGetKey(const char* a_WindowName, GLuint a_Key)
 {
 	if(Foundation_Tools::IsValid(a_WindowName))
 	{
-		return GetWindowByName(a_WindowName)->GetKey(a_Key);
+		return GetWindowByName(a_WindowName)->GetKeyState(a_Key);
 	}
 
 	return false;
@@ -343,7 +347,7 @@ bool F_WM::WindowGetKey(GLuint a_WindowIndex, GLuint a_Key)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-		return GetWindowByIndex(a_WindowIndex)->GetKey(a_Key);
+		return GetWindowByIndex(a_WindowIndex)->GetKeyState(a_Key);
 	}
 
 	return false;
@@ -373,7 +377,7 @@ void F_WM::WindowSwapBuffers(const char* a_WindowName)
 {
 	if(Foundation_Tools::IsValid(a_WindowName))
 	{
-		GetWindowByName(a_WindowName)->SwapBuffers();
+		GetWindowByName(a_WindowName)->SwapDrawBuffers();
 	}
 }
 
@@ -381,7 +385,7 @@ void F_WM::WindowSwapBuffers(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-		GetWindowByIndex(a_WindowIndex)->SwapBuffers();
+		GetWindowByIndex(a_WindowIndex)->SwapDrawBuffers();
 	}
 }
 

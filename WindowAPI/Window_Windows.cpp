@@ -41,7 +41,7 @@ void F_W::InitializePixelFormat()
 	return;
 }
 
-void F_W::InitializeWin32(LPCSTR a_MenuName, 
+void F_W::Windows_Initialize(LPCSTR a_MenuName, 
 	UINT a_Style /* = CS_OWNDC | CS_HREDRAW | CS_DROPSHADOW */,
 	int a_ClearScreenExtra /* = 0 */, 
 	int a_WindowExtra /* = 0 */,
@@ -72,104 +72,102 @@ void F_W::InitializeWin32(LPCSTR a_MenuName,
 	UpdateWindow(m_WindowHandle);
 }
 
-void F_W::Win32TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeyState)
+void F_W::Windows_Shutdown()
+{
+	if (m_GLRenderingcontextHandle) {
+		wglMakeCurrent(NULL, NULL);
+		wglDeleteContext(m_GLRenderingcontextHandle);
+	}
+	if (m_PaletteHandle)
+	{
+		DeleteObject(m_PaletteHandle);
+	}
+	ReleaseDC(m_WindowHandle, m_DeviceContextHandle);
+	PostQuitMessage(0);
+}
+
+GLuint F_W::Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam)
 {
 	switch (a_WordParam)
 	{
 		case VK_ESCAPE:
 		{
-			m_Keys[KEY_ESCAPE] = a_KeyState;
-			break;
+			return KEY_ESCAPE;
 		}
 
 		case VK_F1:
 		{
-			m_Keys[KEY_F1] = a_KeyState;
-			break;
+			return KEY_F1;
 		}
 
 		case VK_F2:
 		{
-			m_Keys[KEY_F2] = a_KeyState;
-			break;
+			return KEY_F2;
 		}
 
 		case VK_F3:
 		{
-			m_Keys[KEY_F3] = a_KeyState;
-			break;
+			return KEY_F3;
 		}
 
 		case VK_F4:
 		{
-			m_Keys[KEY_F4] = a_KeyState;
-			break;
+			return KEY_F4;
 		}
 
 		case VK_F5:
 		{
-			m_Keys[KEY_F5] = a_KeyState;
-			break;
+			return KEY_F5;
 		}
 
 		case VK_F6:
 		{
-			m_Keys[KEY_F6] = a_KeyState;
-			break;
+			return KEY_F6;
 		}
 
 		case VK_F7:
 		{
-			m_Keys[KEY_F7] = a_KeyState;
-			break;
+			return KEY_F7;
 		}
 
 		case VK_F8:
 		{
-			m_Keys[KEY_F8] = a_KeyState;
-			break;
+			return KEY_F8;
 		}
 
 		case VK_F9:
 		{
-			m_Keys[KEY_F9] = a_KeyState;
-			break;
+			return KEY_F9;
 		}
 
 		case VK_F10:
 		{
-			m_Keys[KEY_F10] = a_KeyState;
-			break;
+			return KEY_F10;
 		}
 
 		case VK_F11:
 		{
-			m_Keys[KEY_F11] = a_KeyState;
-			break;
+			return KEY_F11;
 		}
 
 		case VK_F12:
 		{
-			m_Keys[KEY_F12] = a_KeyState;
-			break;
+			return KEY_F12;
 		}
 
 		case VK_BACK:
 		{
-			m_Keys[KEY_BACKSPACE] = a_KeyState;
-			break;
+			return KEY_BACKSPACE;
 		}
 
 		case VK_TAB:
 		{
-			m_Keys[KEY_TAB] = a_KeyState;
-			break;
+			return KEY_TAB;
 		}
 
 		case VK_CAPITAL:
 		{
-			m_Keys[KEY_CAPSLOCK] = a_KeyState;
-			break;
+			return KEY_CAPSLOCK;
 		}
 
 		case VK_SHIFT:
@@ -190,171 +188,225 @@ void F_W::Win32TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam, bool a_KeySt
 
 		case VK_RETURN:
 		{
-			m_Keys[KEY_ENTER] = a_KeyState;
-			break;
+			return KEY_ENTER;
 		}
 
 		case VK_PRINT:
 		{
-			m_Keys[KEY_PRINTSCREEN] = a_KeyState;
-			break;
+			return KEY_PRINTSCREEN;
 		}
 
 		case VK_SCROLL:
 		{
-			m_Keys[KEY_SCROLLLOCK] = a_KeyState;
-			break;
+			return KEY_SCROLLLOCK;
 		}
 
 		case VK_PAUSE:
 		{
-			m_Keys[KEY_PAUSE] = a_KeyState;
-			break;
+			return KEY_PAUSE;
 		}
 
 		case VK_INSERT:
 		{
-			m_Keys[KEY_INSERT] = a_KeyState;
-			break;
+			return KEY_INSERT;
 		}
 
 		case VK_HOME:
 		{
-			m_Keys[KEY_HOME] = a_KeyState;
-			break;
+			return KEY_HOME;
 		}
 
 		case VK_DELETE:
 		{
-			m_Keys[KEY_DELETE] = a_KeyState;
-			break;
+			return KEY_DELETE;
 		}
 
 		case VK_END:
 		{
-			m_Keys[KEY_END] = a_KeyState;
-			break;
+			return KEY_END;
 		}
 
 		case VK_DOWN:
 		{
-			m_Keys[KEY_ARROW_DOWN] = a_KeyState;
-			break;
+			return KEY_ARROW_DOWN;
 		}
 
 		case VK_UP:
 		{
-			m_Keys[KEY_ARROW_UP] = a_KeyState;
-			break;
+			return KEY_ARROW_UP;
 		}
 
 		case VK_LEFT:
 		{
-			m_Keys[KEY_ARROW_LEFT] = a_KeyState;
-			break;
+			return KEY_ARROW_LEFT;
 		}
 
 		case VK_RIGHT:
 		{
-			m_Keys[KEY_ARROW_RIGHT] = a_KeyState;
-			break;
+			return KEY_ARROW_RIGHT;
 		}
 
 		case VK_DIVIDE:
 		{
-			m_Keys[KEY_KEYPAD_DIVIDE] = a_KeyState;
-			break;
+			return KEY_KEYPAD_DIVIDE;
 		}
 
 		case VK_MULTIPLY:
 		{
-			m_Keys[KEY_KEYPAD_MULTIPLY] = a_KeyState;
-			break;
+			return KEY_KEYPAD_MULTIPLY;
 		}
 
 		case VK_SUBTRACT:
 		{
-			m_Keys[KEY_KEYPAD_DIVIDE] = a_KeyState;
-			break;
+			return KEY_KEYPAD_DIVIDE;
 		}
 
 		case VK_ADD:
 		{
-			m_Keys[KEY_KEYPAD_ADD] = a_KeyState;
-			break;
+			return KEY_KEYPAD_ADD;
 		}
 
 		case VK_DECIMAL:
 		{
-			m_Keys[KEY_KEYPAD_PERIOD] = a_KeyState;
-			break;
+			return KEY_KEYPAD_PERIOD;
 		}
 
 		case VK_NUMPAD0:
 		{
-			m_Keys[KEY_KEYPAD_0] = a_KeyState;
-			break;
+			return KEY_KEYPAD_0;
 		}
 
 		case VK_NUMPAD1:
 		{
-			m_Keys[KEY_KEYPAD_1] = a_KeyState;
-			break;
+			return KEY_KEYPAD_1;
 		}
 
 		case VK_NUMPAD2:
 		{
-			m_Keys[KEY_KEYPAD_2] = a_KeyState;
-			break;
+			return KEY_KEYPAD_2;			
 		}
 
 		case VK_NUMPAD3:
 		{
-			m_Keys[KEY_KEYPAD_3] = a_KeyState;
-			break;
+			return KEY_KEYPAD_3;			
 		}
 
 		case VK_NUMPAD4:
 		{
-			m_Keys[KEY_KEYPAD_4] = a_KeyState;
-			break;
+			return KEY_KEYPAD_4;			
 		}
 
 		case VK_NUMPAD5:
 		{
-			m_Keys[KEY_KEYPAD_5] = a_KeyState;
-			break;
+			return KEY_KEYPAD_5;			
 		}
 
 		case VK_NUMPAD6:
 		{
-			m_Keys[KEY_KEYPAD_6] = a_KeyState;
-			break;
+			return KEY_KEYPAD_6;			
 		}
 
 		case VK_NUMPAD7:
 		{
-			m_Keys[KEY_KEYPAD_7] = a_KeyState;
-			break;
+			return KEY_KEYPAD_7;			
 		}
 
 		case VK_NUMPAD8:
 		{
-			m_Keys[KEY_KEYPAD_8] = a_KeyState;
-			break;
+			return KEY_KEYPAD_8;			
 		}
 
 		case VK_NUMPAD9:
 		{
-			m_Keys[KEY_KEYPAD_9] = a_KeyState;
-			break;
+			return KEY_KEYPAD_9;			
 		}
+
 		default:
 		{
-			return;
+			return KEY_ERROR;
 		}
 	}
 }
 
+void F_W::Windows_FullScreen(bool a_FullScreenState)
+{
+	if (a_FullScreenState)
+	{
+		SetWindowLongPtr(m_WindowHandle, GWL_STYLE,
+			WS_SYSMENU | WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE);
+
+		MoveWindow(m_WindowHandle, 0, 0, F_WM::GetScreenResolution()[0], 
+			F_WM::GetScreenResolution()[1], true);
+
+		DEVMODE l_ScreenSettings;
+		memset(&l_ScreenSettings, 0, sizeof(l_ScreenSettings));
+		l_ScreenSettings.dmSize = sizeof(l_ScreenSettings);
+		l_ScreenSettings.dmPelsWidth = F_WM::GetScreenResolution()[0];
+		l_ScreenSettings.dmPelsHeight = F_WM::GetScreenResolution()[1];
+		l_ScreenSettings.dmBitsPerPel = m_ColourBits;
+		l_ScreenSettings.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
+
+		if (ChangeDisplaySettings(&l_ScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
+		{
+			printf("could not successfully change to full screen mode \n");
+		}
+	}
+
+	else
+	{
+		RECT l_Rect;
+		l_Rect.left = 0;
+		l_Rect.top = 0;
+		l_Rect.right = m_Resolution[0];
+		l_Rect.left = m_Resolution[1];
+
+		DEVMODE l_ScreenSettings;
+
+		l_ScreenSettings.dmSize = sizeof(l_ScreenSettings);
+		l_ScreenSettings.dmPelsWidth = m_Resolution[0];
+		l_ScreenSettings.dmPelsHeight = m_Resolution[1];
+		l_ScreenSettings.dmBitsPerPel = 32;
+		l_ScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+
+		if (ChangeDisplaySettings(&l_ScreenSettings, CDS_RESET) != DISP_CHANGE_SUCCESSFUL)
+		{
+			printf("could not successfully change back to regular mode. dear god what have i done? \n");
+		}
+
+		SetWindowLongPtr(m_WindowHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+		AdjustWindowRect(&l_Rect, WS_OVERLAPPEDWINDOW, false);
+		MoveWindow(m_WindowHandle, m_Position[0], m_Position[1], l_Rect.right, l_Rect.bottom, true);
+	}
+}
+
+void F_W::Windows_Maximize(bool a_MaximizeState)
+{
+
+}
+
+void F_W::Windows_Minimize(bool a_MinimizeState)
+{
+
+}
+
+void F_W::Windows_SetMousePosition(GLuint a_X, GLuint& a_Y)
+{
+
+}
+
+void F_W::Windows_SetName(const char* a_NewName)
+{
+
+}
+
+void F_W::Windows_SetPosition(GLuint a_X, GLuint a_Y)
+{
+
+}
+
+void F_W::Windows_SetResolution(GLuint a_Width, GLuint a_Height)
+{
+
+}
 
 #endif

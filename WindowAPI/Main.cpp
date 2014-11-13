@@ -3,7 +3,7 @@
 
 void OnWindowKeyPressed(GLuint a_KeySym, bool a_KeyState)
 {
-	if(a_KeySym == ' ' && a_KeyState == KEYSTATE_DOWN)
+    if(a_KeySym == ' ' && a_KeyState == KEYSTATE_DOWN)
 	{
 		F_WM::SetFullScreen("Blarg", true);
 	}
