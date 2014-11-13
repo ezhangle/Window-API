@@ -5,6 +5,7 @@
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 #define CURRENT_OS_LINUX
+#include <GL/glew.h>
 #endif
 
 #define KEYSTATE_DOWN 1

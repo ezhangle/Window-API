@@ -167,7 +167,7 @@ void F_WM::Linux_PollForEvents()
 			}
 	
 			printf("Window was destroyed\n");		
-			l_Window->ShutDownWindow();
+			l_Window->Shutdown();
 			
 			break;
 		}
@@ -544,7 +544,7 @@ void F_WM::Linux_PollForEvents()
 			if((Atom)l_Event.xclient.data.l[1] == l_Window->m_AtomicCloseWindow)
 			{
 				printf("window closed\n");
-				l_Window->WindowShouldClose = true;
+				l_Window->m_ShouldClose = true;
 				XDestroyWindow(GetInstance()->m_Display, l_Event.xclient.window);
 				break;
 			}
