@@ -2,9 +2,26 @@
 #include "WindowManager.h"
 
 #if defined(CURRENT_OS_WINDOWS)
+
 HWND F_W::GetWindowHandle()
 {
 	return m_WindowHandle;
+}
+
+void F_W::Windows_InitializeGL()
+{
+	m_DeviceContextHandle = GetDC(m_WindowHandle);
+	InitializePixelFormat();
+	m_GLRenderingContextHandle = wglCreateContext(m_DeviceContextHandle);
+	wglMakeCurrent(m_DeviceContextHandle, m_GLRenderingContextHandle);
+
+	GLenum l_Error = glewInit();
+
+	if (l_Error != GLEW_OK)
+	{
+		printf("%s\n", glewGetErrorString(l_Error));
+		exit(0);
+	}
 }
 
 void F_W::InitializePixelFormat()
@@ -50,11 +67,12 @@ void F_W::Windows_Initialize(LPCSTR a_MenuName,
 	HCURSOR a_Cursor /* = LoadCursor(0 , IDC_ARROW)*/,
 	HBRUSH a_Brush /* = (HBRUSH)BLACK_BRUSH */)
 {
+	m_InstanceHandle = a_Instance;
 	m_WindowClass.style = a_Style;
 	m_WindowClass.lpfnWndProc = F_WM::StaticWindowProcedure;
 	m_WindowClass.cbClsExtra = 0;
 	m_WindowClass.cbWndExtra = 0;
-	m_WindowClass.hInstance = a_Instance;
+	m_WindowClass.hInstance = m_InstanceHandle;
 	m_WindowClass.hIcon = a_Icon;
 	m_WindowClass.hCursor = a_Cursor;
 	m_WindowClass.hbrBackground = a_Brush;
@@ -74,15 +92,24 @@ void F_W::Windows_Initialize(LPCSTR a_MenuName,
 
 void F_W::Windows_Shutdown()
 {
-	if (m_GLRenderingcontextHandle) {
-		wglMakeCurrent(NULL, NULL);
-		wglDeleteContext(m_GLRenderingcontextHandle);
+	if (m_GLRenderingContextHandle)
+	{
+		wglMakeCurrent(nullptr, nullptr);
+		wglDeleteContext(m_GLRenderingContextHandle);
 	}
+
 	if (m_PaletteHandle)
 	{
 		DeleteObject(m_PaletteHandle);
 	}
 	ReleaseDC(m_WindowHandle, m_DeviceContextHandle);
+	DestroyWindow(m_WindowHandle);
+	UnregisterClass(m_WindowName, m_InstanceHandle);
+
+	m_DeviceContextHandle = nullptr;
+	m_WindowHandle = nullptr;
+	m_GLRenderingContextHandle = nullptr;
+	
 	PostQuitMessage(0);
 }
 
@@ -168,22 +195,6 @@ GLuint F_W::Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam)
 		case VK_CAPITAL:
 		{
 			return KEY_CAPSLOCK;
-		}
-
-		case VK_SHIFT:
-		{
-			//m_Keys
-			break;
-		}
-
-		case VK_CONTROL:
-		{
-			break;
-		}
-
-		case VK_MENU:
-		{
-			break;
 		}
 
 		case VK_RETURN:
@@ -323,7 +334,7 @@ GLuint F_W::Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam)
 
 		default:
 		{
-			return KEY_ERROR;
+			return a_WordParam;
 		}
 	}
 }
@@ -337,6 +348,7 @@ void F_W::Windows_FullScreen(bool a_FullScreenState)
 
 		MoveWindow(m_WindowHandle, 0, 0, F_WM::GetScreenResolution()[0], 
 			F_WM::GetScreenResolution()[1], true);
+/*
 
 		DEVMODE l_ScreenSettings;
 		memset(&l_ScreenSettings, 0, sizeof(l_ScreenSettings));
@@ -349,7 +361,7 @@ void F_W::Windows_FullScreen(bool a_FullScreenState)
 		if (ChangeDisplaySettings(&l_ScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
 		{
 			printf("could not successfully change to full screen mode \n");
-		}
+		}*/
 	}
 
 	else
@@ -358,9 +370,9 @@ void F_W::Windows_FullScreen(bool a_FullScreenState)
 		l_Rect.left = 0;
 		l_Rect.top = 0;
 		l_Rect.right = m_Resolution[0];
-		l_Rect.left = m_Resolution[1];
+		l_Rect.bottom = m_Resolution[1];
 
-		DEVMODE l_ScreenSettings;
+		/*DEVMODE l_ScreenSettings;
 
 		l_ScreenSettings.dmSize = sizeof(l_ScreenSettings);
 		l_ScreenSettings.dmPelsWidth = m_Resolution[0];
@@ -371,7 +383,7 @@ void F_W::Windows_FullScreen(bool a_FullScreenState)
 		if (ChangeDisplaySettings(&l_ScreenSettings, CDS_RESET) != DISP_CHANGE_SUCCESSFUL)
 		{
 			printf("could not successfully change back to regular mode. dear god what have i done? \n");
-		}
+		}*/
 
 		SetWindowLongPtr(m_WindowHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
 		AdjustWindowRect(&l_Rect, WS_OVERLAPPEDWINDOW, false);
@@ -379,34 +391,71 @@ void F_W::Windows_FullScreen(bool a_FullScreenState)
 	}
 }
 
-void F_W::Windows_Maximize(bool a_MaximizeState)
-{
-
-}
-
 void F_W::Windows_Minimize(bool a_MinimizeState)
 {
+	if (a_MinimizeState)
+	{
+		ShowWindow(m_WindowHandle, SW_MINIMIZE);
+	}
 
+	else
+	{
+		ShowWindow(m_WindowHandle, SW_NORMAL);
+	}
+}
+
+void F_W::Windows_Maximize(bool a_MaximizeState)
+{
+	if (a_MaximizeState)
+	{
+		ShowWindow(m_WindowHandle, SW_MAXIMIZE);
+	}
+
+	else
+	{
+		ShowWindow(m_WindowHandle, SW_NORMAL);
+	}
+}
+
+void F_W::Windows_Restore()
+{
+	ShowWindow(m_WindowHandle, SW_RESTORE);
 }
 
 void F_W::Windows_SetMousePosition(GLuint a_X, GLuint& a_Y)
 {
-
+	POINT l_MousePoint;
+	l_MousePoint.x = a_X;
+	l_MousePoint.y = a_Y;
+	ScreenToClient(m_WindowHandle, &l_MousePoint);
+	SetCursorPos(l_MousePoint.x, l_MousePoint.y);
 }
 
 void F_W::Windows_SetName(const char* a_NewName)
 {
-
+	SetWindowText(m_WindowHandle, m_WindowName);
 }
 
 void F_W::Windows_SetPosition(GLuint a_X, GLuint a_Y)
 {
 
+	RECT rect = { a_X, a_Y, a_X, a_Y };
+	AdjustWindowRect(&rect, GWL_STYLE| WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+		false);
+
+	SetWindowPos(m_WindowHandle, HWND_TOP, a_X, a_Y,
+		m_Resolution[0], m_Resolution[1], SWP_SHOWWINDOW | SWP_NOSIZE);
 }
 
 void F_W::Windows_SetResolution(GLuint a_Width, GLuint a_Height)
 {
+	SetWindowPos(m_WindowHandle, HWND_TOP, m_Position[0], m_Position[1],
+		m_Resolution[0], m_Resolution[1], SWP_SHOWWINDOW | SWP_NOMOVE);
+}
 
+void F_W::Windows_VerticalSync(bool a_EnableSync)
+{
+	wglSwapIntervalEXT(a_EnableSync);
 }
 
 #endif

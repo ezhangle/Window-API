@@ -134,7 +134,7 @@ F_W* F_WM::GetWindowByEvent(XEvent a_Event)
 
 	default:
 		{
-			return NULL;
+			return nullptr;
 		}
 	}
 

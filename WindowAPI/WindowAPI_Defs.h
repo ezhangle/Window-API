@@ -1,6 +1,9 @@
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 #define CURRENT_OS_WINDOWS
-#include "glew.h"
+#define GLEW_STATIC
+#include <GL/glew.h>
+#include <gl/wglew.h>
+
 #endif
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
@@ -81,9 +84,10 @@
 #define MOUSE_LEFTBUTTON 0
 #define MOUSE_RIGHTBUTTON 1
 #define MOUSE_MIDDLEBUTTON 2
-#define MOUSE_SCROLL_DOWN 3
-#define MOUSE_SCROLL_UP 4
-#define MOUSE_LAST MOUSE_SCROLL_UP + 1
+#define MOUSE_LAST MOUSE_MIDDLEBUTTON + 1
+
+#define MOUSE_SCROLL_DOWN 0
+#define MOUSE_SCROLL_UP 1
 
 #define WINDOWSTYLE_BARE 1
 #define WINDOWSTYLE_DEFAULT 2
@@ -92,11 +96,10 @@
 typedef void (*OnKeyEvent)(GLuint a_Key, bool a_KeyState);
 typedef void (*OnMouseButtonEvent)(GLuint a_Button, bool a_ButtonState);
 typedef void (*OnMouseWheelEvent)(GLuint a_WheelDirection);
-typedef void (*OnCreated)();
 typedef void (*OnDestroyed)();
-typedef void (*OnMaximized)(bool a_MaximizeState);
-typedef void (*OnMinimized)(bool a_MinimizeState);
+typedef void (*OnMaximized)();
+typedef void (*OnMinimized)();
+typedef void (*OnRestored)();
 typedef void (*OnMoved)(GLuint a_X, GLuint a_Y);
 typedef void (*OnResize)(GLuint a_Width, GLuint a_Height);
-typedef void (*OnFocus)(bool a_FocusState);
-typedef void (*OnMouseMove)(GLuint a_X, GLuint a_Y);
+typedef void (*OnMouseMove)(GLuint a_WindowX, GLuint a_WindowY, GLuint a_ScreenX, GLuint a_ScreenY);

@@ -34,8 +34,7 @@ F_W::F_W(const char*  a_WindowName,
 	InitializeEvents();
 
 #if defined(CURRENT_OS_WINDOWS)
-	//Windows_Initialize(m_WindowName);
-	CreateTerminal();
+
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -59,6 +58,17 @@ void F_W::Shutdown()
 #endif
 }
 
+void F_W::Initialize()
+{
+#if defined(CURRENT_OS_WINDOWS)
+	Windows_Initialize(m_WindowName);
+#endif
+
+#if defined(CURRENT_OS_LINUX)
+	Linux_Initialize();
+#endif
+}
+
 bool F_W::GetShouldClose()
 {
 	return m_ShouldClose;
@@ -66,16 +76,15 @@ bool F_W::GetShouldClose()
 
 void F_W::InitializeEvents()
 {
-	m_OnKeyEvent = NULL;
-	m_OnMouseButtonEvent = NULL;
-	m_OnMouseWheel = NULL;
-	m_OnCreated = NULL;
-	m_OnDestroyed = NULL;
-	m_OnMaximized = NULL;
-	m_OnMinimized = NULL;
-	m_OnMoved = NULL;
-	m_OnFocus = NULL;
-	m_OnMouseMove = NULL;
+	m_OnKeyEvent = nullptr;
+	m_OnMouseButtonEvent = nullptr;
+	m_OnMouseWheel = nullptr;
+	m_OnDestroyed = nullptr;
+	m_OnMaximized = nullptr;
+	m_OnMinimized = nullptr;
+	m_OnRestored = nullptr;
+	m_OnMoved = nullptr;
+	m_OnMouseMove = nullptr;
 }
 
 bool F_W::GetKeyState(GLuint a_Key)
@@ -83,30 +92,10 @@ bool F_W::GetKeyState(GLuint a_Key)
 	return m_Keys[a_Key];
 }
 
-void F_W::CreateTerminal()
-{
-	#if defined(CURRENT_OS_WINDOWS)
-	int hConHandle;
-	long lStdHandle;
-	FILE *fp;
-
-	// allocate a console for this app
-	AllocConsole();
-
-	// redirect unbuffered STDOUT to the console
-	lStdHandle = (long)GetStdHandle(STD_OUTPUT_HANDLE);
-	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
-	fp = _fdopen(hConHandle, "w");
-	*stdout = *fp;
-
-	setvbuf(stdout, NULL, _IONBF, 0);
-	#endif
-}
-
 void F_W::InitializeGL()
 {
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_Initialize(m_WindowName);
+	Windows_InitializeGL();
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -122,6 +111,18 @@ void F_W::SwapDrawBuffers()
 
 #if defined(CURRENT_OS_LINUX)
 	glXSwapBuffers(F_WM::GetDisplay(), m_Window);
+#endif
+}
+
+void F_W::SetVerticalSync(bool a_EnableSync)
+{
+	m_VerticalSyncEnabled = a_EnableSync;
+#if defined(CURRENT_OS_WINDOWS)
+	Windows_VerticalSync(a_EnableSync);
+#endif
+
+#if defined(CURRENT_OS_LINUX)
+	Linux_VerticalSync(a_EnableSync);
 #endif
 }
 
@@ -179,6 +180,17 @@ void F_W::Maximise(bool a_MaximizeState)
 #endif
 }
 
+void F_W::Restore()
+{
+#if defined(CURRENT_OS_WINDOWS)
+	Windows_Restore();
+#endif
+
+#if defined(CURRENT_OS_LINUX)
+	Linux_Restore();
+#endif
+}
+
 void F_W::GetResolution(GLuint& a_Width, GLuint& a_Height)
 {
 	a_Width = m_Resolution[0];
@@ -219,14 +231,10 @@ GLuint* F_W::GetMousePosition()
 
 void F_W::SetMousePosition(GLuint a_X, GLuint a_Y)
 {
+	m_MousePosition[0] = a_X;
+	m_MousePosition[1] = a_Y;
 #if defined(CURRENT_OS_WINDOWS)
-	/*POINT l_Point;
-	l_Point.x = a_X;
-	l_Point.y = a_Y;
-	ClientToScreen(m_WindowHandle, &l_Point);
-	SetCursorPos(l_Point.x, l_Point.y);*/
-
-	Windows_SetPosition(a_X, a_Y);
+	Windows_SetMousePosition(a_X, a_Y);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -249,15 +257,8 @@ void F_W::SetPosition(GLuint a_X, GLuint a_Y)
 {
 	m_Position[0] = a_X;
 	m_Position[1] = a_Y;
-
 #if defined(CURRENT_OS_WINDOWS)
-
 	Windows_SetPosition(m_Position[0], m_Position[1]);
-
-	/*SetWindowPos(m_WindowHandle, HWND_TOP,
-		m_Position[0], m_Position[1],
-		m_Resolution[0], m_Resolution[1],
-		SWP_SHOWWINDOW);*/
 #endif
 	
 #if defined(CURRENT_OS_LINUX)
@@ -272,7 +273,7 @@ const char* F_W::GetWindowName()
 
 void F_W::SetName(const char* a_WindowName)
 {
-	if(a_WindowName != NULL || a_WindowName != nullptr)
+	if(a_WindowName != nullptr)
 	{
 		m_WindowName = a_WindowName;
 #if defined(CURRENT_OS_LINUX)
@@ -288,7 +289,7 @@ void F_W::SetName(const char* a_WindowName)
 void F_W::MakeCurrentContext()
 {
 #if defined(CURRENT_OS_WINDOWS)
-	wglMakeCurrent(m_DeviceContextHandle, m_GLRenderingcontextHandle);
+	wglMakeCurrent(m_DeviceContextHandle, m_GLRenderingContextHandle);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -339,14 +340,6 @@ void F_W::SetOnMouseWheelEvent(OnMouseWheelEvent a_OnMouseWheelEvent)
 	}
 }
 
-void F_W::SetOnCreated(OnCreated a_OnCreated)
-{
-	if(Foundation_Tools::IsValid(a_OnCreated))
-	{
-		m_OnCreated = a_OnCreated;
-	}
-}
-
 void F_W::SetOnDestroyed(OnDestroyed a_OnDestroyed)
 {
 	if(Foundation_Tools::IsValid(a_OnDestroyed))
@@ -371,6 +364,14 @@ void F_W::SetOnMinimized(OnMinimized a_OnMinimized)
 	}
 }
 
+void F_W::SetOnRestored(OnRestored a_OnRestored)
+{
+	if (Foundation_Tools::IsValid(a_OnRestored))
+	{
+		m_OnRestored = a_OnRestored;
+	}
+}
+
 void F_W::SetOnMoved(OnMoved a_OnMoved)
 {
 	if(Foundation_Tools::IsValid(a_OnMoved))
@@ -384,14 +385,6 @@ void F_W::SetOnResize(OnResize a_OnResize)
 	if(Foundation_Tools::IsValid(a_OnResize))
 	{
 		m_OnResize = a_OnResize;
-	}
-}
-
-void F_W::SetOnFocus(OnFocus a_OnFocus)
-{
-	if(Foundation_Tools::IsValid(a_OnFocus))
-	{
-		m_OnFocus = a_OnFocus;
 	}
 }
 

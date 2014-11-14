@@ -32,7 +32,7 @@ F_WM::~F_WM()
 
 F_W* F_WM::GetWindowByName(const char* a_WindowName)
 {
-	if(a_WindowName != NULL && a_WindowName != nullptr)
+	if(a_WindowName != nullptr)
 	{
 		for (GLuint l_Iter = 0; l_Iter <= GetInstance()->m_Windows.size() - 1; l_Iter++)
 		{
@@ -60,14 +60,14 @@ F_W* F_WM::GetWindowByIndex(GLuint a_WindowIndex)
 
 F_WM* F_WM::AddWindow(F_W* a_Window)
 {
-	if(a_Window != NULL || a_Window != nullptr)
+	if(a_Window != nullptr)
 	{
 		GetInstance()->m_Windows.push_back(a_Window);
 		a_Window->m_WindowID = GetInstance()->m_Windows.size() - 1;
-		a_Window->InitializeGL();
+		a_Window->Initialize();
 		return GetInstance();
 	}
-	return NULL;
+	return nullptr;
 }
 
 F_WM* F_WM::GetInstance()
@@ -97,11 +97,15 @@ void F_WM::ShutDown()
 	}
 
 	GetInstance()->m_Windows.clear();
+
+#if defined(CURRENT_OS_WINDOWS)
+#endif
+
 #if defined(CURRENT_OS_LINUX)
 	XCloseDisplay(GetInstance()->m_Display);
 #endif
 
-	
+	delete m_Instance;
 }
 
 void F_WM::GetMousePositionInScreen(GLuint& a_X, GLuint& a_Y)
@@ -154,6 +158,8 @@ void F_WM::PollForEvents()
 	GetInstance()->Linux_PollForEvents();
 #endif
 }
+
+
 
 void F_WM::GetScreenResolution(GLuint& a_Width, GLuint& a_Height)
 {
@@ -252,7 +258,7 @@ GLuint* F_WM::GetWindowPosition(const char* a_WindowName)
 		return GetWindowByName(a_WindowName)->GetPosition();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 GLuint* F_WM::GetWindowPosition(GLuint a_WindowIndex)
@@ -262,7 +268,7 @@ GLuint* F_WM::GetWindowPosition(GLuint a_WindowIndex)
 		return GetWindowByIndex(a_WindowIndex)->GetPosition();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void F_WM::SetWindowPosition(const char* a_WindowName, GLuint a_X, GLuint a_Y)
@@ -304,7 +310,7 @@ GLuint* F_WM::GetMousePositionInWindow(const char* a_WindowName)
 		return GetWindowByName(a_WindowName)->GetMousePosition();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 GLuint* F_WM::GetMousePositionInWindow(GLuint a_WindowIndex)
@@ -314,7 +320,7 @@ GLuint* F_WM::GetMousePositionInWindow(GLuint a_WindowIndex)
 		return GetWindowByIndex(a_WindowIndex)->GetMousePosition();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void F_WM::SetMousePositionInWindow(const char* a_WindowName, GLuint a_X, GLuint a_Y)
@@ -441,6 +447,8 @@ bool F_WM::GetWindowIsMinimized(GLuint a_WindowIndex)
 	{
 		return GetWindowByIndex(a_WindowIndex)->GetIsMinimized();
 	}
+
+	return false;
 }
 
 void F_WM::MinimizeWindow(const char* a_WindowName, bool a_MinimizeState)
@@ -551,20 +559,20 @@ bool F_WM::GetWindowIsInFocus(GLuint a_WindowIndex)
 	return false;
 }
 
-void F_WM::FocusWindow(const char* a_WindowName, bool a_FocusState)
+void F_WM::RestoreWindow(const char* a_WindowName, bool a_FocusState)
 {
 	if(Foundation_Tools::IsValid(a_WindowName))
 	{
-
+		GetWindowByName(a_WindowName)->Restore();
 	}
 	//implement window focusing
 }
 
-void F_WM::FocusWindow(GLuint a_WindowIndex, bool a_FocuState)
+void F_WM::RestoreWindow(GLuint a_WindowIndex, bool a_FocuState)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-
+		GetWindowByIndex(a_WindowIndex)->Restore();
 	}
 	//implement window focusing
 }
@@ -587,6 +595,22 @@ bool F_WM::GetWindowIsObscured(GLuint a_WindowIndex)
 	}
 
 	return false;
+}
+
+void F_WM::SetWindowVerticalSync(const char* a_WindowName, bool a_EnableSync)
+{
+	if (Foundation_Tools::IsValid(a_WindowName))
+	{
+		return GetWindowByName(a_WindowName)->SetVerticalSync(a_EnableSync);
+	}
+}
+
+void F_WM::SetWindowVerticalSync(GLuint a_WindowIndex, bool a_EnableSync)
+{
+	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		return GetWindowByIndex(a_WindowIndex)->SetVerticalSync(a_EnableSync);
+	}
 }
 
 F_WM* F_WM::m_Instance = 0;

@@ -1,7 +1,6 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -9,14 +8,13 @@
 #include "WindowAPI_Defs.h"
 
 #if defined(CURRENT_OS_WINDOWS)
-#include <glew.h>
-#include <wglew.h>
 #include <windows.h>
 #include <io.h>
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 #pragma comment (lib, "opengl32.lib")
+//#pragma comment(lib, "glew32.lib")
 #pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #endif
 
@@ -44,6 +42,8 @@ public:
 	//window deconstructor
 	~F_W();
 
+	void Initialize();
+
 	//shut down respective OpenGL context
 	void Shutdown();
 
@@ -65,9 +65,6 @@ public:
 	//get mouse state key by index
 	bool GetKeyState(GLuint a_Key);
 
-	//create a terminal output. linux not really required
-	void CreateTerminal();
-
 	//wether or not the window should be closing
 	bool GetShouldClose();
 
@@ -86,12 +83,18 @@ public:
 	void Maximise(bool a_MaximizeState);
 	bool GetIsMaximised();
 
+	//restore the window to its natural state
+	void Restore();
+
 	//creates on OpenGL Context
 	void InitializeGL();
 
 	//get and set for window name
 	const char* GetWindowName();
 	void SetName(const char* a_WindowName);
+
+	//set the window icon
+	void SetIcon();
 
 	//make the window the current OpenGL context to be drawn
 	void MakeCurrentContext();
@@ -109,13 +112,12 @@ public:
 	void SetOnKeyEvent(OnKeyEvent a_OnKeyEvent);
 	void SetOnMouseButtonEvent(OnMouseButtonEvent a_OnButtonMouseEvent);
 	void SetOnMouseWheelEvent(OnMouseWheelEvent a_OnMouseWheelEvent);
-	void SetOnCreated(OnCreated a_OnCreated);
 	void SetOnDestroyed(OnDestroyed a_OnDestroyed);
 	void SetOnMaximized(OnMaximized a_OnMaximized);
 	void SetOnMinimized(OnMinimized a_OnMinimized);
+	void SetOnRestored(OnRestored a_OnRestored);
 	void SetOnMoved(OnMoved a_OnMoved);
 	void SetOnResize(OnResize a_OnResize);
-	void SetOnFocus(OnFocus a_OnFocus);
 	void SetOnMouseMove(OnMouseMove a_OnMouseMove);
 
 	friend F_WM;
@@ -133,6 +135,7 @@ private:
 	GLuint m_MousePosition[2];
 	bool m_ShouldClose;
 	GLuint m_WindowID;
+	bool m_OnConsole;
 
 	bool m_InFocus;
 	bool m_IsObscured;
@@ -140,18 +143,19 @@ private:
 	bool m_IsMinimised;
 	bool m_IsMaximised;
 
+	bool m_VerticalSyncEnabled;
+
 	void InitializeEvents();
 
 	OnKeyEvent m_OnKeyEvent;
 	OnMouseButtonEvent m_OnMouseButtonEvent;
 	OnMouseWheelEvent m_OnMouseWheel;
-	OnCreated m_OnCreated;
 	OnDestroyed m_OnDestroyed;
 	OnMaximized m_OnMaximized;
 	OnMinimized m_OnMinimized;
+	OnRestored m_OnRestored;
 	OnMoved m_OnMoved;
 	OnResize m_OnResize;
-	OnFocus m_OnFocus;
 	OnMouseMove m_OnMouseMove;
 	
 #if defined(CURRENT_OS_WINDOWS)
@@ -170,24 +174,26 @@ private:
 	void Windows_FullScreen(bool a_FullScreenState);
 	void Windows_Minimize(bool a_MinimizeState);
 	void Windows_Maximize(bool a_MaximizeState);
+	void Windows_Restore();
 	void Windows_SetName(const char* a_NewName);
 	void Windows_Focus(bool a_FocusState);
 	GLuint Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam);
 	void Windows_InitializeGL();
-	void Windows_SetSwapInterval(bool a_SwapInterval);
 	void Windows_Shutdown();
 	void Windows_VerticalSync(bool a_EnableSync);
 
+	void HasConsole();
 	HWND GetWindowHandle();
 	void InitializePixelFormat();
 
 	HDC m_DeviceContextHandle;
-	HGLRC m_GLRenderingcontextHandle;
+	HGLRC m_GLRenderingContextHandle;
 	HPALETTE m_PaletteHandle;
 	PIXELFORMATDESCRIPTOR m_PFD;
 
 	WNDCLASS m_WindowClass;
 	HWND m_WindowHandle;
+	HINSTANCE m_InstanceHandle;
 
 	LPARAM m_LongParam;
 	WPARAM m_WordParam;
@@ -203,6 +209,7 @@ private:
 	void Linux_FullScreen(bool a_FullScreenState);
 	void Linux_Minimize(bool a_MinimizeState);
 	void Linux_Maximize(bool a_MaximizeState);
+	void Linux_Restore();
 	void Linux_SetName(const char* a_NewName);
 	void Linux_Focus(bool a_FocusState);
 	GLuint Linux_TranslateKey(GLuint a_KeySym);

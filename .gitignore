@@ -244,3 +244,164 @@ glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/glew_static.
 glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/lib.command.1.tlog
 glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/rc.read.1.tlog
 >>>>>>> new-branch
+Debug/NativeCodeAnalysis.read.1.tlog
+Debug/WindowAPI.exe.lastcodeanalysissucceeded
+Debug/main.nativecodeanalysis.xml
+Debug/vc.nativecodeanalysis.all.xml
+Debug/window.nativecodeanalysis.xml
+Debug/window_linux.nativecodeanalysis.xml
+Debug/window_windows.nativecodeanalysis.xml
+Debug/windowmanager.nativecodeanalysis.xml
+Debug/windowmanager_linux.nativecodeanalysis.xml
+Debug/windowmanager_windows.nativecodeanalysis.xml
+glew-1.11.0/bin/Debug/Win32/glewinfo.txt
+glew-1.11.0/bin/Debug/x64/visualinfo.txt
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/x64/glew.res
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/x64/glew_shared.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/x64/glew_shared.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/x64/glew_shared.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/x64/glew_shared.tlog/glew_shared.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/x64/glew_shared.tlog/glew_shared.write.1u.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/x64/glew_shared.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/x64/glew_shared.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/x64/glew_shared.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/x64/glew_shared.tlog/rc.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/x64/glew_shared.tlog/rc.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug MX/x64/glew_shared.tlog/rc.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug/x64/glew.res
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug/x64/glew_shared.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug/x64/glew_shared.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug/x64/glew_shared.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug/x64/glew_shared.tlog/glew_shared.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug/x64/glew_shared.tlog/glew_shared.write.1u.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug/x64/glew_shared.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug/x64/glew_shared.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug/x64/glew_shared.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug/x64/glew_shared.tlog/rc.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug/x64/glew_shared.tlog/rc.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Debug/x64/glew_shared.tlog/rc.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/x64/glew.res
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/x64/glew_shared.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/x64/glew_shared.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/x64/glew_shared.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/x64/glew_shared.tlog/glew_shared.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/x64/glew_shared.tlog/glew_shared.write.1u.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/x64/glew_shared.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/x64/glew_shared.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/x64/glew_shared.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/x64/glew_shared.tlog/rc.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/x64/glew_shared.tlog/rc.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release MX/x64/glew_shared.tlog/rc.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/x64/glew.res
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/x64/glew_shared.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/x64/glew_shared.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/x64/glew_shared.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/x64/glew_shared.tlog/glew_shared.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/x64/glew_shared.tlog/glew_shared.write.1u.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/x64/glew_shared.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/x64/glew_shared.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/x64/glew_shared.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/x64/glew_shared.tlog/rc.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/x64/glew_shared.tlog/rc.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_shared/Release/x64/glew_shared.tlog/rc.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/x64/glew.res
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/x64/glew_static.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/x64/glew_static.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/x64/glew_static.tlog/Lib-link-cvtres.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/x64/glew_static.tlog/Lib-link-cvtres.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/x64/glew_static.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/x64/glew_static.tlog/glew_static.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/x64/glew_static.tlog/lib.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/x64/glew_static.tlog/rc.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/x64/glew_static.tlog/rc.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug MX/x64/glew_static.tlog/rc.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/Win32/glew_static.tlog/Lib-link-cvtres.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/x64/glew.res
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/x64/glew_static.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/x64/glew_static.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/x64/glew_static.tlog/Lib-link-cvtres.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/x64/glew_static.tlog/Lib-link-cvtres.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/x64/glew_static.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/x64/glew_static.tlog/glew_static.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/x64/glew_static.tlog/lib.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/x64/glew_static.tlog/rc.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/x64/glew_static.tlog/rc.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Debug/x64/glew_static.tlog/rc.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release MX/x64/glew.res
+glew-1.11.0/build/vc12/tmp/glew_static/Release MX/x64/glew_static.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release MX/x64/glew_static.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release MX/x64/glew_static.tlog/Lib-link-cvtres.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release MX/x64/glew_static.tlog/Lib-link-cvtres.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release MX/x64/glew_static.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release MX/x64/glew_static.tlog/glew_static.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glew_static/Release MX/x64/glew_static.tlog/lib.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release MX/x64/glew_static.tlog/rc.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release MX/x64/glew_static.tlog/rc.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release MX/x64/glew_static.tlog/rc.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release/x64/glew.res
+glew-1.11.0/build/vc12/tmp/glew_static/Release/x64/glew_static.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release/x64/glew_static.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release/x64/glew_static.tlog/Lib-link-cvtres.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release/x64/glew_static.tlog/Lib.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release/x64/glew_static.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release/x64/glew_static.tlog/glew_static.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glew_static/Release/x64/glew_static.tlog/lib.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release/x64/glew_static.tlog/rc.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release/x64/glew_static.tlog/rc.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glew_static/Release/x64/glew_static.tlog/rc.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug MX/x64/glewinfo.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug MX/x64/glewinfo.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug MX/x64/glewinfo.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug MX/x64/glewinfo.tlog/glewinfo.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug MX/x64/glewinfo.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug MX/x64/glewinfo.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug MX/x64/glewinfo.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug/x64/glewinfo.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug/x64/glewinfo.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug/x64/glewinfo.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug/x64/glewinfo.tlog/glewinfo.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug/x64/glewinfo.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug/x64/glewinfo.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Debug/x64/glewinfo.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Release MX/x64/glewinfo.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Release MX/x64/glewinfo.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Release MX/x64/glewinfo.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Release MX/x64/glewinfo.tlog/glewinfo.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glewinfo/Release MX/x64/glewinfo.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Release MX/x64/glewinfo.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Release MX/x64/glewinfo.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Release/x64/glewinfo.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Release/x64/glewinfo.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Release/x64/glewinfo.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Release/x64/glewinfo.tlog/glewinfo.lastbuildstate
+glew-1.11.0/build/vc12/tmp/glewinfo/Release/x64/glewinfo.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Release/x64/glewinfo.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/glewinfo/Release/x64/glewinfo.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug MX/x64/visualinfo.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug MX/x64/visualinfo.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug MX/x64/visualinfo.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug MX/x64/visualinfo.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug MX/x64/visualinfo.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug MX/x64/visualinfo.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug MX/x64/visualinfo.tlog/visualinfo.lastbuildstate
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug/x64/visualinfo.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug/x64/visualinfo.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug/x64/visualinfo.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug/x64/visualinfo.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug/x64/visualinfo.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug/x64/visualinfo.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Debug/x64/visualinfo.tlog/visualinfo.lastbuildstate
+glew-1.11.0/build/vc12/tmp/visualinfo/Release MX/x64/visualinfo.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Release MX/x64/visualinfo.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Release MX/x64/visualinfo.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Release MX/x64/visualinfo.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Release MX/x64/visualinfo.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Release MX/x64/visualinfo.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Release MX/x64/visualinfo.tlog/visualinfo.lastbuildstate
+glew-1.11.0/build/vc12/tmp/visualinfo/Release/x64/visualinfo.tlog/CL.read.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Release/x64/visualinfo.tlog/CL.write.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Release/x64/visualinfo.tlog/cl.command.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Release/x64/visualinfo.tlog/link.command.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Release/x64/visualinfo.tlog/link.read.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Release/x64/visualinfo.tlog/link.write.1.tlog
+glew-1.11.0/build/vc12/tmp/visualinfo/Release/x64/visualinfo.tlog/visualinfo.lastbuildstate

@@ -175,7 +175,7 @@ void F_W::Linux_Focus(bool a_FocusState)
 	}
 }
 
-void F_W::SetVerticalSync(bool a_EnableSync)
+void F_W::Linux_SetSwapInterval(bool a_EnableSync)
 {
 	GLXDrawable l_Drawable = glXGetCurrentDrawable();
 	glXSwapIntervalEXT(F_WM::GetDisplay(),l_Drawable, a_EnableSync);
