@@ -1,9 +1,8 @@
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 #define CURRENT_OS_WINDOWS
-#define GLEW_STATIC
-#include <GL/glew.h>
-#include <gl/wglew.h>
-
+#include <windows.h>
+#include <gl/GL.h>
+#include "../dependencies/wglext.h"
 #endif
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
@@ -108,3 +107,11 @@ typedef void (*OnRestored)();
 typedef void (*OnMoved)(GLuint a_X, GLuint a_Y);
 typedef void (*OnResize)(GLuint a_Width, GLuint a_Height);
 typedef void (*OnMouseMove)(GLuint a_WindowX, GLuint a_WindowY, GLuint a_ScreenX, GLuint a_ScreenY);
+
+/*
+Legend: this is simply how I like my variables to be notated
+m_: this is a member variable
+a_: this is an function argument variable
+l_: this is a local variable
+t_: this is a temporary variable to be changed later
+*/

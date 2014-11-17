@@ -116,14 +116,14 @@ class F_WM
 		static void SetWindowName(GLuint a_WindowIndex, const char* a_NewName);
 
 		//gets and sets window is in focus(Linux only?)
-		//static bool GetWindowIsInFocus(const char* a_WindowName);
-		//static bool GetWindowIsInFocus(GLuint a_WindowIndex);
+		static bool GetWindowIsInFocus(const char* a_WindowName);
+		static bool GetWindowIsInFocus(GLuint a_WindowIndex);
 
 		//gets and sets for restoring the window
 		static void RestoreWindow(const char* a_WindowName);
 		static void RestoreWindow(GLuint a_WindowIndex);
 
-		//get window obscurity
+		//get window obscurity. I feel like this is completely useless
 		//static bool GetWindowIsObscured(const char* a_WindowName);
 		//static bool GetWindowIsObscured(GLuint a_WindowIndex);
 
@@ -139,6 +139,37 @@ class F_WM
 
 		//remove a window from the manager
 		static void RemoveWindow(F_W* a_Window);
+
+		//set callbacks for the selected window
+		static void SetWindowOnKeyEvent(const char* a_WindowName, OnKeyEvent a_OnKeyEvent);
+		static void SetWindowOnKeyEvent(GLuint a_WindowIndex, OnKeyEvent a_OnKeyEvent);
+
+		static void SetWindowOnMouseButtonEvent(const char* a_WindowName, OnMouseButtonEvent a_OnMouseButtonEvent);
+		static void SetWindowOnMouseButtonEvent(GLuint a_WindowIndex, OnMouseButtonEvent a_OnMouseButtonEvent);
+
+		static void SetWindowOnMouseWheelEvent(const char* a_WindowName, OnMouseWheelEvent a_OnMouseWheelEvent);
+		static void SetWindowOnMouseWheelEvent(GLuint a_WindowIndex, OnMouseWheelEvent a_OnMouseWheelEvent);
+
+		static void SetWindowOnDestroyed(const char* a_WindowName, OnDestroyed a_OnDestroyed);
+		static void SetWindowOnDestroyed(GLuint a_WindowIndex, OnDestroyed a_OnDestroyed);
+
+		static void SetWindowOnMaximized(const char* a_WindowName, OnMaximized a_OnMaximized);
+		static void SetWindowOnMaximized(GLuint a_WindowIndex, OnMaximized a_OnMaximized);
+
+		static void SetWindowOnMinimized(const char* a_WindowName, OnMinimized a_OnMiniimzed);
+		static void SetWindowOnMinimized(GLuint a_WindowIndex, OnMinimized a_OnMiniimzed);
+
+		static void SetWindowOnRestored(const char* a_WindowName, OnRestored a_OnRestored);
+		static void SetWindowOnRestored(GLuint a_WindowIndex, OnRestored a_OnRestored);
+
+		static void SetWindowOnMoved(const char* a_WindowName, OnMoved a_OnMoved);
+		static void SetWindowOnMoved(GLuint a_WindowIndex, OnMoved a_OnMoved);
+
+		static void SetWindowOnResize(const char* a_WindowName, OnResize a_OnResize);
+		static void SetWindowOnResize(GLuint a_WindowIndex, OnResize a_OnResize);
+
+		static void SetWindowOnMouseMove(const char* a_WindowName, OnMouseMove a_OnMouseMove);
+		static void SetWindowOnMouseMove(GLuint a_WindowIndex, OnMouseMove a_OnMouseMove);
 
 	private:
 

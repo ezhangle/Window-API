@@ -593,4 +593,164 @@ void F_WM::SetWindowSwapInterval(GLuint a_WindowIndex, GLint a_SyncSetting)
 	}
 }
 
+void F_WM::SetWindowOnKeyEvent(const char* a_WindowName, OnKeyEvent a_OnKeyEvent)
+{
+	if (Foundation_Tools::IsValid(a_WindowName))
+	{
+		GetWindowByName(a_WindowName)->SetOnKeyEvent(a_OnKeyEvent);
+	}
+}
+
+void F_WM::SetWindowOnKeyEvent(GLuint a_WindowIndex, OnKeyEvent a_OnKeyEvent)
+{
+	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SetOnKeyEvent(a_OnKeyEvent);
+	}
+}
+
+void F_WM::SetWindowOnMouseButtonEvent(const char* a_WindowName, OnMouseButtonEvent a_OnMouseButtonEvent)
+{
+	if (Foundation_Tools::IsValid(a_WindowName))
+	{
+		GetWindowByName(a_WindowName)->SetOnMouseButtonEvent(a_OnMouseButtonEvent);
+	}
+}
+
+void F_WM::SetWindowOnMouseButtonEvent(GLuint a_WindowIndex, OnMouseButtonEvent a_OnMouseButtonEvent)
+{
+	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SetOnMouseButtonEvent(a_OnMouseButtonEvent);
+	}
+}
+
+void F_WM::SetWindowOnMouseWheelEvent(const char* a_WindowName, OnMouseWheelEvent a_OnMouseWheelEvent)
+{
+	if (Foundation_Tools::IsValid(a_WindowName))
+	{
+		GetWindowByName(a_WindowName)->SetOnMouseWheelEvent(a_OnMouseWheelEvent);
+	}
+}
+
+void F_WM::SetWindowOnMouseWheelEvent(GLuint a_WindowIndex, OnMouseWheelEvent a_OnMouseWheelEvent)
+{
+	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SetOnMouseWheelEvent(a_OnMouseWheelEvent);
+	}
+}
+
+void F_WM::SetWindowOnDestroyed(const char* a_WindowName, OnDestroyed a_OnDestroyed)
+{
+	if (Foundation_Tools::IsValid(a_WindowName))
+	{
+		GetWindowByName(a_WindowName)->SetOnDestroyed(a_OnDestroyed);
+	}
+}
+
+void F_WM::SetWindowOnDestroyed(GLuint a_WindowIndex, OnDestroyed a_OnDestroyed)
+{
+	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SetOnDestroyed(a_OnDestroyed);
+	}
+}
+
+void F_WM::SetWindowOnMaximized(const char* a_WindowName, OnMaximized a_OnMaximized)
+{
+	if (Foundation_Tools::IsValid(a_WindowName))
+	{
+		GetWindowByName(a_WindowName)->SetOnMaximized(a_OnMaximized);
+	}
+}
+
+void F_WM::SetWindowOnMaximized(GLuint a_WindowIndex, OnMaximized a_OnMaximized)
+{
+	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SetOnMaximized(a_OnMaximized);
+	}
+}
+
+void F_WM::SetWindowOnMinimized(const char* a_WindowName, OnMinimized a_OnMiniimzed)
+{
+	if (Foundation_Tools::IsValid(a_WindowName))
+	{
+		GetWindowByName(a_WindowName)->SetOnMinimized(a_OnMiniimzed);
+	}
+}
+
+void F_WM::SetWindowOnMinimized(GLuint a_WindowIndex, OnMinimized a_OnMiniimzed)
+{
+	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SetOnMinimized(a_OnMiniimzed);
+	}
+}
+
+void F_WM::SetWindowOnRestored(const char* a_WindowName, OnRestored a_OnRestored)
+{
+	if (Foundation_Tools::IsValid(a_WindowName))
+	{
+		GetWindowByName(a_WindowName)->SetOnRestored(a_OnRestored);
+	}
+}
+
+void F_WM::SetWindowOnRestored(GLuint a_WindowIndex, OnRestored a_OnRestored)
+{
+	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SetOnRestored(a_OnRestored);
+	}
+}
+
+void F_WM::SetWindowOnMoved(const char* a_WindowName, OnMoved a_OnMoved)
+{
+	if (Foundation_Tools::IsValid(a_WindowName))
+	{
+		GetWindowByName(a_WindowName)->SetOnMoved(a_OnMoved);
+	}
+}
+
+void F_WM::SetWindowOnMoved(GLuint a_WindowIndex, OnMoved a_OnMoved)
+{
+	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SetOnMoved(a_OnMoved);
+	}
+}
+
+void F_WM::SetWindowOnResize(const char* a_WindowName, OnResize a_OnResize)
+{
+	if (Foundation_Tools::IsValid(a_WindowName))
+	{
+		GetWindowByName(a_WindowName)->SetOnResize(a_OnResize);
+	}
+}
+
+void F_WM::SetWindowOnResize(GLuint a_WindowIndex, OnResize a_OnResize)
+{
+	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SetOnResize(a_OnResize);
+	}
+}
+
+void F_WM::SetWindowOnMouseMove(const char* a_WindowName, OnMouseMove a_OnMouseMove)
+{
+	if (Foundation_Tools::IsValid(a_WindowName))
+	{
+		GetWindowByName(a_WindowName)->SetOnMouseMove(a_OnMouseMove);
+	}
+}
+
+void F_WM::SetWindowOnMouseMove(GLuint a_WindowIndex, OnMouseMove a_OnMouseMove)
+{
+	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->SetOnMouseMove(a_OnMouseMove);
+	}
+}
+
 F_WM* F_WM::m_Instance = 0;

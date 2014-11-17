@@ -8,19 +8,15 @@
 #include "WindowAPI_Defs.h"
 
 #if defined(CURRENT_OS_WINDOWS)
-#include <windows.h>
 #include <io.h>
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 #pragma comment (lib, "opengl32.lib")
-//#pragma comment(lib, "glew32.lib")
 #pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-#include <GL/glew.h>
-#include <GL/glxew.h>
 #include <GL/glext.h>
 #include <GL/glx.h>
 #include <GL/glu.h>
@@ -39,7 +35,7 @@ public:
 	F_W(const char*  a_WindowName, GLuint a_Width = 1280, GLuint a_Height = 720, GLuint a_ColourBits = 32,
 		GLuint a_DepthBits = 8, GLuint a_StencilBits = 8, bool a_ShouldCreateTerminal = true);
 
-	//window deconstructor
+	//window deconstruction
 	~F_W();
 
 	void Initialize();
@@ -69,13 +65,13 @@ public:
 	//get mouse state key by index
 	bool GetKeyState(GLuint a_Key);
 
-	//wether or not the window should be closing
+	//whether or not the window should be closing
 	bool GetShouldClose();
 
-	//make the window swap drawbuffers
+	//make the window swap draw buffers
 	void SwapDrawBuffers();
 
-	//get and set for triggering fullscreen mode
+	//get and set for triggering full screen mode
 	void FullScreen();
 	bool GetIsFullScreen();
 
@@ -104,10 +100,10 @@ public:
 	void MakeCurrentContext();
 
 	//whether the window is in focus
-	//bool GetInFocus();
-	//void Focus(bool a_FocuState);
+	bool GetInFocus();
 
 	//enable vertical sync if supported
+	//a swap setting of -1 turns on adaptive V-sync
 	void SetSwapInterval(GLint a_SwapSetting);
 
 	void SetOnKeyEvent(OnKeyEvent a_OnKeyEvent);
@@ -144,6 +140,7 @@ private:
 	GLuint m_CurrentSwapInterval;
 
 	void InitializeEvents();
+	void InitGLExtensions();
 
 	OnKeyEvent m_OnKeyEvent;
 	OnMouseButtonEvent m_OnMouseButtonEvent;
@@ -178,11 +175,13 @@ private:
 	GLuint Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam);
 	void Windows_InitializeGL();
 	void Windows_Shutdown();
-	void Windows_VerticalSync(bool a_EnableSync);
+	void Windows_VerticalSync(GLint a_EnableSync);
 
 	void HasConsole();
 	HWND GetWindowHandle();
 	void InitializePixelFormat();
+
+	void Windows_InitGLExtensions();
 
 	HDC m_DeviceContextHandle;
 	HGLRC m_GLRenderingContextHandle;
@@ -195,6 +194,10 @@ private:
 
 	LPARAM m_LongParam;
 	WPARAM m_WordParam;
+
+	PFNWGLSWAPINTERVALEXTPROC SwapIntervalEXT;
+	PFNWGLGETEXTENSIONSSTRINGEXTPROC GetExtensionsStringEXT;
+	GLboolean EXT_swap_control;
 	
 #endif
 
@@ -216,6 +219,7 @@ private:
 	void Linux_Shutdown();
 
 	void InitializeAtomics();
+	void Linux_InitGLExtensions();
 
 	Window GetWindowHandle();
 	Window m_Window;

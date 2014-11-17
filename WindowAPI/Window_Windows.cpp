@@ -15,13 +15,7 @@ void F_W::Windows_InitializeGL()
 	m_GLRenderingContextHandle = wglCreateContext(m_DeviceContextHandle);
 	wglMakeCurrent(m_DeviceContextHandle, m_GLRenderingContextHandle);
 
-	GLenum l_Error = glewInit();
-
-	if (l_Error != GLEW_OK)
-	{
-		printf("%s\n", glewGetErrorString(l_Error));
-		exit(0);
-	}
+	Windows_InitGLExtensions();
 }
 
 void F_W::InitializePixelFormat()
@@ -339,10 +333,8 @@ GLuint F_W::Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam)
 	}
 }
 
-void F_W::Windows_FullScreen(bool a_FullScreenState)
+void F_W::Windows_FullScreen()
 {
-	if (a_FullScreenState)
-	{
 		SetWindowLongPtr(m_WindowHandle, GWL_STYLE,
 			WS_SYSMENU | WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE);
 
@@ -362,17 +354,15 @@ void F_W::Windows_FullScreen(bool a_FullScreenState)
 		{
 			printf("could not successfully change to full screen mode \n");
 		}*/
-	}
 
-	else
-	{
-		RECT l_Rect;
+
+		/*RECT l_Rect;
 		l_Rect.left = 0;
 		l_Rect.top = 0;
 		l_Rect.right = m_Resolution[0];
 		l_Rect.bottom = m_Resolution[1];
 
-		/*DEVMODE l_ScreenSettings;
+		DEVMODE l_ScreenSettings;
 
 		l_ScreenSettings.dmSize = sizeof(l_ScreenSettings);
 		l_ScreenSettings.dmPelsWidth = m_Resolution[0];
@@ -383,38 +373,21 @@ void F_W::Windows_FullScreen(bool a_FullScreenState)
 		if (ChangeDisplaySettings(&l_ScreenSettings, CDS_RESET) != DISP_CHANGE_SUCCESSFUL)
 		{
 			printf("could not successfully change back to regular mode. dear god what have i done? \n");
-		}*/
+		}
 
 		SetWindowLongPtr(m_WindowHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
 		AdjustWindowRect(&l_Rect, WS_OVERLAPPEDWINDOW, false);
-		MoveWindow(m_WindowHandle, m_Position[0], m_Position[1], l_Rect.right, l_Rect.bottom, true);
-	}
+		MoveWindow(m_WindowHandle, m_Position[0], m_Position[1], l_Rect.right, l_Rect.bottom, true);*/
 }
 
-void F_W::Windows_Minimize(bool a_MinimizeState)
+void F_W::Windows_Minimize()
 {
-	if (a_MinimizeState)
-	{
-		ShowWindow(m_WindowHandle, SW_MINIMIZE);
-	}
-
-	else
-	{
-		ShowWindow(m_WindowHandle, SW_NORMAL);
-	}
+	ShowWindow(m_WindowHandle, SW_MINIMIZE);
 }
 
-void F_W::Windows_Maximize(bool a_MaximizeState)
+void F_W::Windows_Maximize()
 {
-	if (a_MaximizeState)
-	{
-		ShowWindow(m_WindowHandle, SW_MAXIMIZE);
-	}
-
-	else
-	{
-		ShowWindow(m_WindowHandle, SW_NORMAL);
-	}
+	ShowWindow(m_WindowHandle, SW_MAXIMIZE);
 }
 
 void F_W::Windows_Restore()
@@ -438,7 +411,6 @@ void F_W::Windows_SetName(const char* a_NewName)
 
 void F_W::Windows_SetPosition(GLuint a_X, GLuint a_Y)
 {
-
 	RECT rect = { a_X, a_Y, a_X, a_Y };
 	AdjustWindowRect(&rect, GWL_STYLE| WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 		false);
@@ -453,9 +425,29 @@ void F_W::Windows_SetResolution(GLuint a_Width, GLuint a_Height)
 		m_Resolution[0], m_Resolution[1], SWP_SHOWWINDOW | SWP_NOMOVE);
 }
 
-void F_W::Windows_VerticalSync(bool a_EnableSync)
+void F_W::Windows_VerticalSync(GLint a_EnableSync)
 {
-	wglSwapIntervalEXT(a_EnableSync);
+	if (EXT_swap_control)
+	{
+		SwapIntervalEXT(a_EnableSync);
+	}
+}
+
+void F_W::Windows_InitGLExtensions()
+{
+	SwapIntervalEXT = nullptr;
+	GetExtensionsStringEXT = nullptr;
+
+	GetExtensionsStringEXT = (PFNWGLGETEXTENSIONSSTRINGEXTPROC)
+		wglGetProcAddress("wglGetExtensionsStringEXT");
+
+	SwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)
+		wglGetProcAddress("wglSwapIntervalEXT");
+
+	if (SwapIntervalEXT)
+	{
+		EXT_swap_control = GL_TRUE;
+	}
 }
 
 #endif

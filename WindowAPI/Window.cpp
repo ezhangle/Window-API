@@ -117,7 +117,7 @@ void F_W::SetSwapInterval(GLint a_SwapSetting)
 {
 	m_CurrentSwapInterval = a_SwapSetting;
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_VerticalSync(a_EnableSync);
+	Windows_VerticalSync(a_SwapSetting);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -335,6 +335,18 @@ void F_W::MakeCurrentContext()
 #if defined(CURRENT_OS_LINUX)
 	glXMakeCurrent(F_WM::GetDisplay(), m_Window, m_Context);
 #endif
+}
+
+void F_W::InitGLExtensions()
+{
+#if defined(CURRENT_OS_WINDOWS)
+	Windows_InitGLExtensions();
+#endif
+
+#if defined(CURRENT_OS_LINUX)
+	Linux_InitGLExtensions();
+#endif
+
 }
 
 /*bool F_W::GetInFocus()
