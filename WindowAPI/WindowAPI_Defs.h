@@ -93,6 +93,11 @@
 #define WINDOWSTYLE_DEFAULT 2
 #define WINDOWSTYLE_POPUP 3
 
+#define WINDOWSTATE_NORMAL 0
+#define WINDOWSTATE_MAXIMIZED 1
+#define WINDOWSTATE_MINIMIZED 2
+#define WINDOWSTATE_FULLSCREEN 3
+
 typedef void (*OnKeyEvent)(GLuint a_Key, bool a_KeyState);
 typedef void (*OnMouseButtonEvent)(GLuint a_Button, bool a_ButtonState);
 typedef void (*OnMouseWheelEvent)(GLuint a_WheelDirection);

@@ -172,7 +172,7 @@ void F_WM::Linux_PollForEvents()
 			break;
 		}
 
-		case CreateNotify:
+		/*case CreateNotify:
 		{	
 			printf("Window was created\n");
 			l_Window->InitializeGL();
@@ -183,7 +183,7 @@ void F_WM::Linux_PollForEvents()
 			}
 
 			break;
-		}
+		}*/
 
 		case KeyPress:
 		{			
@@ -409,13 +409,14 @@ void F_WM::Linux_PollForEvents()
 			if(Foundation_Tools::IsValid(l_Window->m_OnMouseMove))
 			{
 				l_Window->m_OnMouseMove(l_Event.xmotion.x, 
-						l_Event.xmotion.y);
+						l_Event.xmotion.y, l_Event.xmotion.x_root, 
+						l_Event.xmotion.y_root);
 			}	
 			break;
 		}
 
 		//when the window goes out of focus
-		case FocusOut:
+		/*case FocusOut:
 		{
 			l_Window->m_InFocus = false;
 			if(Foundation_Tools::IsValid(l_Window->m_OnFocus))
@@ -424,10 +425,10 @@ void F_WM::Linux_PollForEvents()
 						l_Window->m_InFocus);
 			}
 			break;
-		}
+		}*/
 
 		//when the window is back in focus (use to restore?)
-		case FocusIn:
+		/*case FocusIn:
 		{
 			l_Window->m_InFocus = true;
 			
@@ -437,7 +438,7 @@ void F_WM::Linux_PollForEvents()
 						l_Window->m_InFocus);
 			}
 			break;
-		}
+		}*/
 
 		//when a request to resize the window is made either by 
 		//dragging out the window or programmatically
@@ -514,7 +515,7 @@ void F_WM::Linux_PollForEvents()
 						{
 							if(Foundation_Tools::IsValid(l_Window->m_OnMinimized))
 							{
-								l_Window->m_OnMinimized(true);
+								l_Window->m_OnMinimized();
 							}
 						}
 
@@ -523,7 +524,7 @@ void F_WM::Linux_PollForEvents()
 						{
 							if(Foundation_Tools::IsValid(l_Window->m_OnMaximized))
 							{
-								l_Window->m_OnMaximized(true);
+								l_Window->m_OnMaximized();
 							}
 						}
 					}
@@ -557,7 +558,7 @@ void F_WM::Linux_PollForEvents()
 			break;
 		}
 
-		case VisibilityNotify:
+		/*case VisibilityNotify:
 		{
 			if(l_Event.xvisibility.state == VisibilityUnobscured)
 			{
@@ -570,7 +571,7 @@ void F_WM::Linux_PollForEvents()
 				//printf("window obscured\n");
 				l_Window->m_IsObscured = true;
 			}
-		}
+		}*/
 
 		default:
 		{

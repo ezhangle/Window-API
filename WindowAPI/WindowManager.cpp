@@ -415,19 +415,19 @@ bool F_WM::GetWindowIsFullScreen(GLuint a_WindowIndex)
 	return false;
 }
 
-void F_WM::SetFullScreen(const char* a_WindowName, bool a_FullScreenState)
+void F_WM::SetFullScreen(const char* a_WindowName)
 {
 	if(Foundation_Tools::IsValid(a_WindowName))
 	{
-		GetWindowByName(a_WindowName)->FullScreen(a_FullScreenState);
+		GetWindowByName(a_WindowName)->FullScreen();
 	}
 }
 
-void F_WM::SetFullScreen(GLuint a_WindowIndex, bool a_FullScreenState)
+void F_WM::SetFullScreen(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-		GetWindowByIndex(a_WindowIndex)->FullScreen(a_FullScreenState);
+		GetWindowByIndex(a_WindowIndex)->FullScreen();
 	}
 }
 
@@ -451,19 +451,19 @@ bool F_WM::GetWindowIsMinimized(GLuint a_WindowIndex)
 	return false;
 }
 
-void F_WM::MinimizeWindow(const char* a_WindowName, bool a_MinimizeState)
+void F_WM::MinimizeWindow(const char* a_WindowName)
 {
 	if(Foundation_Tools::IsValid(a_WindowName))
 	{
-		GetWindowByName(a_WindowName)->Minimize(a_MinimizeState);
+		GetWindowByName(a_WindowName)->Minimize();
 	}
 }
 
-void F_WM::MinimizeWindow(GLuint a_WindowIndex, bool a_MinimizeState)
+void F_WM::MinimizeWindow(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-		GetWindowByIndex(a_WindowIndex)->Minimize(a_MinimizeState);
+		GetWindowByIndex(a_WindowIndex)->Minimize();
 	}
 }
 
@@ -487,19 +487,19 @@ bool F_WM::GetWindowIsMaximized(GLuint a_WindowIndex)
 	return false;
 }
 
-void F_WM::MaximizeWindow(const char* a_WindowName, bool a_MaximizeState)
+void F_WM::MaximizeWindow(const char* a_WindowName)
 {
 	if(Foundation_Tools::IsValid(a_WindowName))
 	{
-		GetWindowByName(a_WindowName)->Maximise(a_MaximizeState);
+		GetWindowByName(a_WindowName)->Maximise();
 	}
 }
 
-void F_WM::MaximizeWindow(GLuint a_WindowIndex, bool a_MaximizeState)
+void F_WM::MaximizeWindow(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-		GetWindowByIndex(a_WindowIndex)->Maximise(a_MaximizeState);
+		GetWindowByIndex(a_WindowIndex)->Maximise();
 	}
 }
 
@@ -539,7 +539,7 @@ void F_WM::SetWindowName(GLuint a_WindowIndex, const char* a_NewName)
 	}
 }
 
-bool F_WM::GetWindowIsInFocus(const char* a_WindowName)
+/*bool F_WM::GetWindowIsInFocus(const char* a_WindowName)
 {
 	if(Foundation_Tools::IsValid(a_WindowName))
 	{
@@ -557,9 +557,9 @@ bool F_WM::GetWindowIsInFocus(GLuint a_WindowIndex)
 	}
 
 	return false;
-}
+}*/
 
-void F_WM::RestoreWindow(const char* a_WindowName, bool a_FocusState)
+void F_WM::RestoreWindow(const char* a_WindowName)
 {
 	if(Foundation_Tools::IsValid(a_WindowName))
 	{
@@ -568,7 +568,7 @@ void F_WM::RestoreWindow(const char* a_WindowName, bool a_FocusState)
 	//implement window focusing
 }
 
-void F_WM::RestoreWindow(GLuint a_WindowIndex, bool a_FocuState)
+void F_WM::RestoreWindow(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
@@ -577,39 +577,19 @@ void F_WM::RestoreWindow(GLuint a_WindowIndex, bool a_FocuState)
 	//implement window focusing
 }
 
-bool F_WM::GetWindowIsObscured(const char* a_WindowName)
-{
-	if(Foundation_Tools::IsValid(a_WindowName))
-	{
-		return GetWindowByName(a_WindowName)->GetIsObscured();
-	}
-
-	return false;
-}
-
-bool F_WM::GetWindowIsObscured(GLuint a_WindowIndex)
-{
-	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
-	{
-		return GetWindowByIndex(a_WindowIndex)->GetIsObscured();
-	}
-
-	return false;
-}
-
-void F_WM::SetWindowVerticalSync(const char* a_WindowName, bool a_EnableSync)
+void F_WM::SetWindowSwapInterval(const char* a_WindowName, GLint a_SyncSetting)
 {
 	if (Foundation_Tools::IsValid(a_WindowName))
 	{
-		return GetWindowByName(a_WindowName)->SetVerticalSync(a_EnableSync);
+		return GetWindowByName(a_WindowName)->SetSwapInterval(a_SyncSetting);
 	}
 }
 
-void F_WM::SetWindowVerticalSync(GLuint a_WindowIndex, bool a_EnableSync)
+void F_WM::SetWindowSwapInterval(GLuint a_WindowIndex, GLint a_SyncSetting)
 {
 	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-		return GetWindowByIndex(a_WindowIndex)->SetVerticalSync(a_EnableSync);
+		return GetWindowByIndex(a_WindowIndex)->SetSwapInterval(a_SyncSetting);
 	}
 }
 

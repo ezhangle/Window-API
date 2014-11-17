@@ -34,7 +34,6 @@ F_W::F_W(const char*  a_WindowName,
 	InitializeEvents();
 
 #if defined(CURRENT_OS_WINDOWS)
-
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -114,74 +113,115 @@ void F_W::SwapDrawBuffers()
 #endif
 }
 
-void F_W::SetVerticalSync(bool a_EnableSync)
+void F_W::SetSwapInterval(GLint a_SwapSetting)
 {
-	m_VerticalSyncEnabled = a_EnableSync;
+	m_CurrentSwapInterval = a_SwapSetting;
 #if defined(CURRENT_OS_WINDOWS)
 	Windows_VerticalSync(a_EnableSync);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_VerticalSync(a_EnableSync);
+	Linux_SetSwapInterval(a_SwapSetting);
 #endif
+}
+
+GLuint F_W::GetCurrentState()
+{
+	return m_CurrentState;
+}
+
+void F_W::SetCurrentState(GLuint a_NewState)
+{
+	switch(a_NewState)
+	{
+		case WINDOWSTATE_NORMAL:
+			{
+				Restore();
+				break;
+			}
+
+		case WINDOWSTATE_MAXIMIZED:
+			{
+				Maximise();
+				break;
+			}
+
+		case WINDOWSTATE_MINIMIZED:
+			{
+				Minimize();
+				break;
+			}
+
+			case WINDOWSTATE_FULLSCREEN:
+			{
+				FullScreen();
+				break;
+			}
+
+			default:
+			{
+				break;
+			}
+	}
 }
 
 bool F_W::GetIsFullScreen()
 {
-	return m_IsFullScreen;
+	return (m_CurrentState == WINDOWSTATE_FULLSCREEN);
 }
 
-void F_W::FullScreen(bool a_FullScreenState)
+void F_W::FullScreen()
 {
-	m_IsFullScreen = a_FullScreenState;
+	m_CurrentState = WINDOWSTATE_FULLSCREEN;
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_FullScreen(m_IsFullScreen);
+	Linux_FullScreen();
 #endif
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_FullScreen(m_IsFullScreen);
+	Windows_FullScreen();
 #endif
 }
 
 bool F_W::GetIsMinimized()
 {
-	return m_IsMinimised;
+	return (m_CurrentState == WINDOWSTATE_MINIMIZED);
 }
 
-void F_W::Minimize(bool a_MinimizeState)
+void F_W::Minimize()
 {
-	m_IsMinimised = a_MinimizeState;
+	m_CurrentState = WINDOWSTATE_MINIMIZED;
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_Minimize(m_IsMinimised);
+	Windows_Minimize();
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Minimize(a_MinimizeState);
+	Linux_Minimize();
 #endif	
 }
 
 bool F_W::GetIsMaximised()
 {
-	return m_IsMaximised;
+	return (m_CurrentState == WINDOWSTATE_MAXIMIZED) ;
 }
 
-void F_W::Maximise(bool a_MaximizeState)
+void F_W::Maximise()
 {
-	m_IsMaximised = a_MaximizeState;
+	m_CurrentState = WINDOWSTATE_MAXIMIZED;
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_Maximize(m_IsMaximised);
+	Windows_Maximize();
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Maximize(a_MaximizeState);
+	Linux_Maximize();
 #endif
 }
 
 void F_W::Restore()
 {
+	m_CurrentState = WINDOWSTATE_NORMAL;
 #if defined(CURRENT_OS_WINDOWS)
 	Windows_Restore();
 #endif
@@ -297,7 +337,7 @@ void F_W::MakeCurrentContext()
 #endif
 }
 
-bool F_W::GetInFocus()
+/*bool F_W::GetInFocus()
 {
 	return m_InFocus;
 }
@@ -309,12 +349,7 @@ void F_W::Focus(bool a_FocusState)
 #if defined(CURRENT_OS_LINUX)
 	Linux_Focus(a_FocusState);	
 #endif
-}
-
-bool F_W::GetIsObscured()
-{
-	return m_IsObscured;
-}
+}*/
 
 void F_W::SetOnKeyEvent(OnKeyEvent a_OnKeyPressed)
 {

@@ -91,10 +91,8 @@ void F_W::Linux_SetMousePosition(GLuint a_X, GLuint a_Y)
 			a_X, a_Y);
 }
 
-void F_W::Linux_FullScreen(bool a_FullScreenState)
+void F_W::Linux_FullScreen()
 {
-	m_IsFullScreen = a_FullScreenState;
-
 	XEvent l_Event;
 	memset(&l_Event, 0, sizeof(l_Event));
 
@@ -102,7 +100,7 @@ void F_W::Linux_FullScreen(bool a_FullScreenState)
 	l_Event.xclient.message_type = m_AtomicState;
 	l_Event.xclient.format = 32;
 	l_Event.xclient.window = m_Window;
-	l_Event.xclient.data.l[0] = m_IsFullScreen;
+	l_Event.xclient.data.l[0] = true;
 	l_Event.xclient.data.l[1] = m_AtomicFullScreenState;
 
 	XSendEvent(F_WM::GetDisplay(),
@@ -110,28 +108,14 @@ void F_W::Linux_FullScreen(bool a_FullScreenState)
 			0, SubstructureNotifyMask, &l_Event);
 }
 
-void F_W::Linux_Minimize(bool a_MinimizeState)
+void F_W::Linux_Minimize()
 {
-	m_IsMinimised = a_MinimizeState;
-
-	if(m_IsMinimised)
-	{
 		XIconifyWindow(F_WM::GetDisplay(),
 				m_Window, 0);
-	}
-
-	else
-	{
-		XMapWindow(F_WM::GetDisplay(),
-				m_Window);
-	}
 }
 
-void F_W::Linux_Maximize(bool a_MaximizeState)
-{
-
-	m_IsMaximised = a_MaximizeState;
-	
+void F_W::Linux_Maximize()
+{	
 	XEvent l_Event;
 	memset(&l_Event, 0, sizeof(l_Event));
 
@@ -139,19 +123,18 @@ void F_W::Linux_Maximize(bool a_MaximizeState)
 	l_Event.xclient.message_type = m_AtomicState;
 	l_Event.xclient.format = 32;
 	l_Event.xclient.window = m_Window;
-	l_Event.xclient.data.l[0] = m_IsMaximised;
+	l_Event.xclient.data.l[0] = true;
 	l_Event.xclient.data.l[1] = m_AtomicMaximizedVertical;
 	l_Event.xclient.data.l[2] = m_AtomicMaximizedHorizontal;
 
 	XSendEvent(F_WM::GetDisplay(),
 			XDefaultRootWindow(F_WM::GetDisplay()),
 			0, SubstructureNotifyMask, &l_Event);
-	
-	if(!m_IsMaximised)
-	{
-		XMoveWindow(F_WM::GetDisplay(),
-				m_Window, m_Position[0], m_Position[1]);
-	}
+}
+
+void F_W::Linux_Restore()
+{
+
 }
 
 void F_W::Linux_SetName(const char* a_NewName)
@@ -162,7 +145,7 @@ void F_W::Linux_SetName(const char* a_NewName)
 			m_Window, m_WindowName);
 }
 
-void F_W::Linux_Focus(bool a_FocusState)
+/*void F_W::Linux_Focus(bool a_FocusState)
 {
 	if(a_FocusState)
 	{
@@ -173,9 +156,9 @@ void F_W::Linux_Focus(bool a_FocusState)
 	{
 		XUnmapWindow(F_WM::GetDisplay(), m_Window);
 	}
-}
+}*/
 
-void F_W::Linux_SetSwapInterval(bool a_EnableSync)
+void F_W::Linux_SetSwapInterval(GLint a_EnableSync)
 {
 	GLXDrawable l_Drawable = glXGetCurrentDrawable();
 	glXSwapIntervalEXT(F_WM::GetDisplay(),l_Drawable, a_EnableSync);

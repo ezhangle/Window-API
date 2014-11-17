@@ -91,24 +91,22 @@ class F_WM
 		static void WindowSwapBuffers(GLuint a_WindowIndex);
 
 		//sets and gets for fullscreen
-		static void SetFullScreen(const char* a_WindowName, bool a_FullScreenState);
-		static void SetFullScreen(GLuint a_WindowIndex, bool a_FullScreenState);
+		static void SetFullScreen(const char* a_WindowName);
+		static void SetFullScreen(GLuint a_WindowIndex);
 		static bool GetWindowIsFullScreen(const char* a_WindowName);
 		static bool GetWindowIsFullScreen(GLuint a_WindowIndex);
 
 		//gets and sets for minimized
 		static bool GetWindowIsMinimized(const char* a_WindowName);
 		static bool GetWindowIsMinimized(GLuint a_WindowIndex);
-		static void MinimizeWindow(const char* a_WindowName, bool a_MinimizeState);
-		static void MinimizeWindow(GLuint a_WindowIndex, bool a_MinimizeState);
+		static void MinimizeWindow(const char* a_WindowName);
+		static void MinimizeWindow(GLuint a_WindowIndex);
 
 		//gets and sets for maximised state
 		static bool GetWindowIsMaximized(const char* a_WindowName);
 		static bool GetWindowIsMaximized(GLuint a_WindowIndex);
-
-		//static void MaximizeWindow(F_W* a_Window, bool a_MaximizeState);
-		static void MaximizeWindow(const char* a_WindowName, bool a_MaximizeState);
-		static void MaximizeWindow(GLuint a_WindowIndex, bool a_MaximizeState);
+		static void MaximizeWindow(const char* a_WindowName);
+		static void MaximizeWindow(GLuint a_WindowIndex);
 
 		//gets and sets for window name and index
 		static const char* GetWindowName(GLuint a_WindowIndex);
@@ -118,20 +116,20 @@ class F_WM
 		static void SetWindowName(GLuint a_WindowIndex, const char* a_NewName);
 
 		//gets and sets window is in focus(Linux only?)
-		static bool GetWindowIsInFocus(const char* a_WindowName);
-		static bool GetWindowIsInFocus(GLuint a_WindowIndex);
+		//static bool GetWindowIsInFocus(const char* a_WindowName);
+		//static bool GetWindowIsInFocus(GLuint a_WindowIndex);
 
 		//gets and sets for restoring the window
-		static void RestoreWindow(const char* a_WindowName, bool a_FocusState);
-		static void RestoreWindow(GLuint a_WindowIndex, bool a_FocusState);
+		static void RestoreWindow(const char* a_WindowName);
+		static void RestoreWindow(GLuint a_WindowIndex);
 
 		//get window obscurity
-		static bool GetWindowIsObscured(const char* a_WindowName);
-		static bool GetWindowIsObscured(GLuint a_WindowIndex);
+		//static bool GetWindowIsObscured(const char* a_WindowName);
+		//static bool GetWindowIsObscured(GLuint a_WindowIndex);
 
 		//enable vertical sync on selected window
-		static void SetWindowVerticalSync(const char* a_WindowName, bool a_EnableSync);
-		static void SetWindowVerticalSync(GLuint a_WindowIndex, bool a_EnableSync);
+		static void SetWindowSwapInterval(const char* a_WindowName, GLint a_EnableSync);
+		static void SetWindowSwapInterval(GLuint a_WindowIndex, GLint a_EnableSync);
 		
 		//initialize the window manager
 		static void Initialize();

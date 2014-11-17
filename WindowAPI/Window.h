@@ -61,6 +61,10 @@ public:
 	void GetPosition(GLuint& a_X, GLuint& a_Y);
 	GLuint* GetPosition();
 	void SetPosition(GLuint a_X, GLuint a_Y);
+
+	//gets and sets for the current state of the window
+	GLuint GetCurrentState();
+	void SetCurrentState(GLuint a_CurrentState);
 	
 	//get mouse state key by index
 	bool GetKeyState(GLuint a_Key);
@@ -72,15 +76,15 @@ public:
 	void SwapDrawBuffers();
 
 	//get and set for triggering fullscreen mode
-	void FullScreen(bool a_FullScreenState);
+	void FullScreen();
 	bool GetIsFullScreen();
 
 	//set and get for minimizing a window
-	void Minimize(bool a_MinimizeState);
+	void Minimize();
 	bool GetIsMinimized();
 
 	// set and get for maximizing a window
-	void Maximise(bool a_MaximizeState);
+	void Maximise();
 	bool GetIsMaximised();
 
 	//restore the window to its natural state
@@ -100,14 +104,11 @@ public:
 	void MakeCurrentContext();
 
 	//whether the window is in focus
-	bool GetInFocus();
-	void Focus(bool a_FocuState);
-
-	//whether the window is obscured
-	bool GetIsObscured();
+	//bool GetInFocus();
+	//void Focus(bool a_FocuState);
 
 	//enable vertical sync if supported
-	void SetVerticalSync(bool a_EnableSync);
+	void SetSwapInterval(GLint a_SwapSetting);
 
 	void SetOnKeyEvent(OnKeyEvent a_OnKeyEvent);
 	void SetOnMouseButtonEvent(OnMouseButtonEvent a_OnButtonMouseEvent);
@@ -120,7 +121,7 @@ public:
 	void SetOnResize(OnResize a_OnResize);
 	void SetOnMouseMove(OnMouseMove a_OnMouseMove);
 
-	friend F_WM;
+	friend class F_WM;
 
 private:
 
@@ -138,12 +139,9 @@ private:
 	bool m_OnConsole;
 
 	bool m_InFocus;
-	bool m_IsObscured;
-	bool m_IsFullScreen;
-	bool m_IsMinimised;
-	bool m_IsMaximised;
+	GLuint m_CurrentState;
 
-	bool m_VerticalSyncEnabled;
+	GLuint m_CurrentSwapInterval;
 
 	void InitializeEvents();
 
@@ -171,12 +169,12 @@ private:
 	void Windows_SetResolution(GLuint a_Width, GLuint a_Height);
 	void Windows_SetPosition(GLuint a_X, GLuint a_Y);
 	void Windows_SetMousePosition(GLuint a_X, GLuint& a_Y);
-	void Windows_FullScreen(bool a_FullScreenState);
-	void Windows_Minimize(bool a_MinimizeState);
-	void Windows_Maximize(bool a_MaximizeState);
+	void Windows_FullScreen();
+	void Windows_Minimize();
+	void Windows_Maximize();
 	void Windows_Restore();
 	void Windows_SetName(const char* a_NewName);
-	void Windows_Focus(bool a_FocusState);
+	//void Windows_Focus(bool a_FocusState);
 	GLuint Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam);
 	void Windows_InitializeGL();
 	void Windows_Shutdown();
@@ -206,17 +204,16 @@ private:
 	void Linux_SetResolution(GLuint a_Width, GLuint a_Height);
 	void Linux_SetPosition(GLuint a_X, GLuint a_Y);
 	void Linux_SetMousePosition(GLuint a_X, GLuint a_Y);
-	void Linux_FullScreen(bool a_FullScreenState);
-	void Linux_Minimize(bool a_MinimizeState);
-	void Linux_Maximize(bool a_MaximizeState);
+	void Linux_FullScreen();
+	void Linux_Minimize();
+	void Linux_Maximize();
 	void Linux_Restore();
 	void Linux_SetName(const char* a_NewName);
-	void Linux_Focus(bool a_FocusState);
+	//void Linux_Focus(bool a_FocusState);
 	GLuint Linux_TranslateKey(GLuint a_KeySym);
 	void Linux_InitializeGL();
-	void Linux_SetSwapInterval(GLuint a_SwapInterval);
+	void Linux_SetSwapInterval(GLint a_SwapInterval);
 	void Linux_Shutdown();
-	void Linux_VerticalSync(bool a_EnableSync);
 
 	void InitializeAtomics();
 
