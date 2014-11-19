@@ -134,14 +134,10 @@ GLuint F_W::GetCurrentState()
 
 void F_W::SetCurrentState(GLuint a_NewState)
 {
+	Restore();
+
 	switch(a_NewState)
 	{
-		case WINDOWSTATE_NORMAL:
-			{
-				Restore();
-				break;
-			}
-
 		case WINDOWSTATE_MAXIMIZED:
 			{
 				Maximize(true);

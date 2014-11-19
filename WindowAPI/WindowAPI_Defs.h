@@ -54,8 +54,8 @@
 #define KEY_INSERT KEY_FIRST + 26
 #define KEY_HOME KEY_FIRST + 27
 #define KEY_END KEY_FIRST + 28
-#define KEY_PAGEUP KEY_FIRST + 28 //
-#define KEY_PAGEDOWN KEY_FIRST + 30 //
+#define KEY_PAGEUP KEY_FIRST + 28 
+#define KEY_PAGEDOWN KEY_FIRST + 30 
 #define KEY_ARROW_DOWN KEY_FIRST + 31
 #define KEY_ARROW_UP KEY_FIRST + 32
 #define KEY_ARROW_LEFT KEY_FIRST + 33
@@ -80,8 +80,9 @@
 #define KEY_TAB KEY_FIRST + 52
 #define KEY_DELETE KEY_FIRST + 53
 #define KEY_ESCAPE KEY_FIRST + 54
-#define KEY_WINDOW KEY_FIRST + 55
-#define KEY_LAST KEY_WINDOW
+#define KEY_WINDOW_LEFT KEY_FIRST + 55
+#define KEY_WINDOW_RIGHT KEY_FIRST + 56
+#define KEY_LAST KEY_WINDOW_RIGHT
 
 #define MOUSE_BUTTONUP 0
 #define MOUSE_BUTTONDOWN 1
@@ -110,7 +111,7 @@ typedef void (*OnMouseWheelEvent)(GLuint a_WheelDirection);
 typedef void (*OnDestroyed)();
 typedef void (*OnMaximized)();
 typedef void (*OnMinimized)();
-typedef void (*OnRestored)(); //only really works on windows, linux doesnt even have an atomic for it.
+typedef void (*OnRestored)(); //only really works on windows, Linux doesn't even have an atomic for it.
 typedef void (*OnFocus)(bool m_InFocus);
 typedef void (*OnMoved)(GLuint a_X, GLuint a_Y);
 typedef void (*OnResize)(GLuint a_Width, GLuint a_Height);
