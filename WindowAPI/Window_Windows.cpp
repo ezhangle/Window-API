@@ -231,6 +231,16 @@ GLuint F_W::Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam)
 			return KEY_END;
 		}
 
+		case VK_PRIOR:
+		{
+			return KEY_PAGEUP;
+		}
+
+		case VK_NEXT:
+		{
+			return KEY_PAGEDOWN;
+		}
+
 		case VK_DOWN:
 		{
 			return KEY_ARROW_DOWN;
@@ -326,6 +336,16 @@ GLuint F_W::Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam)
 			return KEY_KEYPAD_9;			
 		}
 
+		case VK_LWIN:
+		{
+			return KEY_WINDOW_LEFT;
+		}
+
+		case VK_RWIN:
+		{
+			return KEY_WINDOW_RIGHT;
+		}
+
 		default:
 		{
 			return a_WordParam;
@@ -333,7 +353,7 @@ GLuint F_W::Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam)
 	}
 }
 
-void F_W::Windows_FullScreen()
+void F_W::Windows_FullScreen(bool a_NewState)
 {
 		SetWindowLongPtr(m_WindowHandle, GWL_STYLE,
 			WS_SYSMENU | WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE);
@@ -380,19 +400,50 @@ void F_W::Windows_FullScreen()
 		MoveWindow(m_WindowHandle, m_Position[0], m_Position[1], l_Rect.right, l_Rect.bottom, true);*/
 }
 
-void F_W::Windows_Minimize()
+void F_W::Windows_Minimize(bool a_NewState)
 {
-	ShowWindow(m_WindowHandle, SW_MINIMIZE);
+	if (a_NewState)
+	{
+		ShowWindow(m_WindowHandle, SW_MINIMIZE);
+	}
+
+	else
+	{
+		ShowWindow(m_WindowHandle, SW_RESTORE);
+	}
 }
 
-void F_W::Windows_Maximize()
+void F_W::Windows_Maximize(bool a_NewState)
 {
-	ShowWindow(m_WindowHandle, SW_MAXIMIZE);
+	if (a_NewState)
+	{
+		ShowWindow(m_WindowHandle, SW_MAXIMIZE);
+	}
+
+	else
+	{
+		ShowWindow(m_WindowHandle, SW_RESTORE);
+	}
 }
 
 void F_W::Windows_Restore()
 {
 	ShowWindow(m_WindowHandle, SW_RESTORE);
+}
+
+void F_W::Windows_Focus(bool a_NewState)
+{
+	m_InFocus = a_NewState;
+
+	if (a_NewState)
+	{
+		SetFocus(m_WindowHandle);
+	}
+
+	else
+	{
+		SetFocus(nullptr);
+	}
 }
 
 void F_W::Windows_SetMousePosition(GLuint a_X, GLuint& a_Y)
@@ -427,7 +478,7 @@ void F_W::Windows_SetResolution(GLuint a_Width, GLuint a_Height)
 
 void F_W::Windows_VerticalSync(GLint a_EnableSync)
 {
-	if (EXT_swap_control)
+	if (EXTSwapControlSupported)
 	{
 		SwapIntervalEXT(a_EnableSync);
 	}
@@ -446,7 +497,7 @@ void F_W::Windows_InitGLExtensions()
 
 	if (SwapIntervalEXT)
 	{
-		EXT_swap_control = GL_TRUE;
+		EXTSwapControlSupported = GL_TRUE;
 	}
 }
 
