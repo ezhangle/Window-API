@@ -51,7 +51,6 @@ F_W* F_WM::GetWindowByEvent(XEvent a_Event)
 {
 	switch(a_Event.type)
 	{
-
 		case Expose:
 			{
 				return GetWindowByHandle(a_Event.xexpose.window);
@@ -137,7 +136,6 @@ F_W* F_WM::GetWindowByEvent(XEvent a_Event)
 			return nullptr;
 		}
 	}
-
 }
 
 Display* F_WM::GetDisplay()
@@ -161,6 +159,8 @@ void F_WM::Linux_PollForEvents()
 
 		case DestroyNotify:
 		{
+			printf("blarg");
+
 			if(Foundation_Tools::IsValid(l_Window->m_OnDestroyed))
 			{
 				l_Window->m_OnDestroyed();
@@ -416,7 +416,7 @@ void F_WM::Linux_PollForEvents()
 		}
 
 		//when the window goes out of focus
-		/*case FocusOut:
+		case FocusOut:
 		{
 			l_Window->m_InFocus = false;
 			if(Foundation_Tools::IsValid(l_Window->m_OnFocus))
@@ -425,20 +425,19 @@ void F_WM::Linux_PollForEvents()
 						l_Window->m_InFocus);
 			}
 			break;
-		}*/
+		}
 
 		//when the window is back in focus (use to restore?)
-		/*case FocusIn:
+		case FocusIn:
 		{
 			l_Window->m_InFocus = true;
 			
 			if(Foundation_Tools::IsValid(l_Window->m_OnFocus))
 			{
-				l_Window->m_OnFocus(
-						l_Window->m_InFocus);
+				l_Window->m_OnFocus(l_Window->m_InFocus);
 			}
 			break;
-		}*/
+		}
 
 		//when a request to resize the window is made either by 
 		//dragging out the window or programmatically
@@ -497,7 +496,7 @@ void F_WM::Linux_PollForEvents()
 			Atom l_Type;
 			GLint l_Format;
 			ulong l_NumItems, l_BytesAfter;
-			unsigned char* l_Properties = 0;
+			unsigned char* l_Properties = nullptr;
 
 			XGetWindowProperty(F_WM::GetDisplay(), l_Event.xproperty.window, 
 						l_Window->m_AtomicState, 
@@ -509,12 +508,13 @@ void F_WM::Linux_PollForEvents()
 				{
 					for(GLuint l_CurrentItem = 0; l_CurrentItem < l_NumItems; l_CurrentItem++)
 					{
-						long l_Property = ((long*)(l_Properties))[l_CurrentItem];
+						long l_Property = ((long*)(l_Properties))[l_CurrentItem];	
 
 						if(l_Property == l_Window->m_AtomicHidden)
 						{
+							printf("window hidden \n");
 							if(Foundation_Tools::IsValid(l_Window->m_OnMinimized))
-							{
+							{								
 								l_Window->m_OnMinimized();
 							}
 						}
@@ -522,10 +522,22 @@ void F_WM::Linux_PollForEvents()
 						if(l_Property == l_Window->m_AtomicMaximizedVertical ||
 								l_Property == l_Window->m_AtomicMaximizedVertical)
 						{
+							printf("window maximized \n");
 							if(Foundation_Tools::IsValid(l_Window->m_OnMaximized))
 							{
+								
 								l_Window->m_OnMaximized();
 							}
+						}
+
+						if(l_Property == l_Window->m_AtomFocused)
+						{
+							printf("window focused \n");
+						}
+
+						if(l_Property == l_Window->m_AtomDemandsAttention)
+						{
+							printf("window demands attention \n");
 						}
 					}
 				}
@@ -542,11 +554,19 @@ void F_WM::Linux_PollForEvents()
 
 		case ClientMessage:
 		{
-			if((Atom)l_Event.xclient.data.l[1] == l_Window->m_AtomicCloseWindow)
+			const char* l_AtomName = XGetAtomName(F_WM::GetDisplay(), l_Event.xclient.message_type);
+			if(Foundation_Tools::IsValid(l_AtomName))
+			{
+				printf("%s\n", l_AtomName);
+			}
+
+			if((Atom)l_Event.xclient.data.l[0] == l_Window->m_AtomicCloseWindow)
 			{
 				printf("window closed\n");
 				l_Window->m_ShouldClose = true;
-				XDestroyWindow(GetInstance()->m_Display, l_Event.xclient.window);
+				l_Window->m_OnDestroyed();
+				l_Window->Shutdown();
+				//XDestroyWindow(GetInstance()->m_Display, l_Event.xclient.window);
 				break;
 			}
 

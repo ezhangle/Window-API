@@ -24,6 +24,9 @@ F_W::F_W(const char*  a_WindowName,
 	m_Position[0] = 0;
 	m_Position[1] = 0;
 	m_ShouldClose = false;
+	EXTSwapControlSupported = GL_FALSE;
+	SGISwapControlSupported = GL_FALSE;
+	MESASwapControlSupported = GL_FALSE;
 
 	if(!Foundation_Tools::IsValid(m_WindowName))
 	{
@@ -33,11 +36,10 @@ F_W::F_W(const char*  a_WindowName,
 
 	InitializeEvents();
 
-#if defined(CURRENT_OS_WINDOWS)
-#endif
+	m_CurrentState = WINDOWSTATE_NORMAL;
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Initialize();	
+	//Linux_Initialize();	
 #endif
 }
 
@@ -142,19 +144,19 @@ void F_W::SetCurrentState(GLuint a_NewState)
 
 		case WINDOWSTATE_MAXIMIZED:
 			{
-				Maximise();
+				Maximize(true);
 				break;
 			}
 
 		case WINDOWSTATE_MINIMIZED:
 			{
-				Minimize();
+				Minimize(true);
 				break;
 			}
 
 			case WINDOWSTATE_FULLSCREEN:
 			{
-				FullScreen();
+				FullScreen(false);
 				break;
 			}
 
@@ -170,16 +172,24 @@ bool F_W::GetIsFullScreen()
 	return (m_CurrentState == WINDOWSTATE_FULLSCREEN);
 }
 
-void F_W::FullScreen()
+void F_W::FullScreen(bool a_NewState)
 {
-	m_CurrentState = WINDOWSTATE_FULLSCREEN;
+	if(a_NewState)
+	{
+		m_CurrentState = WINDOWSTATE_FULLSCREEN;
+	}
+
+	else
+	{
+		m_CurrentState = WINDOWSTATE_NORMAL;
+	}
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_FullScreen();
+	Linux_FullScreen(a_NewState);
 #endif
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_FullScreen();
+	Windows_FullScreen(a_NewState);
 #endif
 }
 
@@ -188,39 +198,70 @@ bool F_W::GetIsMinimized()
 	return (m_CurrentState == WINDOWSTATE_MINIMIZED);
 }
 
-void F_W::Minimize()
+void F_W::Minimize(bool a_NewState)
 {
-	m_CurrentState = WINDOWSTATE_MINIMIZED;
+	if(a_NewState)
+	{
+		m_CurrentState = WINDOWSTATE_MINIMIZED;
+	}
+
+	else
+	{
+		m_CurrentState = WINDOWSTATE_NORMAL;
+	}
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_Minimize();
+	Windows_Minimize(a_NewState);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Minimize();
+	Linux_Minimize(a_NewState);
 #endif	
 }
 
-bool F_W::GetIsMaximised()
+bool F_W::GetIsMaximized()
 {
 	return (m_CurrentState == WINDOWSTATE_MAXIMIZED) ;
 }
 
-void F_W::Maximise()
+void F_W::Maximize(bool a_NewState)
 {
-	m_CurrentState = WINDOWSTATE_MAXIMIZED;
+	if(a_NewState)
+	{
+		m_CurrentState = WINDOWSTATE_MAXIMIZED;
+	}
+
+	else
+	{
+		m_CurrentState = WINDOWSTATE_NORMAL;
+	}
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_Maximize();
+	Windows_Maximize(a_NewState);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Maximize();
+	Linux_Maximize(a_NewState);
 #endif
 }
 
 void F_W::Restore()
 {
+	switch(m_CurrentState)
+	{
+		case WINDOWSTATE_MAXIMIZED:
+			{
+				Maximize(false);
+				break;
+			}
+
+		case WINDOWSTATE_FULLSCREEN:
+			{
+				FullScreen(false);
+				break;
+			}
+	}
+
 	m_CurrentState = WINDOWSTATE_NORMAL;
 #if defined(CURRENT_OS_WINDOWS)
 	Windows_Restore();
@@ -349,19 +390,23 @@ void F_W::InitGLExtensions()
 
 }
 
-/*bool F_W::GetInFocus()
+bool F_W::GetInFocus()
 {
 	return m_InFocus;
 }
 
-void F_W::Focus(bool a_FocusState)
+void F_W::Focus(bool a_NewState)
 {
-	m_InFocus = a_FocusState;
+	m_InFocus = a_NewState;
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Focus(a_FocusState);	
+	Linux_Focus(a_NewState);	
 #endif
-}*/
+
+#if defined(CURRENT_OS_WINDOWS)
+	Windows_Focus(a_NewState);
+#endif
+}
 
 void F_W::SetOnKeyEvent(OnKeyEvent a_OnKeyPressed)
 {
@@ -416,6 +461,14 @@ void F_W::SetOnRestored(OnRestored a_OnRestored)
 	if (Foundation_Tools::IsValid(a_OnRestored))
 	{
 		m_OnRestored = a_OnRestored;
+	}
+}
+
+void F_W::SetOnFocus(OnFocus a_OnFocus)
+{
+	if(Foundation_Tools::IsValid(a_OnFocus))
+	{
+		m_OnFocus = a_OnFocus;
 	}
 }
 

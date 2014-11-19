@@ -415,19 +415,19 @@ bool F_WM::GetWindowIsFullScreen(GLuint a_WindowIndex)
 	return false;
 }
 
-void F_WM::SetFullScreen(const char* a_WindowName)
+void F_WM::SetFullScreen(const char* a_WindowName, bool a_NewState)
 {
 	if(Foundation_Tools::IsValid(a_WindowName))
 	{
-		GetWindowByName(a_WindowName)->FullScreen();
+		GetWindowByName(a_WindowName)->FullScreen(a_NewState);
 	}
 }
 
-void F_WM::SetFullScreen(GLuint a_WindowIndex)
+void F_WM::SetFullScreen(GLuint a_WindowIndex, bool a_NewState)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-		GetWindowByIndex(a_WindowIndex)->FullScreen();
+		GetWindowByIndex(a_WindowIndex)->FullScreen(a_NewState);
 	}
 }
 
@@ -451,19 +451,19 @@ bool F_WM::GetWindowIsMinimized(GLuint a_WindowIndex)
 	return false;
 }
 
-void F_WM::MinimizeWindow(const char* a_WindowName)
+void F_WM::MinimizeWindow(const char* a_WindowName, bool a_NewState)
 {
 	if(Foundation_Tools::IsValid(a_WindowName))
 	{
-		GetWindowByName(a_WindowName)->Minimize();
+		GetWindowByName(a_WindowName)->Minimize(a_NewState);
 	}
 }
 
-void F_WM::MinimizeWindow(GLuint a_WindowIndex)
+void F_WM::MinimizeWindow(GLuint a_WindowIndex, bool a_NewState)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-		GetWindowByIndex(a_WindowIndex)->Minimize();
+		GetWindowByIndex(a_WindowIndex)->Minimize(a_NewState);
 	}
 }
 
@@ -471,7 +471,7 @@ bool F_WM::GetWindowIsMaximized(const char* a_WindowName)
 {
 	if(Foundation_Tools::IsValid(a_WindowName))
 	{
-		return GetWindowByName(a_WindowName)->GetIsMaximised();
+		return GetWindowByName(a_WindowName)->GetIsMaximized();
 	}
 
 	return false;
@@ -481,25 +481,25 @@ bool F_WM::GetWindowIsMaximized(GLuint a_WindowIndex)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-		return GetWindowByIndex(a_WindowIndex)->GetIsMaximised();
+		return GetWindowByIndex(a_WindowIndex)->GetIsMaximized();
 	}
 
 	return false;
 }
 
-void F_WM::MaximizeWindow(const char* a_WindowName)
+void F_WM::MaximizeWindow(const char* a_WindowName, bool a_NewState)
 {
 	if(Foundation_Tools::IsValid(a_WindowName))
 	{
-		GetWindowByName(a_WindowName)->Maximise();
+		GetWindowByName(a_WindowName)->Maximize(a_NewState);
 	}
 }
 
-void F_WM::MaximizeWindow(GLuint a_WindowIndex)
+void F_WM::MaximizeWindow(GLuint a_WindowIndex, bool a_NewState)
 {
 	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
-		GetWindowByIndex(a_WindowIndex)->Maximise();
+		GetWindowByIndex(a_WindowIndex)->Maximize(a_NewState);
 	}
 }
 
@@ -539,7 +539,7 @@ void F_WM::SetWindowName(GLuint a_WindowIndex, const char* a_NewName)
 	}
 }
 
-/*bool F_WM::GetWindowIsInFocus(const char* a_WindowName)
+bool F_WM::GetWindowIsInFocus(const char* a_WindowName)
 {
 	if(Foundation_Tools::IsValid(a_WindowName))
 	{
@@ -557,7 +557,23 @@ bool F_WM::GetWindowIsInFocus(GLuint a_WindowIndex)
 	}
 
 	return false;
-}*/
+}
+
+void F_WM::FocusWindow(const char* a_WindowName, bool a_NewState)
+{
+	if(Foundation_Tools::IsValid(a_WindowName))
+	{
+		GetWindowByName(a_WindowName)->Focus(a_NewState);
+	}
+}
+
+void F_WM::FocusWindow(GLuint a_WindowIndex, bool a_NewState)
+{
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->Focus(a_NewState);
+	}
+}
 
 void F_WM::RestoreWindow(const char* a_WindowName)
 {
@@ -702,6 +718,22 @@ void F_WM::SetWindowOnRestored(GLuint a_WindowIndex, OnRestored a_OnRestored)
 	if (a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
 	{
 		GetWindowByIndex(a_WindowIndex)->SetOnRestored(a_OnRestored);
+	}
+}
+
+void F_WM::SetWindowOnFocus(const char* a_WindowName, OnFocus a_OnFocus)
+{
+	if(Foundation_Tools::IsValid(a_OnFocus))
+	{
+		GetWindowByName(a_WindowName)->m_OnFocus = a_OnFocus;
+	}
+}
+
+void F_WM::SetWindowOnFocus(GLuint a_WindowIndex, OnFocus a_OnFocus)
+{
+	if(a_WindowIndex <= GetInstance()->m_Windows.size() - 1)
+	{
+		GetWindowByIndex(a_WindowIndex)->m_OnFocus = a_OnFocus;
 	}
 }
 

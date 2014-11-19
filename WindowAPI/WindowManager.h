@@ -91,22 +91,22 @@ class F_WM
 		static void WindowSwapBuffers(GLuint a_WindowIndex);
 
 		//sets and gets for fullscreen
-		static void SetFullScreen(const char* a_WindowName);
-		static void SetFullScreen(GLuint a_WindowIndex);
+		static void SetFullScreen(const char* a_WindowName, bool a_NewState);
+		static void SetFullScreen(GLuint a_WindowIndex, bool a_NewState);
 		static bool GetWindowIsFullScreen(const char* a_WindowName);
 		static bool GetWindowIsFullScreen(GLuint a_WindowIndex);
 
 		//gets and sets for minimized
 		static bool GetWindowIsMinimized(const char* a_WindowName);
 		static bool GetWindowIsMinimized(GLuint a_WindowIndex);
-		static void MinimizeWindow(const char* a_WindowName);
-		static void MinimizeWindow(GLuint a_WindowIndex);
+		static void MinimizeWindow(const char* a_WindowName, bool a_NewState);
+		static void MinimizeWindow(GLuint a_WindowIndex, bool a_NewState);
 
 		//gets and sets for maximised state
 		static bool GetWindowIsMaximized(const char* a_WindowName);
 		static bool GetWindowIsMaximized(GLuint a_WindowIndex);
-		static void MaximizeWindow(const char* a_WindowName);
-		static void MaximizeWindow(GLuint a_WindowIndex);
+		static void MaximizeWindow(const char* a_WindowName, bool a_NewState);
+		static void MaximizeWindow(GLuint a_WindowIndex, bool a_NewState);
 
 		//gets and sets for window name and index
 		static const char* GetWindowName(GLuint a_WindowIndex);
@@ -118,6 +118,8 @@ class F_WM
 		//gets and sets window is in focus(Linux only?)
 		static bool GetWindowIsInFocus(const char* a_WindowName);
 		static bool GetWindowIsInFocus(GLuint a_WindowIndex);
+		static void FocusWindow(const char* a_WindowName, bool a_NewState);
+		static void FocusWindow(GLuint a_WindowIndex, bool a_NewState);
 
 		//gets and sets for restoring the window
 		static void RestoreWindow(const char* a_WindowName);
@@ -161,6 +163,9 @@ class F_WM
 
 		static void SetWindowOnRestored(const char* a_WindowName, OnRestored a_OnRestored);
 		static void SetWindowOnRestored(GLuint a_WindowIndex, OnRestored a_OnRestored);
+
+		static void SetWindowOnFocus(const char* a_WindowName, OnFocus a_OnFocus);
+		static void SetWindowOnFocus(GLuint a_WindowIndex, OnFocus a_OnFocus);
 
 		static void SetWindowOnMoved(const char* a_WindowName, OnMoved a_OnMoved);
 		static void SetWindowOnMoved(GLuint a_WindowIndex, OnMoved a_OnMoved);

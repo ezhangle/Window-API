@@ -26,6 +26,11 @@ public:
 		return (a_OnMaximized != nullptr);
 	}
 
+	static bool IsValid(OnFocus a_OnFocus)
+	{
+		return (a_OnFocus != nullptr);
+	}
+
 	static bool IsValid(OnMoved a_OnMoved)
 	{
 		return (a_OnMoved != nullptr);

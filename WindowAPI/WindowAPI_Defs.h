@@ -7,8 +7,15 @@
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 #define CURRENT_OS_LINUX
-#include <GL/glew.h>
-#include <GL/glxew.h>
+#include <GL/glx.h>
+#include "../dependencies/glxext.h"
+#include <GL/glext.h>
+#include <GL/glx.h>
+#include <GL/glu.h>
+#include <X11/X.h>
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
+#include <X11/Xatom.h>
 #endif
 
 #define KEYSTATE_DOWN 1
@@ -103,11 +110,11 @@ typedef void (*OnMouseWheelEvent)(GLuint a_WheelDirection);
 typedef void (*OnDestroyed)();
 typedef void (*OnMaximized)();
 typedef void (*OnMinimized)();
-typedef void (*OnRestored)();
+typedef void (*OnRestored)(); //only really works on windows, linux doesnt even have an atomic for it.
+typedef void (*OnFocus)(bool m_InFocus);
 typedef void (*OnMoved)(GLuint a_X, GLuint a_Y);
 typedef void (*OnResize)(GLuint a_Width, GLuint a_Height);
 typedef void (*OnMouseMove)(GLuint a_WindowX, GLuint a_WindowY, GLuint a_ScreenX, GLuint a_ScreenY);
-
 /*
 Legend: this is simply how I like my variables to be notated
 m_: this is a member variable

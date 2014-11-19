@@ -2,9 +2,6 @@
 #include "WindowManager.h"
 #if defined(CURRENT_OS_LINUX)
 #include <cstring>
-#include <GL/glxext.h>
-#include <GL/glext.h>
-#include <GL/glxproto.h>
 
 void F_W::Linux_Initialize()
 {
@@ -48,17 +45,23 @@ void F_W::Linux_Initialize()
 
 	InitializeAtomics();
 
-	XSetWMProtocols(F_WM::GetDisplay(), 
-			m_Window, &m_AtomicCloseWindow, 1);
+	XSetWMProtocols(F_WM::GetDisplay(),	m_Window, &m_AtomicCloseWindow, true);	
 
-	XSetWMProtocols(F_WM::GetDisplay(),
-			m_Window, &m_AtomicFullScreenState, 1);	
+	Linux_InitializeGL();
 }
 
 void F_W::Linux_Shutdown()
 {
+	if(m_CurrentState == WINDOWSTATE_FULLSCREEN)
+	{
+		Restore();
+	}
+
 	glXDestroyContext(F_WM::GetDisplay(), m_Context);
+	XUnmapWindow(F_WM::GetDisplay(), m_Window);
 	XDestroyWindow(F_WM::GetDisplay(), m_Window);
+	m_Window = 0;
+	m_Context = 0;
 }
 
 void F_W::Linux_SetResolution(GLuint a_Width, GLuint a_Height)
@@ -91,7 +94,7 @@ void F_W::Linux_SetMousePosition(GLuint a_X, GLuint a_Y)
 			a_X, a_Y);
 }
 
-void F_W::Linux_FullScreen()
+void F_W::Linux_FullScreen(bool a_NewState)
 {
 	XEvent l_Event;
 	memset(&l_Event, 0, sizeof(l_Event));
@@ -100,7 +103,7 @@ void F_W::Linux_FullScreen()
 	l_Event.xclient.message_type = m_AtomicState;
 	l_Event.xclient.format = 32;
 	l_Event.xclient.window = m_Window;
-	l_Event.xclient.data.l[0] = true;
+	l_Event.xclient.data.l[0] = a_NewState;
 	l_Event.xclient.data.l[1] = m_AtomicFullScreenState;
 
 	XSendEvent(F_WM::GetDisplay(),
@@ -108,13 +111,21 @@ void F_W::Linux_FullScreen()
 			0, SubstructureNotifyMask, &l_Event);
 }
 
-void F_W::Linux_Minimize()
+void F_W::Linux_Minimize(bool a_NewState)
 {
+	if(a_NewState)
+	{
 		XIconifyWindow(F_WM::GetDisplay(),
 				m_Window, 0);
+	}
+
+	else
+	{
+		XMapWindow(F_WM::GetDisplay(), m_Window);
+	}
 }
 
-void F_W::Linux_Maximize()
+void F_W::Linux_Maximize(bool a_NewState)
 {	
 	XEvent l_Event;
 	memset(&l_Event, 0, sizeof(l_Event));
@@ -123,7 +134,7 @@ void F_W::Linux_Maximize()
 	l_Event.xclient.message_type = m_AtomicState;
 	l_Event.xclient.format = 32;
 	l_Event.xclient.window = m_Window;
-	l_Event.xclient.data.l[0] = true;
+	l_Event.xclient.data.l[0] = a_NewState;
 	l_Event.xclient.data.l[1] = m_AtomicMaximizedVertical;
 	l_Event.xclient.data.l[2] = m_AtomicMaximizedHorizontal;
 
@@ -134,7 +145,7 @@ void F_W::Linux_Maximize()
 
 void F_W::Linux_Restore()
 {
-
+	XMapWindow(F_WM::GetDisplay(), m_Window);
 }
 
 void F_W::Linux_SetName(const char* a_NewName)
@@ -145,9 +156,9 @@ void F_W::Linux_SetName(const char* a_NewName)
 			m_Window, m_WindowName);
 }
 
-/*void F_W::Linux_Focus(bool a_FocusState)
+void F_W::Linux_Focus(bool a_NewState)
 {
-	if(a_FocusState)
+	if(a_NewState)
 	{
 		XMapWindow(F_WM::GetDisplay(), m_Window);
 	}
@@ -156,12 +167,28 @@ void F_W::Linux_SetName(const char* a_NewName)
 	{
 		XUnmapWindow(F_WM::GetDisplay(), m_Window);
 	}
-}*/
+}
 
 void F_W::Linux_SetSwapInterval(GLint a_EnableSync)
 {
-	GLXDrawable l_Drawable = glXGetCurrentDrawable();
-	glXSwapIntervalEXT(F_WM::GetDisplay(),l_Drawable, a_EnableSync);
+	if(EXTSwapControlSupported)
+	{
+		SwapIntervalEXT(F_WM::GetDisplay(), m_Window, a_EnableSync);
+	}
+
+	if(MESASwapControlSupported)
+	{
+		SwapIntervalMESA(a_EnableSync);
+	}
+
+	if(SGISwapControlSupported)
+	{
+		if(a_EnableSync < 0)
+		{
+			a_EnableSync = 0;
+		}
+		SwapIntervalSGI(a_EnableSync);
+	}
 }
 
 GLuint F_W::Linux_TranslateKey(GLuint a_KeySym)
@@ -414,14 +441,6 @@ void F_W::Linux_InitializeGL()
 	glXMakeCurrent(F_WM::GetDisplay(),
 			m_Window, m_Context);
 
-	GLenum l_Error = glewInit();
-
-	if(l_Error != GLEW_OK)
-	{
-		printf("%s\n", glewGetErrorString(l_Error));
-		exit(0);
-	}
-
 	XWindowAttributes l_Attributes;
 
 	XGetWindowAttributes(F_WM::GetDisplay(),
@@ -442,6 +461,8 @@ void F_W::Linux_InitializeGL()
 	{
 		printf("no extensions wtf?\n");
 	}
+
+	InitGLExtensions();
 }
 
 void F_W::InitializeAtomics()
@@ -450,9 +471,41 @@ void F_W::InitializeAtomics()
 	m_AtomicFullScreenState = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_FULLSCREEN", False);
 	m_AtomicMaximizedHorizontal = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_MAXIMIZED_HORZ", False);
 	m_AtomicMaximizedVertical = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_MAXIMIZED_VERT", False);
-	m_AtomicCloseWindow = XInternAtom(F_WM::GetDisplay(), "_NET_WM_CLOSE_WINDOW", False);
+	m_AtomicCloseWindow = XInternAtom(F_WM::GetDisplay(), "WM_DELETE_WINDOW", False);
 	m_AtomicHidden = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_HIDDEN", False);
+	m_AtomActiveWindow = XInternAtom(F_WM::GetDisplay(), "_NET_ACTIVE_WINDOW", False);
+	m_AtomDemandsAttention = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_DEMANDS_ATTENTION", False);	
+	m_AtomFocused = XInternAtom(F_WM::GetDisplay(), "_NET_WM_STATE_FOCUSED", False);
+}
 
+void F_W::Linux_InitGLExtensions()
+{
+	printf("initializing GL extensions\n");
+	SwapIntervalEXT = nullptr;
+	SwapIntervalSGI = nullptr;
+	SwapIntervalMESA = nullptr;
+
+	SwapIntervalMESA = (PFNGLXSWAPINTERVALMESAPROC)glXGetProcAddress((const GLubyte*)"glXSwapIntervalMESA");
+	SwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC)glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT");
+	SwapIntervalSGI = (PFNGLXSWAPINTERVALSGIPROC)glXGetProcAddress((const GLubyte*)"glXSwapIntervalSGI");
+
+	if(SwapIntervalMESA)
+	{
+		printf("MESA swap interval supported\n");
+		MESASwapControlSupported = GL_TRUE;
+	}
+	
+	if(SwapIntervalEXT)
+	{
+		printf("EXT swap interval supported \n");
+		EXTSwapControlSupported = GL_TRUE;	
+	}
+
+	if(SwapIntervalSGI)
+	{
+		printf("SGI swap interval supported \n");
+		SGISwapControlSupported = GL_TRUE;
+	}
 }
 
 Window F_W::GetWindowHandle()

@@ -16,16 +16,6 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #endif
 
-#if defined(CURRENT_OS_LINUX)
-#include <GL/glext.h>
-#include <GL/glx.h>
-#include <GL/glu.h>
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
-#endif
-
 class F_WM;
 
 class F_W
@@ -72,16 +62,16 @@ public:
 	void SwapDrawBuffers();
 
 	//get and set for triggering full screen mode
-	void FullScreen();
+	void FullScreen(bool a_NewState);
 	bool GetIsFullScreen();
 
 	//set and get for minimizing a window
-	void Minimize();
+	void Minimize(bool a_NewState);
 	bool GetIsMinimized();
 
 	// set and get for maximizing a window
-	void Maximise();
-	bool GetIsMaximised();
+	void Maximize(bool a_NewState);
+	bool GetIsMaximized();
 
 	//restore the window to its natural state
 	void Restore();
@@ -101,6 +91,7 @@ public:
 
 	//whether the window is in focus
 	bool GetInFocus();
+	void Focus(bool a_NewState);
 
 	//enable vertical sync if supported
 	//a swap setting of -1 turns on adaptive V-sync
@@ -113,6 +104,7 @@ public:
 	void SetOnMaximized(OnMaximized a_OnMaximized);
 	void SetOnMinimized(OnMinimized a_OnMinimized);
 	void SetOnRestored(OnRestored a_OnRestored);
+	void SetOnFocus(OnFocus a_OnFocus);
 	void SetOnMoved(OnMoved a_OnMoved);
 	void SetOnResize(OnResize a_OnResize);
 	void SetOnMouseMove(OnMouseMove a_OnMouseMove);
@@ -149,10 +141,14 @@ private:
 	OnMaximized m_OnMaximized;
 	OnMinimized m_OnMinimized;
 	OnRestored m_OnRestored;
+	OnFocus m_OnFocus;
 	OnMoved m_OnMoved;
 	OnResize m_OnResize;
 	OnMouseMove m_OnMouseMove;
-	
+
+	GLboolean EXTSwapControlSupported;
+	GLboolean SGISwapControlSupported;
+	GLboolean MESASwapControlSupported;
 #if defined(CURRENT_OS_WINDOWS)
 	
 private:
@@ -166,12 +162,12 @@ private:
 	void Windows_SetResolution(GLuint a_Width, GLuint a_Height);
 	void Windows_SetPosition(GLuint a_X, GLuint a_Y);
 	void Windows_SetMousePosition(GLuint a_X, GLuint& a_Y);
-	void Windows_FullScreen();
-	void Windows_Minimize();
-	void Windows_Maximize();
+	void Windows_FullScreen(bool a_NewState);
+	void Windows_Minimize(bool a_NewState);
+	void Windows_Maximize(bool a_NewState);
 	void Windows_Restore();
 	void Windows_SetName(const char* a_NewName);
-	//void Windows_Focus(bool a_FocusState);
+	void Windows_Focus(bool a_NewState);
 	GLuint Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam);
 	void Windows_InitializeGL();
 	void Windows_Shutdown();
@@ -196,23 +192,21 @@ private:
 	WPARAM m_WordParam;
 
 	PFNWGLSWAPINTERVALEXTPROC SwapIntervalEXT;
+	PFNWGLSWAPINTERVALSGIPROC SwapIntervalSGI;
 	PFNWGLGETEXTENSIONSSTRINGEXTPROC GetExtensionsStringEXT;
-	GLboolean EXT_swap_control;
-	
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-
 	void Linux_Initialize();
 	void Linux_SetResolution(GLuint a_Width, GLuint a_Height);
 	void Linux_SetPosition(GLuint a_X, GLuint a_Y);
 	void Linux_SetMousePosition(GLuint a_X, GLuint a_Y);
-	void Linux_FullScreen();
-	void Linux_Minimize();
-	void Linux_Maximize();
+	void Linux_FullScreen(bool a_NewState);
+	void Linux_Minimize(bool a_NewState);
+	void Linux_Maximize(bool a_NewState);
 	void Linux_Restore();
+	void Linux_Focus(bool a_NewState);
 	void Linux_SetName(const char* a_NewName);
-	//void Linux_Focus(bool a_FocusState);
 	GLuint Linux_TranslateKey(GLuint a_KeySym);
 	void Linux_InitializeGL();
 	void Linux_SetSwapInterval(GLint a_SwapInterval);
@@ -230,14 +224,22 @@ private:
 	Colormap m_Colourmap;
 	XSetWindowAttributes m_SetAttributes;
 	XWindowAttributes m_WindowAttributes;
+	
+	//these are the callbacks for the glx swap interval extension. 
+	PFNGLXSWAPINTERVALMESAPROC SwapIntervalMESA;
+	PFNGLXSWAPINTERVALEXTPROC SwapIntervalEXT;
+	PFNGLXSWAPINTERVALSGIPROC SwapIntervalSGI;	
 
-	//these atomics are needed to change window states via code
+	//these atomics are needed to change window states via the extended window manager
 	Atom m_AtomicState; //_NET_WM_STATE
 	Atom m_AtomicHidden;// _NET_WM_STATE_HIDDEN
 	Atom m_AtomicFullScreenState; //NET_WM_STATE_FULLSCREEN
 	Atom m_AtomicMaximizedHorizontal; // _NET_WM_STATE_MAXIMIZED_HORZ
 	Atom m_AtomicMaximizedVertical; // _NET_WM_STATE_MAXIMIZED_VERT
-	Atom m_AtomicCloseWindow; // _NET_CLOSE_WINDOW
+	Atom m_AtomicCloseWindow; // _NET_WM_CLOSE_WINDOW
+	Atom m_AtomActiveWindow; //_NET_ACTIVE_WINDOW
+	Atom m_AtomDemandsAttention;//_NET_WM_STATE_DEMANDS_ATTENTION
+	Atom m_AtomFocused;//_NET_WM_STATE_FOCUSED
 
 	bool m_OverrideRedirect; //whether to use window manager or not	
 
