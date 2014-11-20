@@ -18,123 +18,123 @@
 #include "Window.h"
 #include "Tools.h"
 
-class F_W;
+class Window;
 class Foundation_Tools;
 
-class F_WM
+class WindowManager
 {
-	friend F_W;
+	friend Window;
 	friend Foundation_Tools;
 
 	public:
-		F_WM();
-		~F_WM();
+		WindowManager();
+		~WindowManager();
 
 		//shut down the window manager when your program is finished
 		static void ShutDown();
 
 		//get a pointer to a window via name or index
-		static F_W* GetWindowByName(const char* a_WindowName);
-		static F_W* GetWindowByIndex(GLuint a_WindowIndex);
+		static Window* GetWindowByName(const char* WindowName);
+		static Window* GetWindowByIndex(GLuint WindowIndex);
 
 		//add a window to the manager. i ripped off a behavior tree feature
 		//that allows the user to create multiple windows easily
-		static F_WM* AddWindow(F_W* a_Window);
+		static WindowManager* AddWindow(Window* NewWindow);
 
 		//return the total amount of windows the manager has
 		static GLuint GetNumWindows();
 
 		//gets and sets for the mouse position in the screen
-		static void GetMousePositionInScreen(GLuint& a_X, GLuint& a_Y);
+		static void GetMousePositionInScreen(GLuint& X, GLuint& Y);
 		static GLuint* GetMousePositionInScreen();
-		static void SetMousePositionInScreen(GLuint a_X, GLuint a_Y);
+		static void SetMousePositionInScreen(GLuint X, GLuint Y);
 
 		// get the screen resolution for the screen that is being drawn to
 		static GLuint* GetScreenResolution();
-		static void GetScreenResolution(GLuint& a_Width, GLuint& a_Height);
+		static void GetScreenResolution(GLuint& Width, GLuint& Height);
 
 		//these are another way to set and get window variables
 		//apart from the functions that are available to the user
 		//via each window
 		
 		//sets and gets for window resolution
-		static void GetWindowResolution(const char* a_WindowName, GLuint& a_Width, GLuint& a_Height);
-		static void GetWindowResolution(GLuint a_WindowIndex, GLuint& a_Width, GLuint& a_Height);
-		static GLuint* GetWindowResolution(const char* a_WindowName);
-		static GLuint* GetWindowResolution(GLuint a_WindowIndex);
-		static void SetWindowResolution(const char* a_WindowName, GLuint a_Width, GLuint a_Height);
-		static void SetWindowResolution(GLuint a_WindowIndex, GLuint a_Width, GLuint a_Height);
+		static void GetWindowResolution(const char* WindowName, GLuint& Width, GLuint& Height);
+		static void GetWindowResolution(GLuint WindowIndex, GLuint& Width, GLuint& Height);
+		static GLuint* GetWindowResolution(const char* WindowName);
+		static GLuint* GetWindowResolution(GLuint WindowIndex);
+		static void SetWindowResolution(const char* WindowName, GLuint Width, GLuint Height);
+		static void SetWindowResolution(GLuint WindowIndex, GLuint Width, GLuint Height);
 
 		//sets and gets for window position
-		static void GetWindowPosition(const char* a_WindowName, GLuint& a_X, GLuint& a_Y);
-		static void GetWindowPosition(GLuint a_WindowIndex, GLuint& a_X, GLuint& a_Y);
-		static GLuint* GetWindowPosition(const char* a_WindowName);
-		static GLuint* GetWindowPosition(GLuint a_WindowIndex);
-		static void SetWindowPosition(const char* a_WindowName, GLuint a_X, GLuint a_Y);
-		static void SetWindowPosition(GLuint a_WindowIndex, GLuint a_X, GLuint a_Y);
+		static void GetWindowPosition(const char* WindowName, GLuint& X, GLuint& Y);
+		static void GetWindowPosition(GLuint WindowIndex, GLuint& X, GLuint& Y);
+		static GLuint* GetWindowPosition(const char* WindowName);
+		static GLuint* GetWindowPosition(GLuint WindowIndex);
+		static void SetWindowPosition(const char* WindowName, GLuint X, GLuint Y);
+		static void SetWindowPosition(GLuint WindowIndex, GLuint X, GLuint Y);
 
 		//sets and gets for the mouse position in window
-		static void GetMousePositionInWindow(const char* a_WindowName, GLuint& a_X, GLuint& a_Y);
-		static void GetMousePositionInWindow(GLuint a_WindowIndex, GLuint& a_X, GLuint& a_Y);
-		static GLuint* GetMousePositionInWindow(const char* a_WindowName);
-		static GLuint* GetMousePositionInWindow(GLuint a_WindowIndex);
-		static void SetMousePositionInWindow(const char* a_WindowName, GLuint a_X, GLuint a_Y);
-		static void SetMousePositionInWindow(GLuint a_WindowIndex, GLuint a_X, GLuint a_Y);
+		static void GetMousePositionInWindow(const char* WindowName, GLuint& X, GLuint& Y);
+		static void GetMousePositionInWindow(GLuint WindowIndex, GLuint& X, GLuint& Y);
+		static GLuint* GetMousePositionInWindow(const char* WindowName);
+		static GLuint* GetMousePositionInWindow(GLuint WindowIndex);
+		static void SetMousePositionInWindow(const char* WindowName, GLuint X, GLuint Y);
+		static void SetMousePositionInWindow(GLuint WindowIndex, GLuint X, GLuint Y);
 
 		//gets for window keys
-		static bool WindowGetKey(const char* a_WindowName, GLuint a_Key);
-		static bool WindowGetKey(GLuint a_WindowIndex, GLuint a_Key);
+		static GLboolean WindowGetKey(const char* WindowName, GLuint Key);
+		static GLboolean WindowGetKey(GLuint WindowIndex, GLuint Key);
 
 		//gets for window should close
-		static bool GetWindowShouldClose(const char* a_WindowName);
-		static bool GetWindowShouldClose(GLuint a_WindowIndex);
+		static GLboolean GetWindowShouldClose(const char* WindowName);
+		static GLboolean GetWindowShouldClose(GLuint WindowIndex);
 
 		//swap buffers
-		static void WindowSwapBuffers(const char* a_WindowName);
-		static void WindowSwapBuffers(GLuint a_WindowIndex);
+		static void WindowSwapBuffers(const char* WindowName);
+		static void WindowSwapBuffers(GLuint WindowIndex);
 
 		//sets and gets for fullscreen
-		static void SetFullScreen(const char* a_WindowName, bool a_NewState);
-		static void SetFullScreen(GLuint a_WindowIndex, bool a_NewState);
-		static bool GetWindowIsFullScreen(const char* a_WindowName);
-		static bool GetWindowIsFullScreen(GLuint a_WindowIndex);
+		static void SetFullScreen(const char* WindowName, GLboolean NewState);
+		static void SetFullScreen(GLuint WindowIndex, GLboolean NewState);
+		static GLboolean GetWindowIsFullScreen(const char* WindowName);
+		static GLboolean GetWindowIsFullScreen(GLuint WindowIndex);
 
 		//gets and sets for minimized
-		static bool GetWindowIsMinimized(const char* a_WindowName);
-		static bool GetWindowIsMinimized(GLuint a_WindowIndex);
-		static void MinimizeWindow(const char* a_WindowName, bool a_NewState);
-		static void MinimizeWindow(GLuint a_WindowIndex, bool a_NewState);
+		static GLboolean GetWindowIsMinimized(const char* WindowName);
+		static GLboolean GetWindowIsMinimized(GLuint WindowIndex);
+		static void MinimizeWindow(const char* WindowName, GLboolean NewState);
+		static void MinimizeWindow(GLuint WindowIndex, GLboolean NewState);
 
 		//gets and sets for maximised state
-		static bool GetWindowIsMaximized(const char* a_WindowName);
-		static bool GetWindowIsMaximized(GLuint a_WindowIndex);
-		static void MaximizeWindow(const char* a_WindowName, bool a_NewState);
-		static void MaximizeWindow(GLuint a_WindowIndex, bool a_NewState);
+		static GLboolean GetWindowIsMaximized(const char* WindowName);
+		static GLboolean GetWindowIsMaximized(GLuint WindowIndex);
+		static void MaximizeWindow(const char* WindowName, GLboolean NewState);
+		static void MaximizeWindow(GLuint WindowIndex, GLboolean NewState);
 
 		//gets and sets for window name and index
-		static const char* GetWindowName(GLuint a_WindowIndex);
-		static GLuint GetWindowIndex(const char*  a_WindowName);
+		static const char* GetWindowName(GLuint WindowIndex);
+		static GLuint GetWindowIndex(const char*  WindowName);
 
-		static void SetWindowName(const char* a_WindowName, const char* a_NewName);
-		static void SetWindowName(GLuint a_WindowIndex, const char* a_NewName);
+		static void SetWindowName(const char* WindowName, const char* NewName);
+		static void SetWindowName(GLuint WindowIndex, const char* NewName);
 
 		//gets and sets window is in focus(Linux only?)
-		static bool GetWindowIsInFocus(const char* a_WindowName);
-		static bool GetWindowIsInFocus(GLuint a_WindowIndex);
-		static void FocusWindow(const char* a_WindowName, bool a_NewState);
-		static void FocusWindow(GLuint a_WindowIndex, bool a_NewState);
+		static GLboolean GetWindowIsInFocus(const char* WindowName);
+		static GLboolean GetWindowIsInFocus(GLuint WindowIndex);
+		static void FocusWindow(const char* WindowName, GLboolean NewState);
+		static void FocusWindow(GLuint WindowIndex, GLboolean NewState);
 
 		//gets and sets for restoring the window
-		static void RestoreWindow(const char* a_WindowName);
-		static void RestoreWindow(GLuint a_WindowIndex);
+		static void RestoreWindow(const char* WindowName);
+		static void RestoreWindow(GLuint WindowIndex);
 
 		//get window obscurity. I feel like this is completely useless
-		//static bool GetWindowIsObscured(const char* a_WindowName);
-		//static bool GetWindowIsObscured(GLuint a_WindowIndex);
+		//static GLboolean GetWindowIsObscured(const char* WindowName);
+		//static GLboolean GetWindowIsObscured(GLuint WindowIndex);
 
 		//enable vertical sync on selected window
-		static void SetWindowSwapInterval(const char* a_WindowName, GLint a_EnableSync);
-		static void SetWindowSwapInterval(GLuint a_WindowIndex, GLint a_EnableSync);
+		static void SetWindowSwapInterval(const char* WindowName, GLint EnableSync);
+		static void SetWindowSwapInterval(GLuint WindowIndex, GLint EnableSync);
 		
 		//initialize the window manager
 		static void Initialize();
@@ -143,64 +143,64 @@ class F_WM
 		static void PollForEvents();
 
 		//remove a window from the manager
-		static void RemoveWindow(F_W* a_Window);
+		static void RemoveWindow(Window* WindowToBeRemoved);
 
 		//set callbacks for the selected window
-		static void SetWindowOnKeyEvent(const char* a_WindowName, OnKeyEvent a_OnKeyEvent);
-		static void SetWindowOnKeyEvent(GLuint a_WindowIndex, OnKeyEvent a_OnKeyEvent);
+		static void SetWindowOnKeyEvent(const char* WindowName, OnKeyEvent OnKey);
+		static void SetWindowOnKeyEvent(GLuint WindowIndex, OnKeyEvent OnKey);
 
-		static void SetWindowOnMouseButtonEvent(const char* a_WindowName, OnMouseButtonEvent a_OnMouseButtonEvent);
-		static void SetWindowOnMouseButtonEvent(GLuint a_WindowIndex, OnMouseButtonEvent a_OnMouseButtonEvent);
+		static void SetWindowOnMouseButtonEvent(const char* WindowName, OnMouseButtonEvent a_OnMouseButtonEvent);
+		static void SetWindowOnMouseButtonEvent(GLuint WindowIndex, OnMouseButtonEvent a_OnMouseButtonEvent);
 
-		static void SetWindowOnMouseWheelEvent(const char* a_WindowName, OnMouseWheelEvent a_OnMouseWheelEvent);
-		static void SetWindowOnMouseWheelEvent(GLuint a_WindowIndex, OnMouseWheelEvent a_OnMouseWheelEvent);
+		static void SetWindowOnMouseWheelEvent(const char* WindowName, OnMouseWheelEvent OnMouseWheelEvent);
+		static void SetWindowOnMouseWheelEvent(GLuint WindowIndex, OnMouseWheelEvent OnMouseWheelEvent);
 
-		static void SetWindowOnDestroyed(const char* a_WindowName, OnDestroyed a_OnDestroyed);
-		static void SetWindowOnDestroyed(GLuint a_WindowIndex, OnDestroyed a_OnDestroyed);
+		static void SetWindowOnDestroyed(const char* WindowName, OnDestroyedEvent OnDestroyed);
+		static void SetWindowOnDestroyed(GLuint WindowIndex, OnDestroyedEvent OnDestroyed);
 
-		static void SetWindowOnMaximized(const char* a_WindowName, OnMaximized a_OnMaximized);
-		static void SetWindowOnMaximized(GLuint a_WindowIndex, OnMaximized a_OnMaximized);
+		static void SetWindowOnMaximized(const char* WindowName, OnMaximizedEvent OnMaximized);
+		static void SetWindowOnMaximized(GLuint WindowIndex, OnMaximizedEvent OnMaximized);
 
-		static void SetWindowOnMinimized(const char* a_WindowName, OnMinimized a_OnMiniimzed);
-		static void SetWindowOnMinimized(GLuint a_WindowIndex, OnMinimized a_OnMiniimzed);
+		static void SetWindowOnMinimized(const char* WindowName, OnMinimizedEvent a_OnMiniimzed);
+		static void SetWindowOnMinimized(GLuint WindowIndex, OnMinimizedEvent a_OnMiniimzed);
 
-		static void SetWindowOnRestored(const char* a_WindowName, OnRestored a_OnRestored);
-		static void SetWindowOnRestored(GLuint a_WindowIndex, OnRestored a_OnRestored);
+		static void SetWindowOnRestored(const char* WindowName, OnRestoredEvent OnRestored);
+		static void SetWindowOnRestored(GLuint WindowIndex, OnRestoredEvent OnRestored);
 
-		static void SetWindowOnFocus(const char* a_WindowName, OnFocus a_OnFocus);
-		static void SetWindowOnFocus(GLuint a_WindowIndex, OnFocus a_OnFocus);
+		static void SetWindowOnFocus(const char* WindowName, OnFocusEvent OnFocus);
+		static void SetWindowOnFocus(GLuint WindowIndex, OnFocusEvent OnFocus);
 
-		static void SetWindowOnMoved(const char* a_WindowName, OnMoved a_OnMoved);
-		static void SetWindowOnMoved(GLuint a_WindowIndex, OnMoved a_OnMoved);
+		static void SetWindowOnMoved(const char* WindowName, OnMovedEvent OnMoved);
+		static void SetWindowOnMoved(GLuint WindowIndex, OnMovedEvent OnMoved);
 
-		static void SetWindowOnResize(const char* a_WindowName, OnResize a_OnResize);
-		static void SetWindowOnResize(GLuint a_WindowIndex, OnResize a_OnResize);
+		static void SetWindowOnResize(const char* WindowName, OnResizeEvent OnResize);
+		static void SetWindowOnResize(GLuint WindowIndex, OnResizeEvent OnResize);
 
-		static void SetWindowOnMouseMove(const char* a_WindowName, OnMouseMove a_OnMouseMove);
-		static void SetWindowOnMouseMove(GLuint a_WindowIndex, OnMouseMove a_OnMouseMove);
+		static void SetWindowOnMouseMove(const char* WindowName, OnMouseMoveEvent OnMouseMove);
+		static void SetWindowOnMouseMove(GLuint WindowIndex, OnMouseMoveEvent OnMouseMove);
 
 	private:
 
 		//get a static reference to the window manager
-		static F_WM* GetInstance();
+		static WindowManager* GetInstance();
 
-		std::vector<F_W*> m_Windows;
-		static F_WM* m_Instance;
+		std::vector<Window*> Windows;
+		static WindowManager* Instance;
 
-		GLuint m_ScreenResolution[2];
-		GLuint m_ScreenMousePosition[2];
+		GLuint ScreenResolution[2];
+		GLuint ScreenMousePosition[2];
 
 #if defined(CURRENT_OS_WINDOWS)
-		LRESULT CALLBACK WindowProcedure(HWND a_WindowHandle, GLuint a_Message, WPARAM a_WordParam, LPARAM a_LongParam);
+		LRESULT CALLBACK WindowProcedure(HWND WindowHandle, GLuint Message, WPARAM WordParam, LPARAM LongParam);
 	
-		static LRESULT CALLBACK StaticWindowProcedure(HWND a_WindowHandle, UINT a_Message, WPARAM a_WordParam, LPARAM a_LongParam);
+		static LRESULT CALLBACK StaticWindowProcedure(HWND WindowHandle, UINT Message, WPARAM WordParam, LPARAM LongParam);
 
-		static F_W* GetWindowByHandle(HWND a_WindowHandle);
+		static Window* GetWindowByHandle(HWND WindowHandle);
 
 		static void Windows_PollForEvents();
 		static void Windows_Initialize();
 		static void Windows_Shutdown();
-		static void Windows_SetMousePositionInScreen(GLuint a_X, GLuint a_Y);
+		static void Windows_SetMousePositionInScreen(GLuint X, GLuint Y);
 
 		static void CreateTerminal();
 
@@ -209,14 +209,14 @@ class F_WM
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-		static F_W* GetWindowByHandle(Window a_WindowHandle);
-		static F_W* GetWindowByEvent(XEvent a_Event);
+		static Window* GetWindowByHandle(Window WindowHandle);
+		static Window* GetWindowByEvent(XEvent Event);
 
 		static void Linux_Initialize();
 		static void Linux_Shutdown();
 
 		static void Linux_PollForEvents();
-		static void Linux_SetMousePositionInScreen(GLuint a_X, GLuint a_Y);
+		static void Linux_SetMousePositionInScreen(GLuint X, GLuint Y);
 		static Display* GetDisplay();
 
 		Display* m_Display;

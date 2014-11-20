@@ -1,9 +1,9 @@
 #include "Tools.h"
 #if defined(CURRENT_OS_LINUX)
 
-const char* Foundation_Tools::Linux_GetEventType(XEvent a_Event)
+const char* Foundation_Tools::Linux_GetEventType(XEvent Event)
 {
-	switch (a_Event.type)
+	switch (Event.type)
 	{
 		case MotionNotify:
 		{
@@ -162,9 +162,9 @@ const char* Foundation_Tools::Linux_GetEventType(XEvent a_Event)
 	}
 }
 
-GLuint Foundation_Tools::Linux_TranslateKey(GLuint a_KeySym)
+GLuint Foundation_Tools::Linux_TranslateKey(GLuint KeySym)
 {
-	switch (a_KeySym)
+	switch (KeySym)
 	{
 		case XK_Escape:
 		{

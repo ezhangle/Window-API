@@ -2,7 +2,7 @@
 #include "Tools.h"
 
 #if defined(CURRENT_OS_WINDOWS)
-void F_WM::Windows_Initialize()
+void WindowManager::Windows_Initialize()
 {
 	CreateTerminal();
 	RECT l_Desktop;
@@ -11,32 +11,32 @@ void F_WM::Windows_Initialize()
 
 	GetWindowRect(l_DesktopHandle, &l_Desktop);
 
-	GetInstance()->m_ScreenResolution[0] = l_Desktop.right;
-	GetInstance()->m_ScreenResolution[1] = l_Desktop.bottom;
+	GetInstance()->ScreenResolution[0] = l_Desktop.right;
+	GetInstance()->ScreenResolution[1] = l_Desktop.bottom;
 }
 
-F_W* F_WM::GetWindowByHandle(HWND a_WindowHandle)
+Window* WindowManager::GetWindowByHandle(HWND WindowHandle)
 {
-	for (GLuint l_Iter = 0; l_Iter < GetInstance()->m_Windows.size(); l_Iter++)
+	for (GLuint l_Iter = 0; l_Iter < GetInstance()->Windows.size(); l_Iter++)
 	{
-		if (GetInstance()->m_Windows[l_Iter]->GetWindowHandle() == a_WindowHandle)
+		if (GetInstance()->Windows[l_Iter]->GetWindowHandle() == WindowHandle)
 		{
-			return GetInstance()->m_Windows[l_Iter];
+			return GetInstance()->Windows[l_Iter];
 		}
 	}
 
 	return nullptr;
 }
 
-LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPARAM a_WordParam, LPARAM a_LongParam)
+LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message, WPARAM WordParam, LPARAM LongParam)
 {
-	F_W* l_Window = GetWindowByHandle(a_WindowHandle);
-	switch (a_Message)
+	Window* l_Window = GetWindowByHandle(WindowHandle);
+	switch (Message)
 	{
 	case WM_CREATE:
 	{
-		GetWindowByIndex(m_Windows.size() - 1)->m_WindowHandle = a_WindowHandle;
-		l_Window = GetWindowByHandle(a_WindowHandle);
+		GetWindowByIndex(Windows.size() - 1)->WindowHandle = WindowHandle;
+		l_Window = GetWindowByHandle(WindowHandle);
 
 		l_Window->InitializeGL();
 		break;
@@ -44,11 +44,11 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 
 	case WM_DESTROY:
 	{
-		l_Window->m_ShouldClose = true;
+		l_Window->ShouldClose = GL_TRUE;
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnDestroyed))
+		if (Foundation_Tools::IsValid(l_Window->DestroyedEvent))
 		{
-			l_Window->m_OnDestroyed();
+			l_Window->DestroyedEvent();
 		}
 
 		l_Window->Shutdown();
@@ -56,12 +56,12 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 	}
 	case WM_MOVE:
 	{
-		l_Window->m_Position[0] = LOWORD(a_LongParam);
-		l_Window->m_Position[1] = HIWORD(a_LongParam);
+		l_Window->Position[0] = LOWORD(LongParam);
+		l_Window->Position[1] = HIWORD(LongParam);
 		
-		if (Foundation_Tools::IsValid(l_Window->m_OnMoved))
+		if (Foundation_Tools::IsValid(l_Window->MovedEvent))
 		{
-			l_Window->m_OnMoved(l_Window->m_Position[0], l_Window->m_Position[1]);
+			l_Window->MovedEvent(l_Window->Position[0], l_Window->Position[1]);
 		}
 		
 		break;
@@ -69,28 +69,28 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 
 	case WM_MOVING:
 	{
-		l_Window->m_Position[0] = LOWORD(a_LongParam);
-		l_Window->m_Position[1] = HIWORD(a_LongParam);
+		l_Window->Position[0] = LOWORD(LongParam);
+		l_Window->Position[1] = HIWORD(LongParam);
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnMoved))
+		if (Foundation_Tools::IsValid(l_Window->MovedEvent))
 		{
-			l_Window->m_OnMoved(l_Window->m_Position[0], l_Window->m_Position[1]);
+			l_Window->MovedEvent(l_Window->Position[0], l_Window->Position[1]);
 		}
 		break;
 	}
 
 	case WM_SIZE:
 	{
-		l_Window->m_Resolution[0] = (GLuint)LOWORD(a_LongParam);
-		l_Window->m_Resolution[1] = (GLuint)HIWORD(a_LongParam);
+		l_Window->Resolution[0] = (GLuint)LOWORD(LongParam);
+		l_Window->Resolution[1] = (GLuint)HIWORD(LongParam);
 
-		switch (a_WordParam)
+		switch (WordParam)
 		{
 			case SIZE_MAXIMIZED:
 			{
-				if (Foundation_Tools::IsValid(l_Window->m_OnMaximized))
+				if (Foundation_Tools::IsValid(l_Window->MaximizedEvent))
 				{
-					l_Window->m_OnMaximized();
+					l_Window->MaximizedEvent();
 				}
 
 				break;
@@ -98,28 +98,28 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 
 			case SIZE_MINIMIZED:
 			{
-				if (Foundation_Tools::IsValid(l_Window->m_OnMinimized))
+				if (Foundation_Tools::IsValid(l_Window->MinimizedEvent))
 				{
-					l_Window->m_OnMinimized();
+					l_Window->MinimizedEvent();
 				}
 				break;
 			}
 
 			case SIZE_RESTORED:
 			{
-				if (Foundation_Tools::IsValid(l_Window->m_OnMaximized))
+				if (Foundation_Tools::IsValid(l_Window->MaximizedEvent))
 				{
-					l_Window->m_OnRestored();
+					l_Window->RestoredEvent();
 				}
 				break;
 			}
 
 			default:
 			{
-				if (Foundation_Tools::IsValid(l_Window->m_OnResize))
+				if (Foundation_Tools::IsValid(l_Window->ResizeEvent))
 				{
-					l_Window->m_OnResize(l_Window->m_Resolution[0],
-						l_Window->m_Resolution[1]);
+					l_Window->ResizeEvent(l_Window->Resolution[0],
+						l_Window->Resolution[1]);
 				}
 
 				break;
@@ -131,13 +131,13 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 	case WM_SIZING:
 	{
 
-		l_Window->m_Resolution[0] = (GLuint)LOWORD(a_LongParam);
-		l_Window->m_Resolution[1] = (GLuint)HIWORD(a_LongParam);
+		l_Window->Resolution[0] = (GLuint)LOWORD(LongParam);
+		l_Window->Resolution[1] = (GLuint)HIWORD(LongParam);
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnResize))
+		if (Foundation_Tools::IsValid(l_Window->ResizeEvent))
 		{
-			l_Window->m_OnResize(l_Window->m_Resolution[0],
-				l_Window->m_Resolution[1]);
+			l_Window->ResizeEvent(l_Window->Resolution[0],
+				l_Window->Resolution[1]);
 		}
 
 
@@ -148,47 +148,47 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 	{
  		GLuint l_TranslatedKey = 0;
 
-		switch (HIWORD(a_LongParam))
+		switch (HIWORD(LongParam))
 		{
 			case 29:
 			{
-				l_Window->m_Keys[KEY_LEFTCONTROL] = KEYSTATE_DOWN;
+				l_Window->Keys[KEY_LEFTCONTROL] = KEYSTATE_DOWN;
 				l_TranslatedKey = KEY_LEFTCONTROL;
 				break;
 			}
 
 			case 285:
 			{
-				l_Window->m_Keys[KEY_RIGHTCONTROL] = KEYSTATE_DOWN;
+				l_Window->Keys[KEY_RIGHTCONTROL] = KEYSTATE_DOWN;
 				l_TranslatedKey = KEY_RIGHTCONTROL;
 				break;
 			}
 
 			case 42:
 			{
-				l_Window->m_Keys[KEY_LEFTSHIFT] = KEYSTATE_DOWN;
+				l_Window->Keys[KEY_LEFTSHIFT] = KEYSTATE_DOWN;
 				l_TranslatedKey = KEY_LEFTSHIFT;
 				break;
 			}
 
 			case 54:
 			{
-				l_Window->m_Keys[KEY_RIGHTSHIFT] = KEYSTATE_DOWN;
+				l_Window->Keys[KEY_RIGHTSHIFT] = KEYSTATE_DOWN;
 				l_TranslatedKey = KEY_RIGHTSHIFT;
 				break;
 			}
 
 			default:
 			{
-				l_TranslatedKey = Foundation_Tools::Windows_TranslateKey(a_WordParam, a_LongParam);
-				l_Window->m_Keys[l_TranslatedKey] = KEYSTATE_DOWN;
+				l_TranslatedKey = Foundation_Tools::Windows_TranslateKey(WordParam, LongParam);
+				l_Window->Keys[l_TranslatedKey] = KEYSTATE_DOWN;
 				break;
 			}
 		}
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnKeyEvent))
+		if (Foundation_Tools::IsValid(l_Window->KeyEvent))
 		{
-			l_Window->m_OnKeyEvent(l_TranslatedKey, KEYSTATE_DOWN);
+			l_Window->KeyEvent(l_TranslatedKey, KEYSTATE_DOWN);
 		}
 		break;
 	}
@@ -197,47 +197,47 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 	{
 		GLuint l_TranslatedKey = 0;		
 
-		switch (HIWORD(a_LongParam))
+		switch (HIWORD(LongParam))
 		{
 			case 49181:
 			{
-				l_Window->m_Keys[KEY_LEFTCONTROL] = KEYSTATE_UP;
+				l_Window->Keys[KEY_LEFTCONTROL] = KEYSTATE_UP;
 				l_TranslatedKey = KEY_LEFTCONTROL;
 				break;
 			}
 
 			case 49437:
 			{
-				l_Window->m_Keys[KEY_RIGHTCONTROL] = KEYSTATE_UP;
+				l_Window->Keys[KEY_RIGHTCONTROL] = KEYSTATE_UP;
 				l_TranslatedKey = KEY_RIGHTCONTROL;
 				break;
 			}
 
 			case 49194:
 			{
-				l_Window->m_Keys[KEY_LEFTSHIFT] = KEYSTATE_UP;
+				l_Window->Keys[KEY_LEFTSHIFT] = KEYSTATE_UP;
 				l_TranslatedKey = KEY_LEFTSHIFT;
 				break;
 			}
 
 			case 49206:
 			{
-				l_Window->m_Keys[KEY_RIGHTSHIFT] = KEYSTATE_UP;
+				l_Window->Keys[KEY_RIGHTSHIFT] = KEYSTATE_UP;
 				l_TranslatedKey = KEY_RIGHTSHIFT;
 				break;
 			}
 
 			default:
 			{
-				l_TranslatedKey = Foundation_Tools::Windows_TranslateKey(a_WordParam, a_LongParam);
-				l_Window->m_Keys[l_TranslatedKey] = KEYSTATE_UP;
+				l_TranslatedKey = Foundation_Tools::Windows_TranslateKey(WordParam, LongParam);
+				l_Window->Keys[l_TranslatedKey] = KEYSTATE_UP;
 				break;
 			}
 		}
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnKeyEvent))
+		if (Foundation_Tools::IsValid(l_Window->KeyEvent))
 		{
-			l_Window->m_OnKeyEvent(l_TranslatedKey, KEYSTATE_UP);
+			l_Window->KeyEvent(l_TranslatedKey, KEYSTATE_UP);
 		}
 		break;
 	}
@@ -245,11 +245,11 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 	case WM_SYSKEYDOWN:
 	{
 		GLuint l_TranslatedKey = 0;
-		switch (HIWORD(a_LongParam))
+		switch (HIWORD(LongParam))
 		{
 		case 8248:
 		{
-			l_Window->m_Keys[KEY_LEFTALT] = KEYSTATE_DOWN;
+			l_Window->Keys[KEY_LEFTALT] = KEYSTATE_DOWN;
 			l_TranslatedKey = KEY_LEFTALT;
 			break;
 		}
@@ -257,7 +257,7 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 
 		case 8504:
 		{
-			l_Window->m_Keys[KEY_RIGHTALT] = KEYSTATE_DOWN;
+			l_Window->Keys[KEY_RIGHTALT] = KEYSTATE_DOWN;
 			l_TranslatedKey = KEY_RIGHTALT;
 		}
 
@@ -267,9 +267,9 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 		}
 		}
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnKeyEvent))
+		if (Foundation_Tools::IsValid(l_Window->KeyEvent))
 		{
-			l_Window->m_OnKeyEvent(l_TranslatedKey, KEYSTATE_DOWN);
+			l_Window->KeyEvent(l_TranslatedKey, KEYSTATE_DOWN);
 		}
 
 		break;
@@ -278,11 +278,11 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 	case WM_SYSKEYUP:
 	{
 		GLuint l_TranslatedKey = 0;
-		switch (HIWORD(a_LongParam))
+		switch (HIWORD(LongParam))
 		{
 		case 49208:
 		{
-			l_Window->m_Keys[KEY_LEFTALT] = KEYSTATE_UP;
+			l_Window->Keys[KEY_LEFTALT] = KEYSTATE_UP;
 			l_TranslatedKey = KEY_LEFTALT;
 			break;
 		}
@@ -290,7 +290,7 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 
 		case 49464:
 		{
-			l_Window->m_Keys[KEY_RIGHTALT] = KEYSTATE_UP;
+			l_Window->Keys[KEY_RIGHTALT] = KEYSTATE_UP;
 			l_TranslatedKey = KEY_RIGHTALT;
 			break;
 		}
@@ -301,115 +301,115 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 		}
 		}
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnKeyEvent))
+		if (Foundation_Tools::IsValid(l_Window->KeyEvent))
 		{
-			l_Window->m_OnKeyEvent(l_TranslatedKey, KEYSTATE_UP);
+			l_Window->KeyEvent(l_TranslatedKey, KEYSTATE_UP);
 		}
 		break;
 	}
 
 	case WM_MOUSEMOVE:
 	{
-		l_Window->m_MousePosition[0] = (GLuint)LOWORD(a_LongParam);
-		l_Window->m_MousePosition[1] = (GLuint)HIWORD(a_LongParam);
+		l_Window->MousePosition[0] = (GLuint)LOWORD(LongParam);
+		l_Window->MousePosition[1] = (GLuint)HIWORD(LongParam);
 
 		POINT l_Point;
-		l_Point.x = l_Window->m_MousePosition[0];
-		l_Point.y = l_Window->m_MousePosition[1];
+		l_Point.x = l_Window->MousePosition[0];
+		l_Point.y = l_Window->MousePosition[1];
 
-		ClientToScreen(a_WindowHandle, &l_Point);
+		ClientToScreen(WindowHandle, &l_Point);
 
 		//printf("%i %i \n", l_Point.x, l_Point.y);
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnMouseMove))
+		if (Foundation_Tools::IsValid(l_Window->MouseMoveEvent))
 		{
-			l_Window->m_OnMouseMove(l_Window->m_MousePosition[0],
-				l_Window->m_MousePosition[1], l_Point.x, l_Point.y);
+			l_Window->MouseMoveEvent(l_Window->MousePosition[0],
+				l_Window->MousePosition[1], l_Point.x, l_Point.y);
 		}
 		break;
 	}
 
 	case WM_LBUTTONDOWN:
 	{
-		l_Window->m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONDOWN;
+		l_Window->MouseButton[MOUSE_LEFTBUTTON] = MOUSE_BUTTONDOWN;
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnMouseButtonEvent))
+		if (Foundation_Tools::IsValid(l_Window->MouseButtonEvent))
 		{
-			l_Window->m_OnMouseButtonEvent(MOUSE_LEFTBUTTON, MOUSE_BUTTONDOWN);
+			l_Window->MouseButtonEvent(MOUSE_LEFTBUTTON, MOUSE_BUTTONDOWN);
 		}
 		break;
 	}
 
 	case WM_LBUTTONUP:
 	{
-		l_Window->m_MouseEvents[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
+		l_Window->MouseButton[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnMouseButtonEvent))
+		if (Foundation_Tools::IsValid(l_Window->MouseButtonEvent))
 		{
-			l_Window->m_OnMouseButtonEvent(MOUSE_LEFTBUTTON, MOUSE_BUTTONUP);
+			l_Window->MouseButtonEvent(MOUSE_LEFTBUTTON, MOUSE_BUTTONUP);
 		}
 		break;
 	}
 
 	case WM_RBUTTONDOWN:
 	{
-		l_Window->m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
+		l_Window->MouseButton[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnMouseButtonEvent))
+		if (Foundation_Tools::IsValid(l_Window->MouseButtonEvent))
 		{
-			l_Window->m_OnMouseButtonEvent(MOUSE_RIGHTBUTTON, MOUSE_BUTTONDOWN);
+			l_Window->MouseButtonEvent(MOUSE_RIGHTBUTTON, MOUSE_BUTTONDOWN);
 		}
 		break;
 	}
 
 	case WM_RBUTTONUP:
 	{
-		l_Window->m_MouseEvents[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONUP;
+		l_Window->MouseButton[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONUP;
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnMouseButtonEvent))
+		if (Foundation_Tools::IsValid(l_Window->MouseButtonEvent))
 		{
-			l_Window->m_OnMouseButtonEvent(MOUSE_RIGHTBUTTON, MOUSE_BUTTONUP);
+			l_Window->MouseButtonEvent(MOUSE_RIGHTBUTTON, MOUSE_BUTTONUP);
 		}
 		break;
 	}
 
 	case WM_MBUTTONDOWN:
 	{
-		l_Window->m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
+		l_Window->MouseButton[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnMouseButtonEvent))
+		if (Foundation_Tools::IsValid(l_Window->MouseButtonEvent))
 		{
-			l_Window->m_OnMouseButtonEvent(MOUSE_MIDDLEBUTTON, MOUSE_BUTTONDOWN);
+			l_Window->MouseButtonEvent(MOUSE_MIDDLEBUTTON, MOUSE_BUTTONDOWN);
 		}
 		break;
 	}
 
 	case WM_MBUTTONUP:
 	{
-		l_Window->m_MouseEvents[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONUP;
+		l_Window->MouseButton[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONUP;
 
-		if (Foundation_Tools::IsValid(l_Window->m_OnMouseButtonEvent))
+		if (Foundation_Tools::IsValid(l_Window->MouseButtonEvent))
 		{
-			l_Window->m_OnMouseButtonEvent(MOUSE_MIDDLEBUTTON, MOUSE_BUTTONUP);
+			l_Window->MouseButtonEvent(MOUSE_MIDDLEBUTTON, MOUSE_BUTTONUP);
 		}
 		break;
 	}
 
 	case WM_MOUSEWHEEL:
 	{
-		if ((a_WordParam % WHEEL_DELTA) > 0)
+		if ((WordParam % WHEEL_DELTA) > 0)
 		{
-			if (Foundation_Tools::IsValid(l_Window->m_OnMouseWheel))
+			if (Foundation_Tools::IsValid(l_Window->MouseWheelEvent))
 			{
-				l_Window->m_OnMouseWheel(MOUSE_SCROLL_DOWN);
+				l_Window->MouseWheelEvent(MOUSE_SCROLL_DOWN);
 			}
 		}
 
 		else
 		{
-			if (Foundation_Tools::IsValid(l_Window->m_OnMouseWheel))
+			if (Foundation_Tools::IsValid(l_Window->MouseWheelEvent))
 			{
-				l_Window->m_OnMouseWheel(MOUSE_SCROLL_UP);
+				l_Window->MouseWheelEvent(MOUSE_SCROLL_UP);
 			}
 
 		}
@@ -418,25 +418,25 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 
 	default:
 	{
-		return DefWindowProc(a_WindowHandle, a_Message, a_WordParam, a_LongParam);
+		return DefWindowProc(WindowHandle, Message, WordParam, LongParam);
 	}
 	}
 	return 0;
 }
 
-LRESULT CALLBACK F_WM::StaticWindowProcedure(HWND a_WindowHandle, UINT a_Message, WPARAM a_WordParam, LPARAM a_LongParam)
+LRESULT CALLBACK WindowManager::StaticWindowProcedure(HWND WindowHandle, UINT Message, WPARAM WordParam, LPARAM LongParam)
 {
-	return F_WM::GetInstance()->WindowProcedure(a_WindowHandle, a_Message, a_WordParam, a_LongParam);
+	return WindowManager::GetInstance()->WindowProcedure(WindowHandle, Message, WordParam, LongParam);
 }
 
-void F_WM::Windows_PollForEvents()
+void WindowManager::Windows_PollForEvents()
 {
 	GetMessage(&GetInstance()->m_Message, 0, 0, 0);
 	TranslateMessage(&GetInstance()->m_Message);
 	DispatchMessage(&GetInstance()->m_Message);
 }
 
-void F_WM::CreateTerminal()
+void WindowManager::CreateTerminal()
 {
 	int hConHandle;
 	long lStdHandle;

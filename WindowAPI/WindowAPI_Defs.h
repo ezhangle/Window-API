@@ -105,22 +105,14 @@
 #define WINDOWSTATE_MINIMIZED 2
 #define WINDOWSTATE_FULLSCREEN 3
 
-typedef void (*OnKeyEvent)(GLuint a_Key, bool a_KeyState);
-typedef void (*OnMouseButtonEvent)(GLuint a_Button, bool a_ButtonState);
-typedef void (*OnMouseWheelEvent)(GLuint a_WheelDirection);
-typedef void (*OnDestroyed)();
-typedef void (*OnMaximized)();
-typedef void (*OnMinimized)();
-typedef void (*OnRestored)(); //only really works on windows, Linux doesn't even have an atomic for it. might need to remove
-typedef void (*OnFocus)(bool m_InFocus);
-typedef void (*OnMoved)(GLuint a_X, GLuint a_Y);
-typedef void (*OnResize)(GLuint a_Width, GLuint a_Height);
-typedef void (*OnMouseMove)(GLuint a_WindowX, GLuint a_WindowY, GLuint a_ScreenX, GLuint a_ScreenY);
-
-/*
-Legend: this is simply how I like my variables to be notated
-m_: this is a member variable
-a_: this is an function argument variable
-l_: this is a local variable
-t_: this is a temporary variable to be changed later
-*/
+typedef void (*OnKeyEvent)(GLuint Key, GLboolean KeyState);
+typedef void (*OnMouseButtonEvent)(GLuint Button, GLboolean ButtonState);
+typedef void (*OnMouseWheelEvent)(GLuint WheelDirection);
+typedef void (*OnDestroyedEvent)();
+typedef void (*OnMaximizedEvent)();
+typedef void (*OnMinimizedEvent)();
+typedef void (*OnRestoredEvent)(); //only really works on windows, Linux doesn't even have an atomic for it. might need to remove
+typedef void (*OnFocusEvent)(GLboolean InFocus);
+typedef void (*OnMovedEvent)(GLuint X, GLuint Y);
+typedef void (*OnResizeEvent)(GLuint Width, GLuint Height);
+typedef void (*OnMouseMoveEvent)(GLuint WindowX, GLuint WindowY, GLuint ScreenX, GLuint ScreenY);

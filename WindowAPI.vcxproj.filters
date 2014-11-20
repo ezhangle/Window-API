@@ -50,9 +50,6 @@
     <ClInclude Include="WindowAPI\WindowManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Linux_Tools.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WindowAPI\Tools.h">
       <Filter>Header Files</Filter>
     </ClInclude>

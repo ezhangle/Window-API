@@ -1,9 +1,9 @@
 
 #include "Tools.h"
 #if defined(CURRENT_OS_WINDOWS)
-GLuint Foundation_Tools::Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam)
+GLuint Foundation_Tools::Windows_TranslateKey(WPARAM WordParam, LPARAM LongParam)
 {
-	switch (a_WordParam)
+	switch (WordParam)
 	{
 		case VK_ESCAPE:
 		{
@@ -242,7 +242,7 @@ GLuint Foundation_Tools::Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongP
 
 		default:
 		{
-			return a_WordParam;
+			return WordParam;
 		}
 	}
 }

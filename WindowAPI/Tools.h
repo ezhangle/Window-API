@@ -2,59 +2,59 @@
 #define TOOLS_H
 #include "WindowAPI_Defs.h"
 
-class F_WM;
+class WindowManager;
 
 class Foundation_Tools
 {
 public:
 
-   static bool IsValid(const char* a_String)
+   static GLboolean IsValid(const char* String)
 	{
-		return (a_String != nullptr);
+		return (String != nullptr);
 	}
 
-	static bool IsValid(OnKeyEvent a_OnKeyPressed)
+	static GLboolean IsValid(OnKeyEvent OnKeyPressed)
 	{
-		return (a_OnKeyPressed != nullptr);
+		return (OnKeyPressed != nullptr);
 	}
 
-	static bool IsValid(OnMouseWheelEvent a_OnMouseWheelEvent)
+	static GLboolean IsValid(OnMouseWheelEvent OnMouseWheelEvent)
 	{
-		return (a_OnMouseWheelEvent != nullptr);
+		return (OnMouseWheelEvent != nullptr);
 	}
 
-	static bool IsValid(OnMaximized a_OnMaximized)
+	static GLboolean IsValid(OnMaximizedEvent OnMaximized)
 	{
-		return (a_OnMaximized != nullptr);
+		return (OnMaximized != nullptr);
 	}
 
-	static bool IsValid(OnFocus a_OnFocus)
+	static GLboolean IsValid(OnFocusEvent OnFocus)
 	{
-		return (a_OnFocus != nullptr);
+		return (OnFocus != nullptr);
 	}
 
-	static bool IsValid(OnMoved a_OnMoved)
+	static GLboolean IsValid(OnMovedEvent OnMoved)
 	{
-		return (a_OnMoved != nullptr);
+		return (OnMoved != nullptr);
 	}
 
-	static bool IsValid(OnMouseMove a_OnMouseMove)
+	static GLboolean IsValid(OnMouseMoveEvent OnMouseMove)
 	{
-		return (a_OnMouseMove != nullptr);
+		return (OnMouseMove != nullptr);
 	}
 
-	friend F_WM;
+	friend WindowManager;
 
 private:
 	//these are internal. do not mess with these
 #if defined(CURRENT_OS_WINDOWS)
-	static GLuint Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam);
+	static GLuint Windows_TranslateKey(WPARAM WordParam, LPARAM LongParam);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	static GLuint Linux_TranslateKey(GLuint a_KeySym);
+	static GLuint Linux_TranslateKey(GLuint KeySym);
 
-	static const char* Linux_GetEventType(XEvent a_Event);
+	static const char* Linux_GetEventType(XEvent Event);
 #endif
 };
 

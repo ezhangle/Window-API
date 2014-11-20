@@ -1,35 +1,36 @@
 #include <stdio.h>
 #include "WindowManager.h"
 
-void OnWindowKeyPressed(GLuint a_KeySym, bool a_KeyState)
+void OnWindowKeyPressed(GLuint KeySym, GLboolean KeyState)
 {
-    if(a_KeySym == KEY_WINDOW_LEFT && a_KeyState == KEYSTATE_DOWN)
+    if(KeySym == KEY_WINDOW_LEFT && KeyState == KEYSTATE_DOWN)
 	{
-		printf("blarg \n");
+		printf("1234\n");
 	}
 }
 
 int main()
 {
-	F_WM::Initialize();
-	F_WM::AddWindow(new F_W("Example"));
+	WindowManager::Initialize();
+	WindowManager::AddWindow(new Window("Example"))->AddWindow(
+		new Window("Example2"));
 
-	F_WM::SetWindowOnKeyEvent("Example", &OnWindowKeyPressed);
-
-	while (!F_WM::GetWindowShouldClose("Example"))
+	WindowManager::SetWindowOnKeyEvent("Example", &OnWindowKeyPressed);
+	
+	while (!WindowManager::GetWindowShouldClose("Example"))
 	{
-		F_WM::PollForEvents();
-		glClearColor(1.0f, 0.25f, 0.25f, 1.0f);
-		for (GLuint i = 0; i < F_WM::GetNumWindows(); i++)
+		WindowManager::PollForEvents();
+		
+		for (GLuint i = 0; i < WindowManager::GetNumWindows(); i++)
 		{
-			F_WM::GetWindowByIndex(i)->MakeCurrentContext();
-			
+			WindowManager::GetWindowByIndex(i)->MakeCurrentContext();
+			glClearColor(1.0f, 0.25f, 0.25f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
-			F_WM::WindowSwapBuffers("Example");
+			WindowManager::GetWindowByIndex(i)->SwapDrawBuffers();
 		}
 	}	
 
-	F_WM::ShutDown();
+	WindowManager::ShutDown();
 	return 0;
 }
