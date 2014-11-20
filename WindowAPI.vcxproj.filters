@@ -36,12 +36,12 @@
     <ClCompile Include="WindowAPI\Example.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WindowAPI\Tools_Windows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowAPI\Window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WindowAPI\Window_Tools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WindowAPI\WindowAPI_Defs.h">
@@ -50,8 +50,14 @@
     <ClInclude Include="WindowAPI\WindowManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WindowAPI\WindowManager_Tools.h">
+    <ClInclude Include="Linux_Tools.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowAPI\Tools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowAPI\Tools_Linux.cpp">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

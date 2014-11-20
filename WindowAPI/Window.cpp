@@ -1,7 +1,7 @@
 #include <limits.h>
 #include "Window.h"
 #include "WindowManager.h"
-#include "Window_Tools.h"
+#include "Tools.h"
 
 #if defined(CURRENT_OS_LINUX)
 #include <cstring>

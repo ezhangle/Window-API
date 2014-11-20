@@ -168,7 +168,7 @@ private:
 	void Windows_Restore();
 	void Windows_SetName(const char* a_NewName);
 	void Windows_Focus(bool a_NewState);
-	GLuint Windows_TranslateKey(WPARAM a_WordParam, LPARAM a_LongParam);
+	
 	void Windows_InitializeGL();
 	void Windows_Shutdown();
 	void Windows_VerticalSync(GLint a_EnableSync);
@@ -206,7 +206,7 @@ private:
 	void Linux_Restore();
 	void Linux_Focus(bool a_NewState);
 	void Linux_SetName(const char* a_NewName);
-	GLuint Linux_TranslateKey(GLuint a_KeySym);
+	
 	void Linux_InitializeGL();
 	void Linux_SetSwapInterval(GLint a_SwapInterval);
 	void Linux_Shutdown();

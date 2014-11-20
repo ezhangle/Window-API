@@ -16,12 +16,15 @@
 
 #include "WindowAPI_Defs.h"
 #include "Window.h"
+#include "Tools.h"
 
 class F_W;
+class Foundation_Tools;
 
 class F_WM
 {
 	friend F_W;
+	friend Foundation_Tools;
 
 	public:
 		F_WM();

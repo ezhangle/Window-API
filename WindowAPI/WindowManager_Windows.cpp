@@ -1,5 +1,5 @@
 #include "WindowManager.h"
-#include "Window_Tools.h"
+#include "Tools.h"
 
 #if defined(CURRENT_OS_WINDOWS)
 void F_WM::Windows_Initialize()
@@ -180,7 +180,7 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 
 			default:
 			{
-				l_TranslatedKey = l_Window->Windows_TranslateKey(a_WordParam, a_LongParam);
+				l_TranslatedKey = Foundation_Tools::Windows_TranslateKey(a_WordParam, a_LongParam);
 				l_Window->m_Keys[l_TranslatedKey] = KEYSTATE_DOWN;
 				break;
 			}
@@ -229,7 +229,7 @@ LRESULT CALLBACK F_WM::WindowProcedure(HWND a_WindowHandle, UINT a_Message, WPAR
 
 			default:
 			{
-				l_TranslatedKey = l_Window->Windows_TranslateKey(a_WordParam, a_LongParam);
+				l_TranslatedKey = Foundation_Tools::Windows_TranslateKey(a_WordParam, a_LongParam);
 				l_Window->m_Keys[l_TranslatedKey] = KEYSTATE_UP;
 				break;
 			}

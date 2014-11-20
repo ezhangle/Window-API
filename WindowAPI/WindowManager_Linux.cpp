@@ -1,6 +1,5 @@
 #include "WindowManager.h"
-#include "Window_Tools.h"
-#include "WindowManager_Tools.h"
+#include "Tools.h"
 
 #if defined(CURRENT_OS_LINUX)
 F_W* F_WM::GetWindowByHandle(Window a_WindowHandle)

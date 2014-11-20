@@ -111,11 +111,12 @@ typedef void (*OnMouseWheelEvent)(GLuint a_WheelDirection);
 typedef void (*OnDestroyed)();
 typedef void (*OnMaximized)();
 typedef void (*OnMinimized)();
-typedef void (*OnRestored)(); //only really works on windows, Linux doesn't even have an atomic for it.
+typedef void (*OnRestored)(); //only really works on windows, Linux doesn't even have an atomic for it. might need to remove
 typedef void (*OnFocus)(bool m_InFocus);
 typedef void (*OnMoved)(GLuint a_X, GLuint a_Y);
 typedef void (*OnResize)(GLuint a_Width, GLuint a_Height);
 typedef void (*OnMouseMove)(GLuint a_WindowX, GLuint a_WindowY, GLuint a_ScreenX, GLuint a_ScreenY);
+
 /*
 Legend: this is simply how I like my variables to be notated
 m_: this is a member variable
