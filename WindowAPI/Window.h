@@ -92,7 +92,7 @@ public:
 
 	//get and set for window name
 	const char* GetWindowName();
-	void SetName(const char* WindowName);
+	void SetTitleBar(const char* NewText);
 
 	//set the window icon
 	void SetIcon();
@@ -108,16 +108,27 @@ public:
 	//a swap setting of -1 turns on adaptive V-sync on supported systems
 	void SetSwapInterval(GLint SwapSetting);
 
+	//set the on key event callback for this window
 	void SetOnKeyEvent(OnKeyEvent OnKey);
+	//set the on mouse button event callback for this window
 	void SetOnMouseButtonEvent(OnMouseButtonEvent OnMouseButton);
+	//set the on mouse wheel event callback for this window
 	void SetOnMouseWheelEvent(OnMouseWheelEvent OnMouseWheelEvent);
+	//set the window on destroyed event callback for this window
 	void SetOnDestroyed(OnDestroyedEvent OnDestroyed);
+	//set the window on maximizes event callback for this window
 	void SetOnMaximized(OnMaximizedEvent OnMaximized);
+	//set the window on minimized event callback for this window
 	void SetOnMinimized(OnMinimizedEvent OnMinimized);
+	//set the window on restored event callback for this window
 	void SetOnRestored(OnRestoredEvent OnRestored);
+	//set the window on focus event callback for this window
 	void SetOnFocus(OnFocusEvent OnFocus);
+	//set the window on moved event callback for this window
 	void SetOnMoved(OnMovedEvent OnMoved);
+	//set the window on resize event callback for this window
 	void SetOnResize(OnResizeEvent OnResize);
+	//set the window on Mouse move callback event for this window
 	void SetOnMouseMove(OnMouseMoveEvent OnMouseMove);
 
 	friend class WindowManager; // lets window use private variables of WindowManager
@@ -186,6 +197,7 @@ private:
 	//Whether the MESA_Swap_Control(Mesa) GL extension is supported on this machine
 	GLboolean MESASwapControlSupported;
 
+	//this section is for the windows side of the Window API
 #if defined(CURRENT_OS_WINDOWS)
 	
 private:
@@ -203,61 +215,98 @@ private:
 	void Windows_SetPosition(GLuint X, GLuint Y);
 	//uses the win32 system to set the position of the mouse cursor relative to the window
 	void Windows_SetMousePosition(GLuint X, GLuint& Y);
-	//uses the win32 system to have the window completely fill the screen and be drawn above the toolbar
+	/*uses the win32 system to have the window completely fill the screen and be 
+	drawn above the toolbar. changing the screen resolution to match has been disabled 
+	due to event handling issues*/
 	void Windows_FullScreen(GLboolean NewState);
 	//uses the win32 system to minimize/hide the window. minimized windows don't receive events
 	void Windows_Minimize(GLboolean NewState);
 	//uses the win32 system to maximize the window. 
 	void Windows_Maximize(GLboolean NewState);
+	//uses the win32 system to restore the window
 	void Windows_Restore();
-	void Windows_SetName(const char* NewName);
+	//uses the win32 system to set the Title Bar text
+	void Windows_SetTitleBar(const char* NewTitle);
+	//uses the win32 system to put the window into event focus
 	void Windows_Focus(GLboolean NewState);
-	
+	//initialize OpenGL for this window
 	void Windows_InitializeGL();
+	//cleanly shutdown this window(window would still need to be deleted of course)
 	void Windows_Shutdown();
+	//turns of vertical sync using the EXT extension
 	void Windows_VerticalSync(GLint EnableSync);
 
+	//get the handle of the window. to be used internally only
 	HWND GetWindowHandle();
+	//initialize the pixel format 
 	void InitializePixelFormat();
 
+	//initialize NEEDED OpenGL extensions for the windows platform
 	void Windows_InitGLExtensions();
 
+	//the handle to the device context
 	HDC DeviceContextHandle;
+	//the handle to the OpenGL rendering context
 	HGLRC GLRenderingContextHandle;
+	//handle to the draw palette
 	HPALETTE PaletteHandle;
+	//describes the pixel format to be used by OpenGL
 	PIXELFORMATDESCRIPTOR PixelFormatDescriptor;
-
+	//this describes the type of Window that Win32 will create
 	WNDCLASS WindowClass;
+	//handle to the Win32 window itself
 	HWND WindowHandle;
+	//handle to the Win32 instance
 	HINSTANCE InstanceHandle;
 
+	//OpenGL extension callback for setting the swap interval(V-Sync)
 	PFNWGLSWAPINTERVALEXTPROC SwapIntervalEXT;
+	//OpenGL extension for revealing available extensions
 	PFNWGLGETEXTENSIONSSTRINGEXTPROC GetExtensionsStringEXT;
 #endif
 
 #if defined(CURRENT_OS_LINUX)
+	//uses the X11 system to initialize the window
 	void Linux_Initialize();
+	//uses the X11 system to set the size/resolution of the window
 	void Linux_SetResolution(GLuint Width, GLuint Height);
+	//uses the X11 system to set the window position relative to screen co-ordinates
 	void Linux_SetPosition(GLuint X, GLuint Y);
+	//uses the X11 system to set the mouse position relative to the window co-ordinates
 	void Linux_SetMousePosition(GLuint X, GLuint Y);
+	//uses the X11 system to toggle full screen mode 
 	void Linux_FullScreen(GLboolean NewState);
+	//uses the X11 system to toggle minimization
 	void Linux_Minimize(GLboolean NewState);
+	//uses the X11 system to toggle maximization
 	void Linux_Maximize(GLboolean NewState);
+	//uses the X11 system to restore the window
 	void Linux_Restore();
+	//uses the X11 system to toggle the window's event focus state
 	void Linux_Focus(GLboolean NewState);
-	void Linux_SetName(const char* NewName);
-	
+	//uses the X11 system to set the title bar of the window
+	void Linux_SetTitleBar(const char* NewName);
+	//uses the X11 system to initialize create an OpenGL context for the window
 	void Linux_InitializeGL();
+	//uses OpenGL extensions for Linux to toggle Vertical syncing
 	void Linux_VerticalSync(GLint EnableSync);
+	//shut down the window. closes all connections to the X11 system
 	void Linux_Shutdown();
 
+	//initialize the window manager Atomics needed for the X11 extended window manager
 	void InitializeAtomics();
+	//initialize the NEEDED OpenGL extensions that are supported on Linux
 	void Linux_InitGLExtensions();
 
+	//get the Handle To the Window
 	Window GetWindowHandle();
+	//the X11 handle to the window. I wish they didn't name the type 'Window'
 	Window WindowHandle;
+	//the handle to the GLX rendering context
 	GLXContext Context;
+	//the handle to the Visual Information. similar purpose to PixelformatDesriptor
 	XVisualInfo* VisualInfo;
+	//attributes of the window. RGB, depth, stencil, etc
 	GLint* Attributes;
 
 	XSetWindowAttributes SetAttributes;
@@ -267,7 +316,9 @@ private:
 	PFNGLXSWAPINTERVALEXTPROC SwapIntervalEXT;
 	PFNGLXSWAPINTERVALSGIPROC SwapIntervalSGI;	
 
-	//these atomics are needed to change window states via the extended window manager
+	/*these atomics are needed to change window states via the extended window manager
+	might move them to window manager considering these are essentially constants
+	*/
 	Atom AtomState; //_NET_WM_STATE
 	Atom AtomHidden;// _NET_WM_STATE_HIDDEN
 	Atom AtomFullScreen; //NET_WM_STATE_FULLSCREEN

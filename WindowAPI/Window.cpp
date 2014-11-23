@@ -347,17 +347,16 @@ const char* Window::GetWindowName()
 	return Name;
 }
 
-void Window::SetName(const char* WindowName)
+void Window::SetTitleBar(const char* NewTitle)
 {
-	if(WindowName != nullptr)
+	if(NewTitle != nullptr)
 	{
-		WindowName = WindowName;
 #if defined(CURRENT_OS_LINUX)
-		Linux_SetName(WindowName);
+		Linux_SetTitleBar(WindowName);
 #endif
 
 #if defined(CURRENT_OS_WINDOWS)
-		Windows_SetName(WindowName);
+		Windows_SetTitleBar(NewTitle);
 #endif
 	}
 }

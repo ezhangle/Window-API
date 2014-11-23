@@ -523,19 +523,19 @@ GLuint WindowManager::GetWindowIndex(const char* WindowName)
 	return 0;
 }
 
-void WindowManager::SetWindowName(const char* WindowName, const char* NewName)
+void WindowManager::SetWindowTitleBar(const char* WindowName, const char* NewTitle)
 {
-	if(Foundation_Tools::IsValid(WindowName) && Foundation_Tools::IsValid(NewName))
+	if(Foundation_Tools::IsValid(WindowName) && Foundation_Tools::IsValid(NewTitle))
 	{
-		GetWindowByName(WindowName)->SetName(NewName);
+		GetWindowByName(WindowName)->SetTitleBar(NewTitle);
 	}
 }
 
-void WindowManager::SetWindowName(GLuint WindowIndex, const char* NewName)
+void WindowManager::SetWindowTitleBar(GLuint WindowIndex, const char* NewTitle)
 {
-	if(WindowIndex <= GetInstance()->Windows.size() - 1 && Foundation_Tools::IsValid(NewName))
+	if(WindowIndex <= GetInstance()->Windows.size() - 1 && Foundation_Tools::IsValid(NewTitle))
 	{
-		GetWindowByIndex(WindowIndex)->SetName(NewName);
+		GetWindowByIndex(WindowIndex)->SetTitleBar(NewTitle);
 	}
 }
 

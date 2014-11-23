@@ -149,7 +149,7 @@ void Window::Linux_Restore()
 	XMapWindow(WindowManager::GetDisplay(), WindowHandle);
 }
 
-void Window::Linux_SetName(const char* NewName)
+void Window::Linux_SetTitleBar(const char* NewName)
 {
 	Name = NewName;
 
