@@ -347,17 +347,16 @@ const char* FWindow::GetWindowName()
 	return Name;
 }
 
-void FWindow::SetName(const char* WindowName)
+void FWindow::SetTitleBar(const char* NewTitle)
 {
-	if(WindowName != nullptr)
+	if(NewTitle != nullptr)
 	{
-		WindowName = WindowName;
 #if defined(CURRENT_OS_LINUX)
-		Linux_SetName(WindowName);
+		Linux_SetTitleBar(NewTitle);
 #endif
 
 #if defined(CURRENT_OS_WINDOWS)
-		Windows_SetName(WindowName);
+		Windows_SetTitleBar(NewTitle);
 #endif
 	}
 }
@@ -455,7 +454,7 @@ void FWindow::SetOnRestored(OnRestoredEvent OnRestored)
 {
 	if (Foundation_Tools::IsValid(OnRestored))
 	{
-		OnRestored = OnRestored;
+		RestoredEvent = OnRestored;
 	}
 }
 

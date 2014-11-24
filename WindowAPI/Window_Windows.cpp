@@ -211,7 +211,7 @@ void Window::Windows_SetMousePosition(GLuint X, GLuint& Y)
 	SetCursorPos(l_MousePoint.x, l_MousePoint.y);
 }
 
-void Window::Windows_SetName(const char* NewName)
+void Window::Windows_SetTitleBar(const char* NewTitle)
 {
 	SetWindowText(WindowHandle, Name);
 }

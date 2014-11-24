@@ -149,12 +149,11 @@ void FWindow::Linux_Restore()
 	XMapWindow(WindowManager::GetDisplay(), WindowHandle);
 }
 
-void FWindow::Linux_SetName(const char* NewName)
+void FWindow::Linux_SetTitleBar(const char* NewTitle)
 {
-	Name = NewName;
 
 	XStoreName(WindowManager::GetDisplay(),
-			WindowHandle, Name);
+			WindowHandle, NewTitle);
 }
 
 void FWindow::Linux_Focus(GLboolean NewState)

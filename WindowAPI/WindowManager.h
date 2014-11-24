@@ -115,8 +115,8 @@ class WindowManager
 		static const char* GetWindowName(GLuint WindowIndex);
 		static GLuint GetWindowIndex(const char*  WindowName);
 
-		static void SetWindowName(const char* WindowName, const char* NewName);
-		static void SetWindowName(GLuint WindowIndex, const char* NewName);
+		static void SetWindowTitleBar(const char* WindowName, const char* NewName);
+		static void SetWindowTitleBar(GLuint WindowIndex, const char* NewName);
 
 		//gets and sets window is in focus(Linux only?)
 		static GLboolean GetWindowIsInFocus(const char* WindowName);
