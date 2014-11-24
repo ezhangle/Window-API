@@ -151,7 +151,6 @@ void FWindow::Linux_Restore()
 
 void FWindow::Linux_SetTitleBar(const char* NewTitle)
 {
-
 	XStoreName(WindowManager::GetDisplay(),
 			WindowHandle, NewTitle);
 }
@@ -191,8 +190,6 @@ void FWindow::Linux_VerticalSync(GLint EnableSync)
 	}
 }
 
-
-
 void FWindow::Linux_InitializeGL()
 {
 	Context = glXCreateContext(
@@ -209,21 +206,19 @@ void FWindow::Linux_InitializeGL()
 	Position[0] = l_Attributes.x;
 	Position[1] = l_Attributes.y;
 
-	const char* l_ExtensionAvailable = 0;
+	const char* l_ExtensionsAvailable = 0;
 
-	l_ExtensionAvailable = glXQueryExtensionsString(WindowManager::GetDisplay(), 0);
+	l_ExtensionsAvailable = glXQueryExtensionsString(WindowManager::GetDisplay(), 0);
 
-	if(l_ExtensionAvailable)
+	if(!l_ExtensionsAvailable)
 	{
-		printf("%s \n", l_ExtensionAvailable);
+		printf("no extensions available \n");
 	}
 
 	else
 	{
-		printf("no extensions wtf?\n");
+		InitGLExtensions();
 	}
-
-	InitGLExtensions();
 }
 
 void FWindow::InitializeAtomics()
@@ -241,7 +236,6 @@ void FWindow::InitializeAtomics()
 
 void FWindow::Linux_InitGLExtensions()
 {
-	printf("initializing GL extensions\n");
 	SwapIntervalEXT = nullptr;
 	SwapIntervalSGI = nullptr;
 	SwapIntervalMESA = nullptr;
@@ -252,19 +246,19 @@ void FWindow::Linux_InitGLExtensions()
 
 	if(SwapIntervalMESA)
 	{
-		printf("MESA swap interval supported\n");
+		//printf("MESA swap interval supported\n");
 		MESASwapControlSupported = GL_TRUE;
 	}
 	
 	if(SwapIntervalEXT)
 	{
-		printf("EXT swap interval supported \n");
+		//printf("EXT swap interval supported \n");
 		EXTSwapControlSupported = GL_TRUE;	
 	}
 
 	if(SwapIntervalSGI)
 	{
-		printf("SGI swap interval supported \n");
+		//printf("SGI swap interval supported \n");
 		SGISwapControlSupported = GL_TRUE;
 	}
 }

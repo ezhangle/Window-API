@@ -164,8 +164,8 @@ class WindowManager
 		static void SetWindowOnMinimized(const char* WindowName, OnMinimizedEvent a_OnMiniimzed);
 		static void SetWindowOnMinimized(GLuint WindowIndex, OnMinimizedEvent a_OnMiniimzed);
 
-		static void SetWindowOnRestored(const char* WindowName, OnRestoredEvent OnRestored);
-		static void SetWindowOnRestored(GLuint WindowIndex, OnRestoredEvent OnRestored);
+	//	static void SetWindowOnRestored(const char* WindowName, OnRestoredEvent OnRestored);
+		//static void SetWindowOnRestored(GLuint WindowIndex, OnRestoredEvent OnRestored);
 
 		static void SetWindowOnFocus(const char* WindowName, OnFocusEvent OnFocus);
 		static void SetWindowOnFocus(GLuint WindowIndex, OnFocusEvent OnFocus);

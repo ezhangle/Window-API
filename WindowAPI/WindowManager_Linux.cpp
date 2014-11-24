@@ -159,16 +159,13 @@ void WindowManager::Linux_PollForEvents()
 
 		case DestroyNotify:
 		{
-			printf("blarg");
 
 			if(Foundation_Tools::IsValid(l_Window->DestroyedEvent))
 			{
 				l_Window->DestroyedEvent();
 			}
-	
-			printf("FWindow was destroyed\n");		
-			l_Window->Shutdown();
 			
+			l_Window->Shutdown();		
 			break;
 		}
 
@@ -512,7 +509,6 @@ void WindowManager::Linux_PollForEvents()
 
 						if(l_Property == l_Window->AtomHidden)
 						{
-							printf("window hidden \n");
 							if(Foundation_Tools::IsValid(l_Window->MinimizedEvent))
 							{								
 								l_Window->MinimizedEvent();
@@ -521,24 +517,16 @@ void WindowManager::Linux_PollForEvents()
 
 						if(l_Property == l_Window->AtomMaxVert ||
 								l_Property == l_Window->AtomMaxVert)
-						{
-							printf("window maximized \n");
-							printf("%i\n", l_Event.xproperty.state);
+						{	
 							if(Foundation_Tools::IsValid(l_Window->MaximizedEvent))
-							{
-								
+							{		
 								l_Window->MaximizedEvent();
 							}
 						}
 
-						if(l_Property == l_Window->AtomFocused)
-						{
-							printf("window focused \n");
-						}
-
 						if(l_Property == l_Window->AtomDemandsAttention)
 						{
-							printf("window demands attention \n");
+							//printf("window demands attention \n");
 						}
 					}
 				}
@@ -558,12 +546,13 @@ void WindowManager::Linux_PollForEvents()
 			const char* l_AtomName = XGetAtomName(WindowManager::GetDisplay(), l_Event.xclient.message_type);
 			if(Foundation_Tools::IsValid(l_AtomName))
 			{
-				printf("%s\n", l_AtomName);
+				//print the name of the Atom
+				//printf("%s\n", l_AtomName);
 			}
 
 			if((Atom)l_Event.xclient.data.l[0] == l_Window->AtomClose)
 			{
-				printf("window closed\n");
+				//printf("window closed\n");
 				l_Window->ShouldClose = GL_TRUE;
 				l_Window->DestroyedEvent();
 				l_Window->Shutdown();
@@ -573,7 +562,7 @@ void WindowManager::Linux_PollForEvents()
 
 			if((Atom)l_Event.xclient.data.l[1] == l_Window->AtomFullScreen)
 			{
-				printf("resized window \n");
+				//printf("resized window \n");
 				break;
 			}
 			break;

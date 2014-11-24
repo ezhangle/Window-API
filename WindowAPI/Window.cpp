@@ -82,7 +82,7 @@ void FWindow::InitializeEvents()
 	DestroyedEvent = nullptr;
 	MaximizedEvent = nullptr;
 	MinimizedEvent = nullptr;
-	RestoredEvent = nullptr;
+//	RestoredEvent = nullptr;
 	MovedEvent = nullptr;
 	MouseMoveEvent = nullptr;
 }
@@ -450,13 +450,13 @@ void FWindow::SetOnMinimized(OnMinimizedEvent OnMinimized)
 	}
 }
 
-void FWindow::SetOnRestored(OnRestoredEvent OnRestored)
+/*void FWindow::SetOnRestored(OnRestoredEvent OnRestored)
 {
 	if (Foundation_Tools::IsValid(OnRestored))
 	{
 		RestoredEvent = OnRestored;
 	}
-}
+}*/
 
 void FWindow::SetOnFocus(OnFocusEvent OnFocus)
 {

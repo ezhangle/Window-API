@@ -121,7 +121,7 @@ public:
 	//set the window on minimized event callback for this window
 	void SetOnMinimized(OnMinimizedEvent OnMinimized);
 	//set the window on restored event callback for this window
-	void SetOnRestored(OnRestoredEvent OnRestored);
+	//void SetOnRestored(OnRestoredEvent OnRestored);
 	//set the window on focus event callback for this window
 	void SetOnFocus(OnFocusEvent OnFocus);
 	//set the window on moved event callback for this window
@@ -180,7 +180,7 @@ private:
 	//this is the callback to be used when the window has been minimized in a non-programmatic fashion
 	OnMinimizedEvent MinimizedEvent;
 	//this is the callback to be used when the window has been restored in a non-programmatic fashion
-	OnRestoredEvent RestoredEvent;
+	//OnRestoredEvent RestoredEvent;
 	//this is the callback to be used when the window has been given focus in a non-programmatic fashion
 	OnFocusEvent FocusEvent;
 	//this is the callback to be used the window has been moved in a non-programmatic fashion

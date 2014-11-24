@@ -12,21 +12,20 @@ void OnWindowKeyPressed(GLuint KeySym, GLboolean KeyState)
 int main()
 {
 	WindowManager::Initialize();
-	WindowManager::AddWindow(new FWindow("Example"))->AddWindow(
-		new FWindow("Example2"));
+	WindowManager::AddWindow(new FWindow("Example"));
 
 	WindowManager::SetWindowOnKeyEvent("Example", &OnWindowKeyPressed);
-	
+	printf("blarg\n");	
 	while (!WindowManager::GetWindowShouldClose("Example"))
 	{
 		WindowManager::PollForEvents();
+		glClearColor(1.0f, 0.25f, 0.25f, 1.0f);
 		
 		for (GLuint i = 0; i < WindowManager::GetNumWindows(); i++)
 		{
+			printf("Blarg2\n");
 			WindowManager::GetWindowByIndex(i)->MakeCurrentContext();
-			glClearColor(1.0f, 0.25f, 0.25f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			
 			WindowManager::GetWindowByIndex(i)->SwapDrawBuffers();
 		}
 	}	

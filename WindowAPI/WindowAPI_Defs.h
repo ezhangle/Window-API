@@ -111,7 +111,7 @@ typedef void (*OnMouseWheelEvent)(GLuint WheelDirection);
 typedef void (*OnDestroyedEvent)();
 typedef void (*OnMaximizedEvent)();
 typedef void (*OnMinimizedEvent)();
-typedef void (*OnRestoredEvent)(); //only really works on windows, Linux doesn't even have an atomic for it. might need to remove
+//typedef void (*OnRestoredEvent)(); //only really works on windows, Linux doesn't even have an atomic for it. might need to remove
 typedef void (*OnFocusEvent)(GLboolean InFocus);
 typedef void (*OnMovedEvent)(GLuint X, GLuint Y);
 typedef void (*OnResizeEvent)(GLuint Width, GLuint Height);

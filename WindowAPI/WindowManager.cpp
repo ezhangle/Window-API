@@ -705,7 +705,7 @@ void WindowManager::SetWindowOnMinimized(GLuint WindowIndex, OnMinimizedEvent a_
 	}
 }
 
-void WindowManager::SetWindowOnRestored(const char* WindowName, OnRestoredEvent OnRestored)
+/*void WindowManager::SetWindowOnRestored(const char* WindowName, OnRestoredEvent OnRestored)
 {
 	if (Foundation_Tools::IsValid(WindowName))
 	{
@@ -719,7 +719,7 @@ void WindowManager::SetWindowOnRestored(GLuint WindowIndex, OnRestoredEvent OnRe
 	{
 		GetWindowByIndex(WindowIndex)->SetOnRestored(OnRestored);
 	}
-}
+}*/
 
 void WindowManager::SetWindowOnFocus(const char* WindowName, OnFocusEvent OnFocus)
 {
