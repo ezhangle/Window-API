@@ -3,10 +3,10 @@
 #if defined(CURRENT_OS_LINUX)
 #include <cstring>
 
-void Window::Linux_Initialize()
+void FWindow::Linux_Initialize()
 {
-	Attributes = new GLuint[5]{GLX_RGBA, GLX_DEPTH_SIZE, DepthBits, GLX_DOUBLEBUFFER, GLX_STENCIL_SIZE, StencilBits, 
-		GLX_RED_SIZE, ColourBits, GLX_GREEN_SIZE, ColourBits, GLX_RED_SIZE, ColourBits, GLX_ALPHA_SIZE, ColourBits / 4, None};
+	Attributes = new GLuint[5]{GLX_RGBA, GLX_DEPTH_SIZE, DepthBits, GLX_DOUBLEBUFFER/*, GLX_STENCIL_SIZE, StencilBits, 
+		GLX_RED_SIZE, ColourBits, GLX_GREEN_SIZE, ColourBits, GLX_RED_SIZE, ColourBits, GLX_ALPHA_SIZE, ColourBits/ 4*/, None};
 
 	if (!WindowManager::GetDisplay())
 	{
@@ -51,7 +51,7 @@ void Window::Linux_Initialize()
 	Linux_InitializeGL();
 }
 
-void Window::Linux_Shutdown()
+void FWindow::Linux_Shutdown()
 {
 	if(CurrentState == WINDOWSTATE_FULLSCREEN)
 	{
@@ -65,7 +65,7 @@ void Window::Linux_Shutdown()
 	Context = 0;
 }
 
-void Window::Linux_SetResolution(GLuint Width, GLuint Height)
+void FWindow::Linux_SetResolution(GLuint Width, GLuint Height)
 {
 	Resolution[0] = Width;
 	Resolution[1] = Height;
@@ -73,7 +73,7 @@ void Window::Linux_SetResolution(GLuint Width, GLuint Height)
 		WindowHandle, Resolution[0], Resolution[1]);	
 }
 
-void Window::Linux_SetPosition(GLuint X, GLuint Y)
+void FWindow::Linux_SetPosition(GLuint X, GLuint Y)
 {
 	XWindowChanges l_WindowChanges;
 
@@ -85,7 +85,7 @@ void Window::Linux_SetPosition(GLuint X, GLuint Y)
 			WindowHandle, CWX | CWY, &l_WindowChanges);
 }
 
-void Window::Linux_SetMousePosition(GLuint X, GLuint Y)
+void FWindow::Linux_SetMousePosition(GLuint X, GLuint Y)
 {
 	XWarpPointer(
 			WindowManager::GetInstance()->m_Display,
@@ -95,7 +95,7 @@ void Window::Linux_SetMousePosition(GLuint X, GLuint Y)
 			X, Y);
 }
 
-void Window::Linux_FullScreen(GLboolean NewState)
+void FWindow::Linux_FullScreen(GLboolean NewState)
 {
 	XEvent l_Event;
 	memset(&l_Event, 0, sizeof(l_Event));
@@ -112,7 +112,7 @@ void Window::Linux_FullScreen(GLboolean NewState)
 			0, SubstructureNotifyMask, &l_Event);
 }
 
-void Window::Linux_Minimize(GLboolean NewState)
+void FWindow::Linux_Minimize(GLboolean NewState)
 {
 	if(NewState)
 	{
@@ -126,7 +126,7 @@ void Window::Linux_Minimize(GLboolean NewState)
 	}
 }
 
-void Window::Linux_Maximize(GLboolean NewState)
+void FWindow::Linux_Maximize(GLboolean NewState)
 {	
 	XEvent l_Event;
 	memset(&l_Event, 0, sizeof(l_Event));
@@ -144,12 +144,12 @@ void Window::Linux_Maximize(GLboolean NewState)
 			0, SubstructureNotifyMask, &l_Event);
 }
 
-void Window::Linux_Restore()
+void FWindow::Linux_Restore()
 {
 	XMapWindow(WindowManager::GetDisplay(), WindowHandle);
 }
 
-void Window::Linux_SetName(const char* NewName)
+void FWindow::Linux_SetName(const char* NewName)
 {
 	Name = NewName;
 
@@ -157,7 +157,7 @@ void Window::Linux_SetName(const char* NewName)
 			WindowHandle, Name);
 }
 
-void Window::Linux_Focus(GLboolean NewState)
+void FWindow::Linux_Focus(GLboolean NewState)
 {
 	if(NewState)
 	{
@@ -170,7 +170,7 @@ void Window::Linux_Focus(GLboolean NewState)
 	}
 }
 
-void Window::Linux_VerticalSync(GLint EnableSync)
+void FWindow::Linux_VerticalSync(GLint EnableSync)
 {
 	if(EXTSwapControlSupported)
 	{
@@ -194,11 +194,11 @@ void Window::Linux_VerticalSync(GLint EnableSync)
 
 
 
-void Window::Linux_InitializeGL()
+void FWindow::Linux_InitializeGL()
 {
 	Context = glXCreateContext(
 			WindowManager::GetDisplay(),
-			VisualInfo, 0, GL_GL_TRUE);
+			VisualInfo, 0, GL_TRUE);
 
 	glXMakeCurrent(WindowManager::GetDisplay(),
 			WindowHandle, Context);
@@ -227,7 +227,7 @@ void Window::Linux_InitializeGL()
 	InitGLExtensions();
 }
 
-void Window::InitializeAtomics()
+void FWindow::InitializeAtomics()
 {
 	AtomState = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_STATE", GL_FALSE);
 	AtomFullScreen = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_STATE_FULLSCREEN", GL_FALSE);
@@ -240,7 +240,7 @@ void Window::InitializeAtomics()
 	AtomFocused = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_STATE_FOCUSED", GL_FALSE);
 }
 
-void Window::Linux_InitGLExtensions()
+void FWindow::Linux_InitGLExtensions()
 {
 	printf("initializing GL extensions\n");
 	SwapIntervalEXT = nullptr;
@@ -254,23 +254,23 @@ void Window::Linux_InitGLExtensions()
 	if(SwapIntervalMESA)
 	{
 		printf("MESA swap interval supported\n");
-		MESASwapControlSupported = GL_GL_TRUE;
+		MESASwapControlSupported = GL_TRUE;
 	}
 	
 	if(SwapIntervalEXT)
 	{
 		printf("EXT swap interval supported \n");
-		EXTSwapControlSupported = GL_GL_TRUE;	
+		EXTSwapControlSupported = GL_TRUE;	
 	}
 
 	if(SwapIntervalSGI)
 	{
 		printf("SGI swap interval supported \n");
-		SGISwapControlSupported = GL_GL_TRUE;
+		SGISwapControlSupported = GL_TRUE;
 	}
 }
 
-Window Window::GetWindowHandle()
+Window FWindow::GetWindowHandle()
 {
 	return WindowHandle;
 }

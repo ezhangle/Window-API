@@ -7,7 +7,7 @@
 #include <cstring>
 #endif
 
-Window::Window(const char*  WindowName,
+FWindow::FWindow(const char*  WindowName,
 	GLuint Width /* = 1280 */,
 	GLuint Height /* = 720 */,
 	GLuint ColourBits /* = 32 */, 
@@ -42,12 +42,12 @@ Window::Window(const char*  WindowName,
 #endif
 }
 
-Window::~Window()
+FWindow::~FWindow()
 {
 	Shutdown();
 }
 
-void Window::Shutdown()
+void FWindow::Shutdown()
 {
 #if defined (CURRENT_OS_WINDOWS)
 	Windows_Shutdown();
@@ -58,7 +58,7 @@ void Window::Shutdown()
 #endif
 }
 
-void Window::Initialize()
+void FWindow::Initialize()
 {
 #if defined(CURRENT_OS_WINDOWS)
 	Windows_Initialize(Name);
@@ -69,12 +69,12 @@ void Window::Initialize()
 #endif
 }
 
-GLboolean Window::GetShouldClose()
+GLboolean FWindow::GetShouldClose()
 {
 	return ShouldClose;
 }
 
-void Window::InitializeEvents()
+void FWindow::InitializeEvents()
 {
 	KeyEvent = nullptr;
 	MouseButtonEvent = nullptr;
@@ -87,12 +87,12 @@ void Window::InitializeEvents()
 	MouseMoveEvent = nullptr;
 }
 
-GLboolean Window::GetKeyState(GLuint Key)
+GLboolean FWindow::GetKeyState(GLuint Key)
 {
 	return Keys[Key];
 }
 
-void Window::InitializeGL()
+void FWindow::InitializeGL()
 {
 #if defined(CURRENT_OS_WINDOWS)
 	Windows_InitializeGL();
@@ -103,7 +103,7 @@ void Window::InitializeGL()
 #endif
 }
 
-void Window::SwapDrawBuffers()
+void FWindow::SwapDrawBuffers()
 {
 #if defined(CURRENT_OS_WINDOWS)
 	SwapBuffers(DeviceContextHandle);
@@ -114,7 +114,7 @@ void Window::SwapDrawBuffers()
 #endif
 }
 
-void Window::SetSwapInterval(GLint SwapSetting)
+void FWindow::SetSwapInterval(GLint SwapSetting)
 {
 	CurrentSwapInterval = SwapSetting;
 #if defined(CURRENT_OS_WINDOWS)
@@ -126,12 +126,12 @@ void Window::SetSwapInterval(GLint SwapSetting)
 #endif
 }
 
-GLuint Window::GetCurrentState()
+GLuint FWindow::GetCurrentState()
 {
 	return CurrentState;
 }
 
-void Window::SetCurrentState(GLuint NewState)
+void FWindow::SetCurrentState(GLuint NewState)
 {
 	Restore();
 
@@ -162,12 +162,12 @@ void Window::SetCurrentState(GLuint NewState)
 	}
 }
 
-GLboolean Window::GetIsFullScreen()
+GLboolean FWindow::GetIsFullScreen()
 {
 	return (CurrentState == WINDOWSTATE_FULLSCREEN);
 }
 
-void Window::FullScreen(GLboolean NewState)
+void FWindow::FullScreen(GLboolean NewState)
 {
 	if(NewState)
 	{
@@ -188,12 +188,12 @@ void Window::FullScreen(GLboolean NewState)
 #endif
 }
 
-GLboolean Window::GetIsMinimized()
+GLboolean FWindow::GetIsMinimized()
 {
 	return (CurrentState == WINDOWSTATE_MINIMIZED);
 }
 
-void Window::Minimize(GLboolean NewState)
+void FWindow::Minimize(GLboolean NewState)
 {
 	if(NewState)
 	{
@@ -214,12 +214,12 @@ void Window::Minimize(GLboolean NewState)
 #endif	
 }
 
-GLboolean Window::GetIsMaximized()
+GLboolean FWindow::GetIsMaximized()
 {
 	return (CurrentState == WINDOWSTATE_MAXIMIZED) ;
 }
 
-void Window::Maximize(GLboolean NewState)
+void FWindow::Maximize(GLboolean NewState)
 {
 	if(NewState)
 	{
@@ -240,7 +240,7 @@ void Window::Maximize(GLboolean NewState)
 #endif
 }
 
-void Window::Restore()
+void FWindow::Restore()
 {
 	switch(CurrentState)
 	{
@@ -267,18 +267,18 @@ void Window::Restore()
 #endif
 }
 
-void Window::GetResolution(GLuint& Width, GLuint& Height)
+void FWindow::GetResolution(GLuint& Width, GLuint& Height)
 {
 	Width = Resolution[0];
 	Height = Resolution[1];
 }
 
-GLuint* Window::GetResolution()
+GLuint* FWindow::GetResolution()
 {
 	return Resolution;
 }
 
-void Window::SetResolution(GLuint Width, GLuint Height)
+void FWindow::SetResolution(GLuint Width, GLuint Height)
 {
 	Resolution[0] = Width;
 	Resolution[1] = Height;
@@ -294,18 +294,18 @@ void Window::SetResolution(GLuint Width, GLuint Height)
 	glViewport(0, 0, Resolution[0], Resolution[1]);
 }
 
-void Window::GetMousePosition(GLuint& X, GLuint& Y)
+void FWindow::GetMousePosition(GLuint& X, GLuint& Y)
 {
 	X = MousePosition[0];
 	Y = MousePosition[1];
 }
 
-GLuint* Window::GetMousePosition()
+GLuint* FWindow::GetMousePosition()
 {
 	return MousePosition;
 }
 
-void Window::SetMousePosition(GLuint X, GLuint Y)
+void FWindow::SetMousePosition(GLuint X, GLuint Y)
 {
 	MousePosition[0] = X;
 	MousePosition[1] = Y;
@@ -318,18 +318,18 @@ void Window::SetMousePosition(GLuint X, GLuint Y)
 #endif
 }
 
-void Window::GetPosition(GLuint& X, GLuint& Y)
+void FWindow::GetPosition(GLuint& X, GLuint& Y)
 {
 	X = Position[0];
 	Y = Position[1];
 }
 
-GLuint* Window::GetPosition()
+GLuint* FWindow::GetPosition()
 {
 	return Position;
 }
 
-void Window::SetPosition(GLuint X, GLuint Y)
+void FWindow::SetPosition(GLuint X, GLuint Y)
 {
 	Position[0] = X;
 	Position[1] = Y;
@@ -342,12 +342,12 @@ void Window::SetPosition(GLuint X, GLuint Y)
 #endif
 }
 
-const char* Window::GetWindowName()
+const char* FWindow::GetWindowName()
 {
 	return Name;
 }
 
-void Window::SetName(const char* WindowName)
+void FWindow::SetName(const char* WindowName)
 {
 	if(WindowName != nullptr)
 	{
@@ -362,7 +362,7 @@ void Window::SetName(const char* WindowName)
 	}
 }
 
-void Window::MakeCurrentContext()
+void FWindow::MakeCurrentContext()
 {
 #if defined(CURRENT_OS_WINDOWS)
 	wglMakeCurrent(DeviceContextHandle, GLRenderingContextHandle);
@@ -373,7 +373,7 @@ void Window::MakeCurrentContext()
 #endif
 }
 
-void Window::InitGLExtensions()
+void FWindow::InitGLExtensions()
 {
 #if defined(CURRENT_OS_WINDOWS)
 	Windows_InitGLExtensions();
@@ -385,12 +385,12 @@ void Window::InitGLExtensions()
 
 }
 
-GLboolean Window::GetInFocus()
+GLboolean FWindow::GetInFocus()
 {
 	return InFocus;
 }
 
-void Window::Focus(GLboolean NewState)
+void FWindow::Focus(GLboolean NewState)
 {
 	InFocus = NewState;
 
@@ -403,7 +403,7 @@ void Window::Focus(GLboolean NewState)
 #endif
 }
 
-void Window::SetOnKeyEvent(OnKeyEvent a_OnKeyPressed)
+void FWindow::SetOnKeyEvent(OnKeyEvent a_OnKeyPressed)
 {
 	if(Foundation_Tools::IsValid(a_OnKeyPressed))
 	{
@@ -411,7 +411,7 @@ void Window::SetOnKeyEvent(OnKeyEvent a_OnKeyPressed)
 	}
 }
 
-void Window::SetOnMouseButtonEvent(OnMouseButtonEvent a_OnMouseButtonEvent)
+void FWindow::SetOnMouseButtonEvent(OnMouseButtonEvent a_OnMouseButtonEvent)
 {
 	if(Foundation_Tools::IsValid(a_OnMouseButtonEvent))
 	{
@@ -419,7 +419,7 @@ void Window::SetOnMouseButtonEvent(OnMouseButtonEvent a_OnMouseButtonEvent)
 	}
 }
 
-void Window::SetOnMouseWheelEvent(OnMouseWheelEvent OnMouseWheelEvent)
+void FWindow::SetOnMouseWheelEvent(OnMouseWheelEvent OnMouseWheelEvent)
 {
 	if(Foundation_Tools::IsValid(OnMouseWheelEvent))
 	{
@@ -427,7 +427,7 @@ void Window::SetOnMouseWheelEvent(OnMouseWheelEvent OnMouseWheelEvent)
 	}
 }
 
-void Window::SetOnDestroyed(OnDestroyedEvent OnDestroyed)
+void FWindow::SetOnDestroyed(OnDestroyedEvent OnDestroyed)
 {
 	if(Foundation_Tools::IsValid(OnDestroyed))
 	{
@@ -435,7 +435,7 @@ void Window::SetOnDestroyed(OnDestroyedEvent OnDestroyed)
 	}
 }
 
-void Window::SetOnMaximized(OnMaximizedEvent OnMaximized)
+void FWindow::SetOnMaximized(OnMaximizedEvent OnMaximized)
 {
 	if(Foundation_Tools::IsValid(OnMaximized))
 	{
@@ -443,7 +443,7 @@ void Window::SetOnMaximized(OnMaximizedEvent OnMaximized)
 	}
 }
 
-void Window::SetOnMinimized(OnMinimizedEvent OnMinimized)
+void FWindow::SetOnMinimized(OnMinimizedEvent OnMinimized)
 {
 	if(Foundation_Tools::IsValid(OnMinimized))
 	{
@@ -451,7 +451,7 @@ void Window::SetOnMinimized(OnMinimizedEvent OnMinimized)
 	}
 }
 
-void Window::SetOnRestored(OnRestoredEvent OnRestored)
+void FWindow::SetOnRestored(OnRestoredEvent OnRestored)
 {
 	if (Foundation_Tools::IsValid(OnRestored))
 	{
@@ -459,7 +459,7 @@ void Window::SetOnRestored(OnRestoredEvent OnRestored)
 	}
 }
 
-void Window::SetOnFocus(OnFocusEvent OnFocus)
+void FWindow::SetOnFocus(OnFocusEvent OnFocus)
 {
 	if(Foundation_Tools::IsValid(OnFocus))
 	{
@@ -467,7 +467,7 @@ void Window::SetOnFocus(OnFocusEvent OnFocus)
 	}
 }
 
-void Window::SetOnMoved(OnMovedEvent OnMoved)
+void FWindow::SetOnMoved(OnMovedEvent OnMoved)
 {
 	if(Foundation_Tools::IsValid(OnMoved))
 	{
@@ -475,7 +475,7 @@ void Window::SetOnMoved(OnMovedEvent OnMoved)
 	}
 }
 
-void Window::SetOnResize(OnResizeEvent OnResize)
+void FWindow::SetOnResize(OnResizeEvent OnResize)
 {
 	if(Foundation_Tools::IsValid(OnResize))
 	{
@@ -483,7 +483,7 @@ void Window::SetOnResize(OnResizeEvent OnResize)
 	}
 }
 
-void Window::SetOnMouseMove(OnMouseMoveEvent OnMouseMove)
+void FWindow::SetOnMouseMove(OnMouseMoveEvent OnMouseMove)
 {
 	if(Foundation_Tools::IsValid(OnMouseMove))
 	{

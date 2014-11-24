@@ -18,12 +18,12 @@
 #include "Window.h"
 #include "Tools.h"
 
-class Window;
+class FWindow;
 class Foundation_Tools;
 
 class WindowManager
 {
-	friend Window;
+	friend FWindow;
 	friend Foundation_Tools;
 
 	public:
@@ -34,12 +34,12 @@ class WindowManager
 		static void ShutDown();
 
 		//get a pointer to a window via name or index
-		static Window* GetWindowByName(const char* WindowName);
-		static Window* GetWindowByIndex(GLuint WindowIndex);
+		static FWindow* GetWindowByName(const char* WindowName);
+		static FWindow* GetWindowByIndex(GLuint WindowIndex);
 
 		//add a window to the manager. i ripped off a behavior tree feature
 		//that allows the user to create multiple windows easily
-		static WindowManager* AddWindow(Window* NewWindow);
+		static WindowManager* AddWindow(FWindow* NewWindow);
 
 		//return the total amount of windows the manager has
 		static GLuint GetNumWindows();
@@ -143,7 +143,7 @@ class WindowManager
 		static void PollForEvents();
 
 		//remove a window from the manager
-		static void RemoveWindow(Window* WindowToBeRemoved);
+		static void RemoveWindow(FWindow* WindowToBeRemoved);
 
 		//set callbacks for the selected window
 		static void SetWindowOnKeyEvent(const char* WindowName, OnKeyEvent OnKey);
@@ -184,7 +184,7 @@ class WindowManager
 		//get a static reference to the window manager
 		static WindowManager* GetInstance();
 
-		std::vector<Window*> Windows;
+		std::vector<FWindow*> Windows;
 		static WindowManager* Instance;
 
 		GLuint ScreenResolution[2];
@@ -195,7 +195,7 @@ class WindowManager
 	
 		static LRESULT CALLBACK StaticWindowProcedure(HWND WindowHandle, UINT Message, WPARAM WordParam, LPARAM LongParam);
 
-		static Window* GetWindowByHandle(HWND WindowHandle);
+		static FWindow* GetWindowByHandle(HWND WindowHandle);
 
 		static void Windows_PollForEvents();
 		static void Windows_Initialize();
@@ -209,8 +209,8 @@ class WindowManager
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-		static Window* GetWindowByHandle(Window WindowHandle);
-		static Window* GetWindowByEvent(XEvent Event);
+		static FWindow* GetWindowByHandle(Window WindowHandle);
+		static FWindow* GetWindowByEvent(XEvent Event);
 
 		static void Linux_Initialize();
 		static void Linux_Shutdown();

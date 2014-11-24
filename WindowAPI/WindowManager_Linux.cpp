@@ -1,8 +1,9 @@
 #include "WindowManager.h"
 #include "Tools.h"
 
+#include <limits.h>
 #if defined(CURRENT_OS_LINUX)
-Window* WindowManager::GetWindowByHandle(Window WindowHandle)
+FWindow* WindowManager::GetWindowByHandle(Window WindowHandle)
 {
 	for (GLuint l_Iter = 0; l_Iter < GetInstance()->Windows.size(); l_Iter++)
 	{
@@ -46,7 +47,7 @@ void WindowManager::Linux_Shutdown()
 	XCloseDisplay(GetInstance()->m_Display);
 }
 
-Window* WindowManager::GetWindowByEvent(XEvent Event)
+FWindow* WindowManager::GetWindowByEvent(XEvent Event)
 {
 	switch(Event.type)
 	{
@@ -147,7 +148,7 @@ void WindowManager::Linux_PollForEvents()
 	XNextEvent(GetInstance()->m_Display, &GetInstance()->m_Event);
 
 	XEvent l_Event = GetInstance()->m_Event;
-	Window* l_Window = GetWindowByEvent(l_Event);
+	FWindow* l_Window = GetWindowByEvent(l_Event);
 
 	switch (l_Event.type)
 	{
@@ -165,7 +166,7 @@ void WindowManager::Linux_PollForEvents()
 				l_Window->DestroyedEvent();
 			}
 	
-			printf("Window was destroyed\n");		
+			printf("FWindow was destroyed\n");		
 			l_Window->Shutdown();
 			
 			break;
@@ -173,7 +174,7 @@ void WindowManager::Linux_PollForEvents()
 
 		/*case CreateNotify:
 		{	
-			printf("Window was created\n");
+			printf("FWindow was created\n");
 			l_Window->InitializeGL();
 
 			if(Foundation_Tools::IsValid(l_Window->m_OnCreated))
@@ -201,11 +202,11 @@ void WindowManager::Linux_PollForEvents()
 			else
 			{
 				l_Window->Keys[
-					l_Window->Linux_TranslateKey(l_FunctionKeysym)] = KEYSTATE_DOWN;
+					Foundation_Tools::Linux_TranslateKey(l_FunctionKeysym)] = KEYSTATE_DOWN;
 				
 				if(Foundation_Tools::IsValid(l_Window->KeyEvent))
 				{
-					l_Window->KeyEvent(GetWindowByEvent(l_Event)->Linux_TranslateKey(l_FunctionKeysym),  KEYSTATE_DOWN);
+					l_Window->KeyEvent(Foundation_Tools::Linux_TranslateKey(l_FunctionKeysym),  KEYSTATE_DOWN);
 				}
 			}
 
@@ -247,18 +248,18 @@ void WindowManager::Linux_PollForEvents()
 				else
 				{
 					l_Window->Keys[
-					l_Window->Linux_TranslateKey(l_FunctionKeysym)] = KEYSTATE_UP;
+					Foundation_Tools::Linux_TranslateKey(l_FunctionKeysym)] = KEYSTATE_UP;
 					
 					if(Foundation_Tools::IsValid(l_Window->KeyEvent))
 					{
-						l_Window->KeyEvent(GetWindowByEvent(l_Event)->
+						l_Window->KeyEvent(Foundation_Tools::
 								Linux_TranslateKey(l_FunctionKeysym), KEYSTATE_UP);
 					}
 				}
 
 				if(Foundation_Tools::IsValid(l_Window->KeyEvent))
 				{
-					l_Window->KeyEvent(GetWindowByEvent(l_Event)->
+					l_Window->KeyEvent(Foundation_Tools::
 							Linux_TranslateKey(l_FunctionKeysym), KEYSTATE_UP);
 				}
 			}
@@ -418,9 +419,9 @@ void WindowManager::Linux_PollForEvents()
 		case FocusOut:
 		{
 			l_Window->InFocus = GL_FALSE;
-			if(Foundation_Tools::IsValid(l_Window->OnFocusEvent))
+			if(Foundation_Tools::IsValid(l_Window->FocusEvent))
 			{
-				l_Window->OnFocusEvent(
+				l_Window->FocusEvent(
 						l_Window->InFocus);
 			}
 			break;
@@ -431,9 +432,9 @@ void WindowManager::Linux_PollForEvents()
 		{
 			l_Window->InFocus = GL_TRUE;
 			
-			if(Foundation_Tools::IsValid(l_Window->OnFocusEvent))
+			if(Foundation_Tools::IsValid(l_Window->FocusEvent))
 			{
-				l_Window->OnFocusEvent(l_Window->InFocus);
+				l_Window->FocusEvent(l_Window->InFocus);
 			}
 			break;
 		}
@@ -522,6 +523,7 @@ void WindowManager::Linux_PollForEvents()
 								l_Property == l_Window->AtomMaxVert)
 						{
 							printf("window maximized \n");
+							printf("%i\n", l_Event.xproperty.state);
 							if(Foundation_Tools::IsValid(l_Window->MaximizedEvent))
 							{
 								

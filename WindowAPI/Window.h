@@ -10,7 +10,7 @@
 #if defined(CURRENT_OS_WINDOWS)
 #include <io.h>
 
-LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK FWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 //this automatically loads the OpenGL library if you are using Visual studio 
 #pragma comment (lib, "opengl32.lib")
 //this makes sure that the entry point of your program is main(). not Winmain
@@ -19,15 +19,15 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 class WindowManager; // just a forward declaration for the window manager
 
-class Window
+class FWindow
 {
 public:
 	//window constructor
-	Window(const char*  WindowName, GLuint Width = 1280, GLuint Height = 720, GLuint ColourBits = 32,
+	FWindow(const char*  WindowName, GLuint Width = 1280, GLuint Height = 720, GLuint ColourBits = 32,
 		GLuint DepthBits = 8, GLuint StencilBits = 8);
 
 	//window deconstruction
-	~Window();
+	~FWindow();
 
 	//Initializes the window depending on OS
 	void Initialize();
@@ -125,7 +125,7 @@ public:
 private:
 	//Name of the window
 	const char*  Name;
-	//ID of the Window. (where it belongs in the window manager)
+	//ID of the FWindow. (where it belongs in the window manager)
 	GLuint ID;
 	//Colour format of the window. (defaults to 32 bit Colour)
 	GLuint ColourBits;
@@ -139,13 +139,13 @@ private:
 	GLboolean MouseButton[MOUSE_LAST];	
 	//Resolution/Size of the window stored in an array
 	GLuint Resolution[2];
-	//Position of the Window relative to the screen co-ordinates
+	//Position of the FWindow relative to the screen co-ordinates
 	GLuint Position[2];
 	//Position of the Mouse cursor relative to the window co-ordinates
 	GLuint MousePosition[2];
-	//Whether the Window should be closing
+	//Whether the FWindow should be closing
 	GLboolean ShouldClose;
-	//Whether the Window is currently in focus(if it is the current window be used)
+	//Whether the FWindow is currently in focus(if it is the current window be used)
 	GLboolean InFocus;
 	//The current state of the window. these states include Normal, Minimized, Maximized and Full screen
 	GLuint CurrentState;
@@ -192,7 +192,7 @@ private:
 
 	//tells windows to create a generic window. need to implement window styles sometime later
 	void Windows_Initialize(LPCSTR a_MenuName, UINT a_Style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW,
-		GLint a_ClearScreenExtra = 0, GLint WindowExtra = 0,
+		GLint a_ClearScreenExtra = 0, GLint FWindowExtra = 0,
 		HINSTANCE a_Instance = GetModuleHandle(0),
 		HICON a_Icon = LoadIcon(0, IDI_APPLICATION),
 		HCURSOR a_Cursor = LoadCursor(0, IDC_ARROW),
@@ -217,7 +217,7 @@ private:
 	void Windows_Shutdown();
 	void Windows_VerticalSync(GLint EnableSync);
 
-	HWND GetWindowHandle();
+	HWND GetFWindowHandle();
 	void InitializePixelFormat();
 
 	void Windows_InitGLExtensions();
@@ -227,8 +227,8 @@ private:
 	HPALETTE PaletteHandle;
 	PIXELFORMATDESCRIPTOR PixelFormatDescriptor;
 
-	WNDCLASS WindowClass;
-	HWND WindowHandle;
+	WNDCLASS FWindowClass;
+	HWND FWindowHandle;
 	HINSTANCE InstanceHandle;
 
 	PFNWGLSWAPINTERVALEXTPROC SwapIntervalEXT;

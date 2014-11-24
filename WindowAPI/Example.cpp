@@ -12,8 +12,8 @@ void OnWindowKeyPressed(GLuint KeySym, GLboolean KeyState)
 int main()
 {
 	WindowManager::Initialize();
-	WindowManager::AddWindow(new Window("Example"))->AddWindow(
-		new Window("Example2"));
+	WindowManager::AddWindow(new FWindow("Example"))->AddWindow(
+		new FWindow("Example2"));
 
 	WindowManager::SetWindowOnKeyEvent("Example", &OnWindowKeyPressed);
 	

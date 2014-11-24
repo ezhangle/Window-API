@@ -30,7 +30,7 @@ WindowManager::~WindowManager()
 	}
 }
 
-Window* WindowManager::GetWindowByName(const char* WindowName)
+FWindow* WindowManager::GetWindowByName(const char* WindowName)
 {
 	if(WindowName != nullptr)
 	{
@@ -48,7 +48,7 @@ Window* WindowManager::GetWindowByName(const char* WindowName)
 	return nullptr;
 }
 
-Window* WindowManager::GetWindowByIndex(GLuint WindowIndex)
+FWindow* WindowManager::GetWindowByIndex(GLuint WindowIndex)
 {
 	if (WindowIndex <= GetInstance()->Windows.size() - 1)
 	{
@@ -58,13 +58,13 @@ Window* WindowManager::GetWindowByIndex(GLuint WindowIndex)
 	return nullptr;
 }
 
-WindowManager* WindowManager::AddWindow(Window* Window)
+WindowManager* WindowManager::AddWindow(FWindow* NewWindow)
 {
-	if(Window != nullptr)
+	if(NewWindow != nullptr)
 	{
-		GetInstance()->Windows.push_back(Window);
-		Window->ID = GetInstance()->Windows.size() - 1;
-		Window->Initialize();
+		GetInstance()->Windows.push_back(NewWindow);
+		NewWindow->ID = GetInstance()->Windows.size() - 1;
+		NewWindow->Initialize();
 		return GetInstance();
 	}
 	return nullptr;
