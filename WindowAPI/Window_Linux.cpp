@@ -228,7 +228,7 @@ void FWindow::Linux_Maximize(GLboolean ShouldBeMaximized)
 	l_Event.xclient.message_type = AtomState;
 	l_Event.xclient.format = 32;
 	l_Event.xclient.window = WindowHandle;
-	l_Event.xclient.data.l[0] = NewState;
+	l_Event.xclient.data.l[0] = ShouldBeMaximized;
 	l_Event.xclient.data.l[1] = AtomMaxVert;
 	l_Event.xclient.data.l[2] = AtomMaxHorz;
 

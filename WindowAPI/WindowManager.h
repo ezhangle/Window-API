@@ -13,11 +13,10 @@ class WindowManager
 {
 	friend FWindow;
 	friend Foundation_Tools;
-
 	public:
-		WindowManager();
-		~WindowManager();
 
+	WindowManager();
+	~WindowManager();
 		/**
 		* shutdown and delete all windows in the manager
 		*/

@@ -712,10 +712,7 @@ GLuint* WindowManager::GetMousePositionInWindow(GLuint WindowIndex)
 	{
 		return GetWindowByIndex(WindowIndex)->GetMousePosition();
 	}
-
-	return nullptr;
 }
-
 /**********************************************************************************************//**
  * @fn	void WindowManager::SetMousePositionInWindow(const char* WindowName, GLuint X, GLuint Y)
  *
