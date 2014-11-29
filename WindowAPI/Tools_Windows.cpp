@@ -1,6 +1,26 @@
+/**********************************************************************************************//**
+ * @file	WindowAPI\Tools_Windows.cpp
+ *
+ * @brief	Implements the tools windows class.
+ **************************************************************************************************/
 
 #include "Tools.h"
 #if defined(CURRENT_OS_WINDOWS)
+
+/**********************************************************************************************//**
+ * @fn	GLuint Foundation_Tools::Windows_TranslateKey(WPARAM WordParam, LPARAM LongParam)
+ *
+ * @brief	Windows translate key.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	WordParam	The wParam field of the message.
+ * @param	LongParam	The lParam field of the message.
+ *
+ * @return	A GLuint.
+ **************************************************************************************************/
+
 GLuint Foundation_Tools::Windows_TranslateKey(WPARAM WordParam, LPARAM LongParam)
 {
 	switch (WordParam)
@@ -232,12 +252,12 @@ GLuint Foundation_Tools::Windows_TranslateKey(WPARAM WordParam, LPARAM LongParam
 
 		case VK_LWIN:
 		{
-			return KEY_WINDOW_LEFT;
+			return KEY_LEFTWINDOW;
 		}
 
 		case VK_RWIN:
 		{
-			return KEY_WINDOW_RIGHT;
+			return KEY_RIGHTWINDOW;
 		}
 
 		default:

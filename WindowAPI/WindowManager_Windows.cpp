@@ -1,7 +1,23 @@
+/**********************************************************************************************//**
+ * @file	WindowAPI\WindowManager_Windows.cpp
+ *
+ * @brief	Implements the window manager windows class.
+ **************************************************************************************************/
+
 #include "WindowManager.h"
 #include "Tools.h"
 
 #if defined(CURRENT_OS_WINDOWS)
+
+/**********************************************************************************************//**
+ * @fn	void WindowManager::Windows_Initialize()
+ *
+ * @brief	Windows initialize.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
+
 void WindowManager::Windows_Initialize()
 {
 	CreateTerminal();
@@ -15,7 +31,20 @@ void WindowManager::Windows_Initialize()
 	GetInstance()->ScreenResolution[1] = l_Desktop.bottom;
 }
 
-Window* WindowManager::GetWindowByHandle(HWND WindowHandle)
+/**********************************************************************************************//**
+ * @fn	FWindow* WindowManager::GetWindowByHandle(HWND WindowHandle)
+ *
+ * @brief	Gets window by handle.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	WindowHandle	Handle of the window.
+ *
+ * @return	null if it fails, else the window by handle.
+ **************************************************************************************************/
+
+FWindow* WindowManager::GetWindowByHandle(HWND WindowHandle)
 {
 	for (GLuint l_Iter = 0; l_Iter < GetInstance()->Windows.size(); l_Iter++)
 	{
@@ -30,7 +59,7 @@ Window* WindowManager::GetWindowByHandle(HWND WindowHandle)
 
 LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message, WPARAM WordParam, LPARAM LongParam)
 {
-	Window* l_Window = GetWindowByHandle(WindowHandle);
+	FWindow* l_Window = GetWindowByHandle(WindowHandle);
 	switch (Message)
 	{
 	case WM_CREATE:
@@ -105,14 +134,14 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 				break;
 			}
 
-			case SIZE_RESTORED:
+			/*case SIZE_RESTORED:
 			{
 				if (Foundation_Tools::IsValid(l_Window->MaximizedEvent))
 				{
 					l_Window->RestoredEvent();
 				}
 				break;
-			}
+			}*/
 
 			default:
 			{
@@ -431,9 +460,9 @@ LRESULT CALLBACK WindowManager::StaticWindowProcedure(HWND WindowHandle, UINT Me
 
 void WindowManager::Windows_PollForEvents()
 {
-	GetMessage(&GetInstance()->m_Message, 0, 0, 0);
-	TranslateMessage(&GetInstance()->m_Message);
-	DispatchMessage(&GetInstance()->m_Message);
+	GetMessage(&GetInstance()->Message, 0, 0, 0);
+	TranslateMessage(&GetInstance()->Message);
+	DispatchMessage(&GetInstance()->Message);
 }
 
 void WindowManager::CreateTerminal()
@@ -452,6 +481,14 @@ void WindowManager::CreateTerminal()
 	*stdout = *fp;
 
 	setvbuf(stdout, nullptr, _IONBF, 0);
+}
+
+void WindowManager::Windows_SetMousePositionInScreen(GLuint X, GLuint Y)
+{
+	POINT l_MousePoint;
+	l_MousePoint.x = X;
+	l_MousePoint.y = Y;
+	SetCursorPos(l_MousePoint.x, l_MousePoint.y);
 }
 
 #endif

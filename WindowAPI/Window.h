@@ -134,68 +134,41 @@ public:
 	friend class WindowManager; // lets window use private variables of WindowManager
 
 private:
-	//Name of the window
-	const char*  Name;
-	//ID of the FWindow. (where it belongs in the window manager)
-	GLuint ID;
-	//Colour format of the window. (defaults to 32 bit Colour)
-	GLuint ColourBits;
-	//Size of the Depth buffer. (defaults to 8 bit depth)
-	GLuint DepthBits;
-	//Size of the stencil buffer, (defaults to 8 bit)
-	GLuint StencilBits;
-	//Record of keys that are either pressed or released in the respective window
-	GLboolean Keys[KEY_LAST];
-	//Record of mouse buttons that are either presses or released
-	GLboolean MouseButton[MOUSE_LAST];	
-	//Resolution/Size of the window stored in an array
-	GLuint Resolution[2];
-	//Position of the FWindow relative to the screen co-ordinates
-	GLuint Position[2];
-	//Position of the Mouse cursor relative to the window co-ordinates
-	GLuint MousePosition[2];
-	//Whether the FWindow should be closing
-	GLboolean ShouldClose;
-	//Whether the FWindow is currently in focus(if it is the current window be used)
-	GLboolean InFocus;
-	//The current state of the window. these states include Normal, Minimized, Maximized and Full screen
-	GLuint CurrentState;
-	//The current swap interval of the window(V-Sync). a value of -1 enables adaptive V-Sync on supported systems
-	GLuint CurrentSwapInterval;
+
+	const char*  Name; /**< Name of the window. also initially the title bar text*/
+	GLuint ID; /**< ID of the FWindow. (where it belongs in the window manager) */
+	GLuint ColourBits; /**< Colour format of the window. (defaults to 32 bit Colour)*/
+	GLuint DepthBits; /**< Size of the Depth buffer. (defaults to 8 bit depth) */
+	GLuint StencilBits; /**< Size of the stencil buffer, (defaults to 8 bit) */
+	GLboolean Keys[KEY_LAST]; /**< Record of keys that are either pressed or released in the respective window */
+	GLboolean MouseButton[MOUSE_LAST];	 /**< Record of mouse buttons that are either presses or released*/
+	GLuint Resolution[2]; /**< Resolution/Size of the window stored in an array*/
+	GLuint Position[2]; /**< Position of the FWindow relative to the screen co-ordinates*/
+	GLuint MousePosition[2]; /**< Position of the Mouse cursor relative to the window co-ordinates*/
+	GLboolean ShouldClose; /**< Whether the FWindow should be closing*/
+	GLboolean InFocus; /**< Whether the FWindow is currently in focus(if it is the current window be used)*/
+	GLuint CurrentState; /**< The current state of the window. these states include Normal, Minimized, Maximized and Full screen*/
+	GLuint CurrentSwapInterval; /**< The current swap interval of the window(V-Sync). a value of -1 enables adaptive V-Sync on supported systems */
 	//set all the Events to null 
 	void InitializeEvents();
 	//Initializes OpenGL extensions
 	void InitGLExtensions();
 
-	//this is the callback to be used when a key has been pressed
-	OnKeyEvent KeyEvent;
-	//this is the callback to be used when a mouse button has been pressed
-	OnMouseButtonEvent MouseButtonEvent;
-	//this is the callback to be used when the mouse wheel has been scrolled. 
-	OnMouseWheelEvent MouseWheelEvent;
-	//this is the callback to be used when the window has been closed in a non-programmatic fashion
-	OnDestroyedEvent DestroyedEvent;
-	//this is the callback to be used when the window has been maximized in a non-programmatic fashion
-	OnMaximizedEvent MaximizedEvent;
-	//this is the callback to be used when the window has been minimized in a non-programmatic fashion
-	OnMinimizedEvent MinimizedEvent;
-	//this is the callback to be used when the window has been restored in a non-programmatic fashion
-	//OnRestoredEvent RestoredEvent;
-	//this is the callback to be used when the window has been given focus in a non-programmatic fashion
-	OnFocusEvent FocusEvent;
-	//this is the callback to be used the window has been moved in a non-programmatic fashion
-	OnMovedEvent MovedEvent;
-	//this is a callback to be used when the window has been resized in a non-programmatic fashion
-	OnResizeEvent ResizeEvent;
-	//this is a callback to be used when the mouse has been moved
-	OnMouseMoveEvent MouseMoveEvent;
+	OnKeyEvent KeyEvent; /**< this is the callback to be used when a key has been pressed*/
+	OnMouseButtonEvent MouseButtonEvent; /**< this is the callback to be used when a mouse button has been pressed*/
+	OnMouseWheelEvent MouseWheelEvent; /**< this is the callback to be used when the mouse wheel has been scrolled.*/
+	OnDestroyedEvent DestroyedEvent; /**< this is the callback to be used when the window has been closed in a non-programmatic fashion*/
+	OnMaximizedEvent MaximizedEvent; /**< this is the callback to be used when the window has been maximized in a non-programmatic fashion*/
+	OnMinimizedEvent MinimizedEvent; /**<this is the callback to be used when the window has been minimized in a non-programmatic fashion */
+	//OnRestoredEvent RestoredEvent; /**< this is the callback to be used when the window has been restored in a non-programmatic fashion*/
+	OnFocusEvent FocusEvent;  /**< this is the callback to be used when the window has been given focus in a non-programmatic fashion */
+	OnMovedEvent MovedEvent;  /**< this is the callback to be used the window has been moved in a non-programmatic fashion*/
+	OnResizeEvent ResizeEvent; /**< this is a callback to be used when the window has been resized in a non-programmatic fashion*/
+	OnMouseMoveEvent MouseMoveEvent; /**< this is a callback to be used when the mouse has been moved*/
 
-	//Whether the EXT_Swap_Control(Generic) GL extension is supported on this machine
-	GLboolean EXTSwapControlSupported;
-	//Whether the SGI_Swap_Control(Silicon graphics) GL extension is supported on this machine
-	GLboolean SGISwapControlSupported;
-	//Whether the MESA_Swap_Control(Mesa) GL extension is supported on this machine
-	GLboolean MESASwapControlSupported;
+	GLboolean EXTSwapControlSupported; /**< Whether the EXT_Swap_Control(Generic) GL extension is supported on this machine */
+	GLboolean SGISwapControlSupported; /**< Whether the SGI_Swap_Control(Silicon graphics) GL extension is supported on this machine */
+	GLboolean MESASwapControlSupported; /**< Whether the MESA_Swap_Control(Mesa) GL extension is supported on this machine*/
 
 	//this section is for the windows side of the Window API
 #if defined(CURRENT_OS_WINDOWS)
@@ -244,29 +217,17 @@ private:
 	//initialize NEEDED OpenGL extensions for the windows platform
 	void Windows_InitGLExtensions();
 
-	//the handle to the device context
-	HDC DeviceContextHandle;
-	//the handle to the OpenGL rendering context
-	HGLRC GLRenderingContextHandle;
-	//handle to the draw palette
-	HPALETTE PaletteHandle;
-	//describes the pixel format to be used by OpenGL
-	PIXELFORMATDESCRIPTOR PixelFormatDescriptor;
+	HDC DeviceContextHandle; /**< the handle to the device context */
+	HGLRC GLRenderingContextHandle; /**< the handle to the OpenGL rendering context*/
+	HPALETTE PaletteHandle; /**< handle to the draw palette*/
+	PIXELFORMATDESCRIPTOR PixelFormatDescriptor; /**< describes the pixel format to be used by OpenGL*/
 
-	WNDCLASS WindowClass;
-	HWND WindowHandle;
+	WNDCLASS WindowClass; /**< this describes the type of Window that Win32 will create*/
+	HWND WindowHandle; /**<handle to the Win32 window itself */
+	HINSTANCE InstanceHandle; /**< handle to the Win32 instance */
 
-	//this describes the type of Window that Win32 will create
-	WNDCLASS WindowClass;
-	//handle to the Win32 window itself
-	HWND WindowHandle;
-	//handle to the Win32 instance
-	HINSTANCE InstanceHandle;
-
-	//OpenGL extension callback for setting the swap interval(V-Sync)
-	PFNWGLSWAPINTERVALEXTPROC SwapIntervalEXT;
-	//OpenGL extension for revealing available extensions
-	PFNWGLGETEXTENSIONSSTRINGEXTPROC GetExtensionsStringEXT;
+	PFNWGLSWAPINTERVALEXTPROC SwapIntervalEXT; /**< OpenGL extension callback for setting the swap interval(V-Sync)*/
+	PFNWGLGETEXTENSIONSSTRINGEXTPROC GetExtensionsStringEXT; /**< OpenGL extension for revealing available extensions*/
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -304,34 +265,30 @@ private:
 
 	//get the Handle To the Window
 	Window GetWindowHandle();
-	//the X11 handle to the window. I wish they didn't name the type 'Window'
-	Window WindowHandle;
-	//the handle to the GLX rendering context
-	GLXContext Context;
-	//the handle to the Visual Information. similar purpose to PixelformatDesriptor
-	XVisualInfo* VisualInfo;
-	//attributes of the window. RGB, depth, stencil, etc
-	GLint* Attributes;
 
-	XSetWindowAttributes SetAttributes;
+	Window WindowHandle; /**< the X11 handle to the window. I wish they didn't name the type 'Window' */
+	GLXContext Context; /**< the handle to the GLX rendering context */
+	XVisualInfo* VisualInfo; /**< the handle to the Visual Information. similar purpose to PixelformatDesriptor*/
+	GLint* Attributes;/**< attributes of the window. RGB, depth, stencil, etc */
+	XSetWindowAttributes SetAttributes; /**< the attributes to be set for the window */
 	
 	//these are the callbacks for the GLX swap interval extension. 
-	PFNGLXSWAPINTERVALMESAPROC SwapIntervalMESA;
-	PFNGLXSWAPINTERVALEXTPROC SwapIntervalEXT;
-	PFNGLXSWAPINTERVALSGIPROC SwapIntervalSGI;	
+	PFNGLXSWAPINTERVALMESAPROC SwapIntervalMESA; /**< the mesa swap interval extension */
+	PFNGLXSWAPINTERVALEXTPROC SwapIntervalEXT; /**< the generic swap interval extension*/
+	PFNGLXSWAPINTERVALSGIPROC SwapIntervalSGI;	 /**< the Silicon graphics swap interval extension*/
 
-	/*these atomics are needed to change window states via the extended window manager
-	might move them to window manager considering these are essentially constants
+	/*these atomics are needed to change window states via the extended window manage.
+	I might move them to window manager considering these are essentially constants
 	*/
-	Atom AtomState; //_NET_WM_STATE
-	Atom AtomHidden;// _NET_WM_STATE_HIDDEN
-	Atom AtomFullScreen; //NET_WM_STATE_FULLSCREEN
-	Atom AtomMaxHorz; // _NET_WM_STATE_MAXIMIZED_HORZ
-	Atom AtomMaxVert; // _NET_WM_STATE_MAXIMIZED_VERT
-	Atom AtomClose; // _NET_WM_CLOSE_WINDOW
-	Atom AtomActive; //_NET_ACTIVE_WINDOW
-	Atom AtomDemandsAttention;//_NET_WM_STATE_DEMANDS_ATTENTION
-	Atom AtomFocused;//_NET_WM_STATE_FOCUSED
+	Atom AtomState;  /**< atom for the state of the window */	//_NET_WM_STATE
+	Atom AtomHidden; /**< atom for the current hidden state of the window */	// _NET_WM_STATE_HIDDEN
+	Atom AtomFullScreen; /**< atom for the fullscreen state of the window*/ //NET_WM_STATE_FULLSCREEN
+	Atom AtomMaxHorz; /**< atom for the maximized horizontally state of the window*/ // _NET_WM_STATE_MAXIMIZED_HORZ
+	Atom AtomMaxVert; /**< atom for the maximized vertically state of the window*/ // _NET_WM_STATE_MAXIMIZED_VERT
+	Atom AtomClose;  /**< atom for closing the window */	// _NET_WM_CLOSE_WINDOW
+	Atom AtomActive;  /**<atom for the active window */	//_NET_ACTIVE_WINDOW
+	Atom AtomDemandsAttention; /**<atom for when the window demands attention*/	//_NET_WM_STATE_DEMANDS_ATTENTION
+	Atom AtomFocused; /**<atom for the focused state of the window */	//_NET_WM_STATE_FOCUSED
 
 #endif
 };

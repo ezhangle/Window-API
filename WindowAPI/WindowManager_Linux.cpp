@@ -1,8 +1,28 @@
+/**********************************************************************************************//**
+ * @file	WindowAPI\WindowManager_Linux.cpp
+ *
+ * @brief	Implements the window manager linux class.
+ **************************************************************************************************/
+
 #include "WindowManager.h"
 #include "Tools.h"
 
 #include <limits.h>
 #if defined(CURRENT_OS_LINUX)
+
+/**********************************************************************************************//**
+ * @fn	FWindow* WindowManager::GetWindowByHandle(Window WindowHandle)
+ *
+ * @brief	Gets window by handle.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	WindowHandle	Handle of the window.
+ *
+ * @return	null if it fails, else the window by handle.
+ **************************************************************************************************/
+
 FWindow* WindowManager::GetWindowByHandle(Window WindowHandle)
 {
 	for (GLuint l_Iter = 0; l_Iter < GetInstance()->Windows.size(); l_Iter++)
@@ -15,6 +35,15 @@ FWindow* WindowManager::GetWindowByHandle(Window WindowHandle)
 
 	return nullptr;
 }
+
+/**********************************************************************************************//**
+ * @fn	void WindowManager::Linux_Initialize()
+ *
+ * @brief	Linux initialize.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
 
 void WindowManager::Linux_Initialize()
 {
@@ -33,6 +62,18 @@ void WindowManager::Linux_Initialize()
 				DefaultScreen(GetInstance()->m_Display)));
 }
 
+/**********************************************************************************************//**
+ * @fn	void WindowManager::Linux_SetMousePositionInScreen(GLuint X, GLuint Y)
+ *
+ * @brief	Linux set mouse position in screen.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	X	The GLuint to process.
+ * @param	Y	The GLuint to process.
+ **************************************************************************************************/
+
 void WindowManager::Linux_SetMousePositionInScreen(GLuint X, GLuint Y)
 {
 	XWarpPointer(GetInstance()->m_Display, None,
@@ -42,10 +83,32 @@ void WindowManager::Linux_SetMousePositionInScreen(GLuint X, GLuint Y)
 			X, Y);
 }
 
+/**********************************************************************************************//**
+ * @fn	void WindowManager::Linux_Shutdown()
+ *
+ * @brief	Linux shutdown.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
+
 void WindowManager::Linux_Shutdown()
 {
 	XCloseDisplay(GetInstance()->m_Display);
 }
+
+/**********************************************************************************************//**
+ * @fn	FWindow* WindowManager::GetWindowByEvent(XEvent Event)
+ *
+ * @brief	Gets window by event.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	Event	The event.
+ *
+ * @return	null if it fails, else the window by event.
+ **************************************************************************************************/
 
 FWindow* WindowManager::GetWindowByEvent(XEvent Event)
 {
@@ -138,10 +201,30 @@ FWindow* WindowManager::GetWindowByEvent(XEvent Event)
 	}
 }
 
+/**********************************************************************************************//**
+ * @fn	Display* WindowManager::GetDisplay()
+ *
+ * @brief	Gets the display.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @return	null if it fails, else the display.
+ **************************************************************************************************/
+
 Display* WindowManager::GetDisplay()
 {
 	return GetInstance()->m_Display;
 }
+
+/**********************************************************************************************//**
+ * @fn	void WindowManager::Linux_PollForEvents()
+ *
+ * @brief	Linux poll for events.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
 
 void WindowManager::Linux_PollForEvents()
 {

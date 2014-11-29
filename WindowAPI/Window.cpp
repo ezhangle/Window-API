@@ -1,3 +1,9 @@
+/**********************************************************************************************//**
+ * @file	WindowAPI\Window.cpp
+ *
+ * @brief	Implements the FWindow class.
+ **************************************************************************************************/
+
 #include <limits.h>
 #include "Window.h"
 #include "WindowManager.h"
@@ -6,6 +12,22 @@
 #if defined(CURRENT_OS_LINUX)
 #include <cstring>
 #endif
+
+/**********************************************************************************************//**
+ * @fn	FWindow::FWindow(const char* WindowName, GLuint Width , GLuint Height , GLuint ColourBits , GLuint DepthBits , GLuint StencilBits )
+ *
+ * @brief	Constructor.
+ *
+ * @author	Ziyad Barakat
+ * @date	29/11/2014
+ *
+ * @param	WindowName 	Name of the window.
+ * @param	Width	   	The width.
+ * @param	Height	   	The height.
+ * @param	ColourBits 	The colour bits.
+ * @param	DepthBits  	The depth bits.
+ * @param	StencilBits	The stencil bits.
+ **************************************************************************************************/
 
 FWindow::FWindow(const char*  WindowName,
 	GLuint Width /* = 1280 */,
@@ -36,16 +58,30 @@ FWindow::FWindow(const char*  WindowName,
 	InitializeEvents();
 
 	CurrentState = WINDOWSTATE_NORMAL;
-
-#if defined(CURRENT_OS_LINUX)
-	//Linux_Initialize();	
-#endif
 }
+
+/**********************************************************************************************//**
+ * @fn	FWindow::~FWindow()
+ *
+ * @brief	FWindow Destructor.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
 
 FWindow::~FWindow()
 {
 	Shutdown();
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::Shutdown()
+ *
+ * @brief	Shuts down this object and frees any resources it is using.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
 
 void FWindow::Shutdown()
 {
@@ -58,6 +94,15 @@ void FWindow::Shutdown()
 #endif
 }
 
+/**********************************************************************************************//**
+ * @fn	void FWindow::Initialize()
+ *
+ * @brief	Initializes this object.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
+
 void FWindow::Initialize()
 {
 #if defined(CURRENT_OS_WINDOWS)
@@ -69,10 +114,30 @@ void FWindow::Initialize()
 #endif
 }
 
+/**********************************************************************************************//**
+ * @fn	GLboolean FWindow::GetShouldClose()
+ *
+ * @brief	Gets should close.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @return	The should close.
+ **************************************************************************************************/
+
 GLboolean FWindow::GetShouldClose()
 {
 	return ShouldClose;
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::InitializeEvents()
+ *
+ * @brief	Initializes the events.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
 
 void FWindow::InitializeEvents()
 {
@@ -87,10 +152,32 @@ void FWindow::InitializeEvents()
 	MouseMoveEvent = nullptr;
 }
 
+/**********************************************************************************************//**
+ * @fn	GLboolean FWindow::GetKeyState(GLuint Key)
+ *
+ * @brief	Gets key state.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	Key	The key.
+ *
+ * @return	The key state.
+ **************************************************************************************************/
+
 GLboolean FWindow::GetKeyState(GLuint Key)
 {
 	return Keys[Key];
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::InitializeGL()
+ *
+ * @brief	Initializes OpenGL for this window.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
 
 void FWindow::InitializeGL()
 {
@@ -103,6 +190,15 @@ void FWindow::InitializeGL()
 #endif
 }
 
+/**********************************************************************************************//**
+ * @fn	void FWindow::SwapDrawBuffers()
+ *
+ * @brief	Swap draw buffers.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
+
 void FWindow::SwapDrawBuffers()
 {
 #if defined(CURRENT_OS_WINDOWS)
@@ -113,6 +209,17 @@ void FWindow::SwapDrawBuffers()
 	glXSwapBuffers(WindowManager::GetDisplay(), WindowHandle);
 #endif
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetSwapInterval(GLint SwapSetting)
+ *
+ * @brief	Sets swap interval(V-sync).
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	SwapSetting	The swap setting.
+ **************************************************************************************************/
 
 void FWindow::SetSwapInterval(GLint SwapSetting)
 {
@@ -126,13 +233,38 @@ void FWindow::SetSwapInterval(GLint SwapSetting)
 #endif
 }
 
+/**********************************************************************************************//**
+ * @fn	GLuint FWindow::GetCurrentState()
+ *
+ * @brief	Gets current state.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @return	The current state.
+ **************************************************************************************************/
+
 GLuint FWindow::GetCurrentState()
 {
 	return CurrentState;
 }
 
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetCurrentState(GLuint NewState)
+ *
+ * @brief	Sets the current state of the window.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	NewState	new state of the window.
+ **************************************************************************************************/
+
 void FWindow::SetCurrentState(GLuint NewState)
 {
+	/**
+	* first we restore the window to make moving from state to state as easy as possible
+	*/
 	Restore();
 
 	switch(NewState)
@@ -162,10 +294,32 @@ void FWindow::SetCurrentState(GLuint NewState)
 	}
 }
 
+/**********************************************************************************************//**
+ * @fn	GLboolean FWindow::GetIsFullScreen()
+ *
+ * @brief	returns whether the window is in fullscreen mode.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @return	Whether the window is currently in fullscreen mode.
+ **************************************************************************************************/
+
 GLboolean FWindow::GetIsFullScreen()
 {
 	return (CurrentState == WINDOWSTATE_FULLSCREEN);
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::FullScreen(GLboolean NewState)
+ *
+ * @brief	toggle the fullscreen mode for the window.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	NewState	whether the window should be in fullscreen mode.
+ **************************************************************************************************/
 
 void FWindow::FullScreen(GLboolean NewState)
 {
@@ -188,10 +342,32 @@ void FWindow::FullScreen(GLboolean NewState)
 #endif
 }
 
+/**********************************************************************************************//**
+ * @fn	GLboolean FWindow::GetIsMinimized()
+ *
+ * @brief	Gets whether the window is minimized.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @return	whether the window is currently minimized.
+ **************************************************************************************************/
+
 GLboolean FWindow::GetIsMinimized()
 {
 	return (CurrentState == WINDOWSTATE_MINIMIZED);
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::Minimize(GLboolean NewState)
+ *
+ * @brief	set the window to be minimized depending on NewState.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	NewState	whether the window should be minimized.
+ **************************************************************************************************/
 
 void FWindow::Minimize(GLboolean NewState)
 {
@@ -214,10 +390,32 @@ void FWindow::Minimize(GLboolean NewState)
 #endif	
 }
 
+/**********************************************************************************************//**
+ * @fn	GLboolean FWindow::GetIsMaximized()
+ *
+ * @brief	Gets whether the window is maximized.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @return	whether the window is currently minimized.
+ **************************************************************************************************/
+
 GLboolean FWindow::GetIsMaximized()
 {
 	return (CurrentState == WINDOWSTATE_MAXIMIZED) ;
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::Maximize(GLboolean NewState)
+ *
+ * @brief	Maximizes the window depending on New state.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	NewState	Whether to minimize the window.
+ **************************************************************************************************/
 
 void FWindow::Maximize(GLboolean NewState)
 {
@@ -239,6 +437,15 @@ void FWindow::Maximize(GLboolean NewState)
 	Linux_Maximize(NewState);
 #endif
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::Restore()
+ *
+ * @brief	Restores the window to its default setting.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
 
 void FWindow::Restore()
 {
@@ -267,16 +474,52 @@ void FWindow::Restore()
 #endif
 }
 
+/**********************************************************************************************//**
+ * @fn	void FWindow::GetResolution(GLuint& Width, GLuint& Height)
+ *
+ * @brief	Gets the resolution of the window by setting width and height.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param [in,out]	Width 	The width.
+ * @param [in,out]	Height	The height.
+ **************************************************************************************************/
+
 void FWindow::GetResolution(GLuint& Width, GLuint& Height)
 {
 	Width = Resolution[0];
 	Height = Resolution[1];
 }
 
+/**********************************************************************************************//**
+ * @fn	GLuint* FWindow::GetResolution()
+ *
+ * @brief	Gets the resolution of the window.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @return	null if it fails, else the resolution as an array. Resolution[0] always returns the
+ *  width and Resolution[1] always returns the Height.
+ **************************************************************************************************/
+
 GLuint* FWindow::GetResolution()
 {
 	return Resolution;
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetResolution(GLuint Width, GLuint Height)
+ *
+ * @brief	Sets the resolution of the window.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	Width 	The new width of the window.
+ * @param	Height	The new height of the window.
+ **************************************************************************************************/
 
 void FWindow::SetResolution(GLuint Width, GLuint Height)
 {
@@ -294,16 +537,52 @@ void FWindow::SetResolution(GLuint Width, GLuint Height)
 	glViewport(0, 0, Resolution[0], Resolution[1]);
 }
 
+/**********************************************************************************************//**
+ * @fn	void FWindow::GetMousePosition(GLuint& X, GLuint& Y)
+ *
+ * @brief	Gets mouse position relative to the window coordinates by setting X and Y.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param [in,out]	X	The X position of the mouse.
+ * @param [in,out]	Y	The Y position of the mouse.
+ **************************************************************************************************/
+
 void FWindow::GetMousePosition(GLuint& X, GLuint& Y)
 {
 	X = MousePosition[0];
 	Y = MousePosition[1];
 }
 
+/**********************************************************************************************//**
+ * @fn	GLuint* FWindow::GetMousePosition()
+ *
+ * @brief	Gets mouse position relative to the window as an array.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @return	null if it fails, else the mouse position. MousePosition[0] always returns the X and
+ *  MousePosition[1] always returns the Y.
+ **************************************************************************************************/
+
 GLuint* FWindow::GetMousePosition()
 {
 	return MousePosition;
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetMousePosition(GLuint X, GLuint Y)
+ *
+ * @brief	Sets mouse position.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	X	The new X position of the mouse relative to the window coordinates.
+ * @param	Y	The new Y position of the mouse relative to the window coordinates.
+ **************************************************************************************************/
 
 void FWindow::SetMousePosition(GLuint X, GLuint Y)
 {
@@ -318,16 +597,53 @@ void FWindow::SetMousePosition(GLuint X, GLuint Y)
 #endif
 }
 
+/**********************************************************************************************//**
+ * @fn	void FWindow::GetPosition(GLuint& X, GLuint& Y)
+ *
+ * @brief	Gets a position.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param [in,out]	X	The X coordinate of the window position relative to screen coordinates.
+ * @param [in,out]	Y	The Y coordinates of the window position relative to screen coordinates.
+ **************************************************************************************************/
+
 void FWindow::GetPosition(GLuint& X, GLuint& Y)
 {
 	X = Position[0];
 	Y = Position[1];
 }
 
+/**********************************************************************************************//**
+ * @fn	GLuint* FWindow::GetPosition()
+ *
+ * @brief	Gets the position.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @return	null if it fails, else the position. Position[0] always returns the X coordinate of
+ *  the window relative to screen coordinates and Position[1] always returns the Y coordinates of
+ *  the window.
+ **************************************************************************************************/
+
 GLuint* FWindow::GetPosition()
 {
 	return Position;
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetPosition(GLuint X, GLuint Y)
+ *
+ * @brief	Sets a position.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	X	The new X coordinate of the window position relative to screen coordinates.
+ * @param	Y	The new Y coordinate of the window position relative to screen coordinates.
+ **************************************************************************************************/
 
 void FWindow::SetPosition(GLuint X, GLuint Y)
 {
@@ -342,10 +658,32 @@ void FWindow::SetPosition(GLuint X, GLuint Y)
 #endif
 }
 
+/**********************************************************************************************//**
+ * @fn	const char* FWindow::GetWindowName()
+ *
+ * @brief	Gets window name.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @return	null if it fails, else the window name.
+ **************************************************************************************************/
+
 const char* FWindow::GetWindowName()
 {
 	return Name;
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetTitleBar(const char* NewTitle)
+ *
+ * @brief	Sets title bar.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	NewTitle	The new title bar of the window.
+ **************************************************************************************************/
 
 void FWindow::SetTitleBar(const char* NewTitle)
 {
@@ -361,6 +699,15 @@ void FWindow::SetTitleBar(const char* NewTitle)
 	}
 }
 
+/**********************************************************************************************//**
+ * @fn	void FWindow::MakeCurrentContext()
+ *
+ * @brief	Makes the window be the current OpenGL context to be drawn to.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
+
 void FWindow::MakeCurrentContext()
 {
 #if defined(CURRENT_OS_WINDOWS)
@@ -371,6 +718,15 @@ void FWindow::MakeCurrentContext()
 	glXMakeCurrent(WindowManager::GetDisplay(), WindowHandle, Context);
 #endif
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::InitGLExtensions()
+ *
+ * @brief	Initializes the OpenGL extensions for this window.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
 
 void FWindow::InitGLExtensions()
 {
@@ -384,10 +740,32 @@ void FWindow::InitGLExtensions()
 
 }
 
+/**********************************************************************************************//**
+ * @fn	GLboolean FWindow::GetInFocus()
+ *
+ * @brief	Gets whether the window is in event focus.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @return	The in focus.
+ **************************************************************************************************/
+
 GLboolean FWindow::GetInFocus()
 {
 	return InFocus;
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::Focus(GLboolean NewState)
+ *
+ * @brief	put the window into event focus.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	NewState	whether to put the window into event focus.
+ **************************************************************************************************/
 
 void FWindow::Focus(GLboolean NewState)
 {
@@ -402,29 +780,73 @@ void FWindow::Focus(GLboolean NewState)
 #endif
 }
 
-void FWindow::SetOnKeyEvent(OnKeyEvent a_OnKeyPressed)
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetOnKeyEvent(OnKeyEvent OnKey)
+ *
+ * @brief	Sets on key event.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	OnKey	The on key event.
+ **************************************************************************************************/
+
+void FWindow::SetOnKeyEvent(OnKeyEvent OnKey)
 {
-	if(Foundation_Tools::IsValid(a_OnKeyPressed))
+	if(Foundation_Tools::IsValid(OnKey))
 	{
-		KeyEvent = a_OnKeyPressed;
+		KeyEvent = OnKey;
 	}
 }
 
-void FWindow::SetOnMouseButtonEvent(OnMouseButtonEvent a_OnMouseButtonEvent)
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetOnMouseButtonEvent(OnMouseButtonEvent OnMouseButtonEvent)
+ *
+ * @brief	Sets on mouse button event.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	OnMouseButtonEvent	The on mouse button event.
+ **************************************************************************************************/
+
+void FWindow::SetOnMouseButtonEvent(OnMouseButtonEvent OnMouseButtonEvent)
 {
-	if(Foundation_Tools::IsValid(a_OnMouseButtonEvent))
+	if(Foundation_Tools::IsValid(OnMouseButtonEvent))
 	{
-		MouseButtonEvent = a_OnMouseButtonEvent;
+		MouseButtonEvent = OnMouseButtonEvent;
 	}
 }
 
-void FWindow::SetOnMouseWheelEvent(OnMouseWheelEvent OnMouseWheelEvent)
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetOnMouseWheelEvent(OnMouseWheelEvent OnMouseWheel)
+ *
+ * @brief	Sets on mouse wheel event.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	OnMouseWheel	The on mouse wheel event.
+ **************************************************************************************************/
+
+void FWindow::SetOnMouseWheelEvent(OnMouseWheelEvent OnMouseWheel)
 {
-	if(Foundation_Tools::IsValid(OnMouseWheelEvent))
+	if(Foundation_Tools::IsValid(OnMouseWheel))
 	{
-		MouseWheelEvent = OnMouseWheelEvent;
+		MouseWheelEvent = OnMouseWheel;
 	}
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetOnDestroyed(OnDestroyedEvent OnDestroyed)
+ *
+ * @brief	Sets on destroyed.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	OnDestroyed	The on destroyed event.
+ **************************************************************************************************/
 
 void FWindow::SetOnDestroyed(OnDestroyedEvent OnDestroyed)
 {
@@ -434,6 +856,17 @@ void FWindow::SetOnDestroyed(OnDestroyedEvent OnDestroyed)
 	}
 }
 
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetOnMaximized(OnMaximizedEvent OnMaximized)
+ *
+ * @brief	Sets on maximized.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	OnMaximized	The on maximized event.
+ **************************************************************************************************/
+
 void FWindow::SetOnMaximized(OnMaximizedEvent OnMaximized)
 {
 	if(Foundation_Tools::IsValid(OnMaximized))
@@ -441,6 +874,17 @@ void FWindow::SetOnMaximized(OnMaximizedEvent OnMaximized)
 		MaximizedEvent = OnMaximized;
 	}
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetOnMinimized(OnMinimizedEvent OnMinimized)
+ *
+ * @brief	Sets on minimized.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	OnMinimized	The on minimized event.
+ **************************************************************************************************/
 
 void FWindow::SetOnMinimized(OnMinimizedEvent OnMinimized)
 {
@@ -458,6 +902,17 @@ void FWindow::SetOnMinimized(OnMinimizedEvent OnMinimized)
 	}
 }*/
 
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetOnFocus(OnFocusEvent OnFocus)
+ *
+ * @brief	Sets on focus.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	OnFocus	The on focus event.
+ **************************************************************************************************/
+
 void FWindow::SetOnFocus(OnFocusEvent OnFocus)
 {
 	if(Foundation_Tools::IsValid(OnFocus))
@@ -465,6 +920,17 @@ void FWindow::SetOnFocus(OnFocusEvent OnFocus)
 		FocusEvent = OnFocus;
 	}
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetOnMoved(OnMovedEvent OnMoved)
+ *
+ * @brief	Sets on moved.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	OnMoved	The on moved event.
+ **************************************************************************************************/
 
 void FWindow::SetOnMoved(OnMovedEvent OnMoved)
 {
@@ -474,6 +940,17 @@ void FWindow::SetOnMoved(OnMovedEvent OnMoved)
 	}
 }
 
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetOnResize(OnResizeEvent OnResize)
+ *
+ * @brief	Sets on resize.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	OnResize	The on resize event.
+ **************************************************************************************************/
+
 void FWindow::SetOnResize(OnResizeEvent OnResize)
 {
 	if(Foundation_Tools::IsValid(OnResize))
@@ -481,6 +958,17 @@ void FWindow::SetOnResize(OnResizeEvent OnResize)
 		ResizeEvent = OnResize;
 	}
 }
+
+/**********************************************************************************************//**
+ * @fn	void FWindow::SetOnMouseMove(OnMouseMoveEvent OnMouseMove)
+ *
+ * @brief	Sets on mouse move.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	OnMouseMove	The on mouse move event.
+ **************************************************************************************************/
 
 void FWindow::SetOnMouseMove(OnMouseMoveEvent OnMouseMove)
 {

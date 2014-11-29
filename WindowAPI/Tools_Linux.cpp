@@ -1,5 +1,24 @@
+/**********************************************************************************************//**
+ * @file	WindowAPI\Tools_Linux.cpp
+ *
+ * @brief	Implements the tools linux class.
+ **************************************************************************************************/
+
 #include "Tools.h"
 #if defined(CURRENT_OS_LINUX)
+
+/**********************************************************************************************//**
+ * @fn	const char* Foundation_Tools::Linux_GetEventType(XEvent Event)
+ *
+ * @brief	Linux get event type.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	Event	The event.
+ *
+ * @return	null if it fails, else a char*.
+ **************************************************************************************************/
 
 const char* Foundation_Tools::Linux_GetEventType(XEvent Event)
 {
@@ -161,6 +180,19 @@ const char* Foundation_Tools::Linux_GetEventType(XEvent Event)
 		}
 	}
 }
+
+/**********************************************************************************************//**
+ * @fn	GLuint Foundation_Tools::Linux_TranslateKey(GLuint KeySym)
+ *
+ * @brief	Linux translate key.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @param	KeySym	The key symbol.
+ *
+ * @return	A GLuint.
+ **************************************************************************************************/
 
 GLuint Foundation_Tools::Linux_TranslateKey(GLuint KeySym)
 {

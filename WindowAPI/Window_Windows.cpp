@@ -1,14 +1,40 @@
+/**********************************************************************************************//**
+ * @file	WindowAPI\Window_Windows.cpp
+ *
+ * @brief	Implements the window windows class.
+ **************************************************************************************************/
+
 #include "Window.h"
 #include "WindowManager.h"
 
 #if defined(CURRENT_OS_WINDOWS)
 
-HWND Window::GetWindowHandle()
+/**********************************************************************************************//**
+ * @fn	HWND FWindow::GetWindowHandle()
+ *
+ * @brief	Gets window handle.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ *
+ * @return	The window handle.
+ **************************************************************************************************/
+
+HWND FWindow::GetWindowHandle()
 {
 	return WindowHandle;
 }
 
-void Window::Windows_InitializeGL()
+/**********************************************************************************************//**
+ * @fn	void FWindow::Windows_InitializeGL()
+ *
+ * @brief	Windows initialize gl.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
+
+void FWindow::Windows_InitializeGL()
 {
 	DeviceContextHandle = GetDC(WindowHandle);
 	InitializePixelFormat();
@@ -18,7 +44,16 @@ void Window::Windows_InitializeGL()
 	Windows_InitGLExtensions();
 }
 
-void Window::InitializePixelFormat()
+/**********************************************************************************************//**
+ * @fn	void FWindow::InitializePixelFormat()
+ *
+ * @brief	Initializes the pixel format.
+ *
+ * @author	Ziyad
+ * @date	29/11/2014
+ **************************************************************************************************/
+
+void FWindow::InitializePixelFormat()
 {
 	PixelFormatDescriptor = {
 		sizeof(PIXELFORMATDESCRIPTOR),  /* size */
@@ -27,7 +62,7 @@ void Window::InitializePixelFormat()
 		PFD_DRAW_TO_WINDOW |
 		PFD_DOUBLEBUFFER,               /* support double-buffering */
 		PFD_TYPE_RGBA,                  /* color type */
-		ColourBits, 0,                             /* prefered color depth */
+		ColourBits, 0,                             /* preferred color depth */
 		0, 0,
 		0, 0,
 		0, 0,
@@ -52,7 +87,7 @@ void Window::InitializePixelFormat()
 	return;
 }
 
-void Window::Windows_Initialize(LPCSTR a_MenuName, 
+void FWindow::Windows_Initialize(LPCSTR a_MenuName, 
 	UINT a_Style /* = CS_OWNDC | CS_HREDRAW | CS_DROPSHADOW */,
 	int a_ClearScreenExtra /* = 0 */, 
 	int WindowExtra /* = 0 */,
@@ -84,7 +119,7 @@ void Window::Windows_Initialize(LPCSTR a_MenuName,
 	UpdateWindow(WindowHandle);
 }
 
-void Window::Windows_Shutdown()
+void FWindow::Windows_Shutdown()
 {
 	if (GLRenderingContextHandle)
 	{
@@ -109,7 +144,7 @@ void Window::Windows_Shutdown()
 
 
 
-void Window::Windows_FullScreen(GLboolean NewState)
+void FWindow::Windows_FullScreen(GLboolean NewState)
 {
 		SetWindowLongPtr(WindowHandle, GWL_STYLE,
 			WS_SYSMENU | WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE);
@@ -156,7 +191,7 @@ void Window::Windows_FullScreen(GLboolean NewState)
 		MoveWindow(m_WindowHandle, m_Position[0], m_Position[1], l_Rect.right, l_Rect.bottom, GL_TRUE);*/
 }
 
-void Window::Windows_Minimize(GLboolean NewState)
+void FWindow::Windows_Minimize(GLboolean NewState)
 {
 	if (NewState)
 	{
@@ -169,7 +204,7 @@ void Window::Windows_Minimize(GLboolean NewState)
 	}
 }
 
-void Window::Windows_Maximize(GLboolean NewState)
+void FWindow::Windows_Maximize(GLboolean NewState)
 {
 	if (NewState)
 	{
@@ -182,12 +217,12 @@ void Window::Windows_Maximize(GLboolean NewState)
 	}
 }
 
-void Window::Windows_Restore()
+void FWindow::Windows_Restore()
 {
 	ShowWindow(WindowHandle, SW_RESTORE);
 }
 
-void Window::Windows_Focus(GLboolean NewState)
+void FWindow::Windows_Focus(GLboolean NewState)
 {
 	InFocus = NewState;
 
@@ -202,7 +237,7 @@ void Window::Windows_Focus(GLboolean NewState)
 	}
 }
 
-void Window::Windows_SetMousePosition(GLuint X, GLuint& Y)
+void FWindow::Windows_SetMousePosition(GLuint X, GLuint& Y)
 {
 	POINT l_MousePoint;
 	l_MousePoint.x = X;
@@ -211,12 +246,12 @@ void Window::Windows_SetMousePosition(GLuint X, GLuint& Y)
 	SetCursorPos(l_MousePoint.x, l_MousePoint.y);
 }
 
-void Window::Windows_SetTitleBar(const char* NewTitle)
+void FWindow::Windows_SetTitleBar(const char* NewTitle)
 {
 	SetWindowText(WindowHandle, Name);
 }
 
-void Window::Windows_SetPosition(GLuint X, GLuint Y)
+void FWindow::Windows_SetPosition(GLuint X, GLuint Y)
 {
 	RECT rect = { X, Y, X, Y };
 	AdjustWindowRect(&rect, GWL_STYLE| WS_OVERLAPPEDWINDOW | WS_VISIBLE,
@@ -226,13 +261,13 @@ void Window::Windows_SetPosition(GLuint X, GLuint Y)
 		Resolution[0], Resolution[1], SWP_SHOWWINDOW | SWP_NOSIZE);
 }
 
-void Window::Windows_SetResolution(GLuint Width, GLuint Height)
+void FWindow::Windows_SetResolution(GLuint Width, GLuint Height)
 {
 	SetWindowPos(WindowHandle, HWND_TOP, Position[0], Position[1],
 		Resolution[0], Resolution[1], SWP_SHOWWINDOW | SWP_NOMOVE);
 }
 
-void Window::Windows_VerticalSync(GLint EnableSync)
+void FWindow::Windows_VerticalSync(GLint EnableSync)
 {
 	if (EXTSwapControlSupported)
 	{
@@ -240,7 +275,7 @@ void Window::Windows_VerticalSync(GLint EnableSync)
 	}
 }
 
-void Window::Windows_InitGLExtensions()
+void FWindow::Windows_InitGLExtensions()
 {
 	SwapIntervalEXT = nullptr;
 	GetExtensionsStringEXT = nullptr;

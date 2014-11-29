@@ -1,18 +1,6 @@
 #ifndef WINDOW_MANAGER_H
 #define WINDOW_MANAGER_H
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
-#if defined(CURRENT_OS_WINDOWS)
-	#include <Windows.h>
-#endif
 
-#if defined(CURRENT_OS_LINUX)
-	#include <X11/X.h>
-	#include <X11/Xlib.h>
-	#include <X11/keysym.h>
-	#include <string>
-#endif
 
 #include "WindowAPI_Defs.h"
 #include "Window.h"
@@ -30,15 +18,19 @@ class WindowManager
 		WindowManager();
 		~WindowManager();
 
-		//shut down the window manager when your program is finished
+		/**
+		* shutdown and delete all windows in the manager
+		*/
 		static void ShutDown();
 
-		//get a pointer to a window via name or index
+		/**get a pointer to a window via name or index */
 		static FWindow* GetWindowByName(const char* WindowName);
 		static FWindow* GetWindowByIndex(GLuint WindowIndex);
 
-		//add a window to the manager. i ripped off a behavior tree feature
-		//that allows the user to create multiple windows easily
+		/**
+		*add a window to the manager. i ripped off a tree feature
+		*that allows the user to create multiple windows easily
+		*/
 		static WindowManager* AddWindow(FWindow* NewWindow);
 
 		//return the total amount of windows the manager has
@@ -184,11 +176,11 @@ class WindowManager
 		//get a static reference to the window manager
 		static WindowManager* GetInstance();
 
-		std::vector<FWindow*> Windows;
-		static WindowManager* Instance;
+		std::vector<FWindow*> Windows; /**< The FWindows storage*/
+		static WindowManager* Instance; /**< The static reference to the WindowManager */
 
-		GLuint ScreenResolution[2];
-		GLuint ScreenMousePosition[2];
+		GLuint ScreenResolution[2]; /**< the resolution of the screen as an array */
+		GLuint ScreenMousePosition[2]; /**< the position of the mouse relative to screen coordinates */
 
 #if defined(CURRENT_OS_WINDOWS)
 		LRESULT CALLBACK WindowProcedure(HWND WindowHandle, GLuint Message, WPARAM WordParam, LPARAM LongParam);
@@ -204,8 +196,8 @@ class WindowManager
 
 		static void CreateTerminal();
 
-		MSG m_Message;
-		HDC m_DeviceContextHandle;
+		HDC m_DeviceContextHandle; /**< the device context handle for the window*/
+		MSG Message; /**< the Win32 message that contains event information */
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -219,8 +211,8 @@ class WindowManager
 		static void Linux_SetMousePositionInScreen(GLuint X, GLuint Y);
 		static Display* GetDisplay();
 
-		Display* m_Display;
-		XEvent m_Event;
+		Display* m_Display; /**< a reference to the X11 display */
+		XEvent m_Event; /**< the current X11 event*/
 #endif
 };
 #endif 
