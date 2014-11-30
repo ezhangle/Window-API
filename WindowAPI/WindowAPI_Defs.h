@@ -5,7 +5,7 @@
  **************************************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
-#include <vector>
+#include <list>
 
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 #define CURRENT_OS_WINDOWS  

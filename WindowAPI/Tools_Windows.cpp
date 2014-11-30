@@ -18,7 +18,7 @@
  * @param	WordParam	The wParam field of the message.
  * @param	LongParam	The lParam field of the message.
  *
- * @return	A GLuint.
+ * @return	return the translated key.
  **************************************************************************************************/
 
 GLuint Foundation_Tools::Windows_TranslateKey(WPARAM WordParam, LPARAM LongParam)

@@ -135,6 +135,8 @@ void FWindow::Windows_Shutdown()
 	DestroyWindow(WindowHandle);
 	UnregisterClass(Name, InstanceHandle);
 
+	FreeModule(InstanceHandle);
+
 	DeviceContextHandle = nullptr;
 	WindowHandle = nullptr;
 	GLRenderingContextHandle = nullptr;
@@ -144,7 +146,7 @@ void FWindow::Windows_Shutdown()
 
 
 
-void FWindow::Windows_FullScreen(GLboolean NewState)
+void FWindow::Windows_FullScreen()
 {
 		SetWindowLongPtr(WindowHandle, GWL_STYLE,
 			WS_SYSMENU | WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE);
@@ -191,9 +193,9 @@ void FWindow::Windows_FullScreen(GLboolean NewState)
 		MoveWindow(m_WindowHandle, m_Position[0], m_Position[1], l_Rect.right, l_Rect.bottom, GL_TRUE);*/
 }
 
-void FWindow::Windows_Minimize(GLboolean NewState)
+void FWindow::Windows_Minimize()
 {
-	if (NewState)
+	if (CurrentState == WINDOWSTATE_MINIMIZED)
 	{
 		ShowWindow(WindowHandle, SW_MINIMIZE);
 	}
@@ -204,9 +206,9 @@ void FWindow::Windows_Minimize(GLboolean NewState)
 	}
 }
 
-void FWindow::Windows_Maximize(GLboolean NewState)
+void FWindow::Windows_Maximize()
 {
-	if (NewState)
+	if (CurrentState == WINDOWSTATE_MAXIMIZED)
 	{
 		ShowWindow(WindowHandle, SW_MAXIMIZE);
 	}
@@ -222,11 +224,9 @@ void FWindow::Windows_Restore()
 	ShowWindow(WindowHandle, SW_RESTORE);
 }
 
-void FWindow::Windows_Focus(GLboolean NewState)
+void FWindow::Windows_Focus()
 {
-	InFocus = NewState;
-
-	if (NewState)
+	if (InFocus)
 	{
 		SetFocus(WindowHandle);
 	}

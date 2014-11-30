@@ -44,7 +44,6 @@ int main()
 	WindowManager::AddWindow(new FWindow("Example"));
 
 	WindowManager::SetWindowOnKeyEvent("Example", &OnWindowKeyPressed);
-	printf("blarg\n");	
 	while (!WindowManager::GetWindowShouldClose("Example"))
 	{
 		WindowManager::PollForEvents();
@@ -52,7 +51,6 @@ int main()
 		
 		for (GLuint i = 0; i < WindowManager::GetNumWindows(); i++)
 		{
-			printf("Blarg2\n");
 			WindowManager::GetWindowByIndex(i)->MakeCurrentContext();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			WindowManager::GetWindowByIndex(i)->SwapDrawBuffers();

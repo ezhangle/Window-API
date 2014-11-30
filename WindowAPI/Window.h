@@ -191,17 +191,17 @@ private:
 	/*uses the win32 system to have the window completely fill the screen and be 
 	drawn above the toolbar. changing the screen resolution to match has been disabled 
 	due to event handling issues*/
-	void Windows_FullScreen(GLboolean NewState);
+	void Windows_FullScreen();
 	//uses the win32 system to minimize/hide the window. minimized windows don't receive events
-	void Windows_Minimize(GLboolean NewState);
+	void Windows_Minimize();
 	//uses the win32 system to maximize the window. 
-	void Windows_Maximize(GLboolean NewState);
+	void Windows_Maximize();
 	//uses the win32 system to restore the window
 	void Windows_Restore();
 	//uses the win32 system to set the Title Bar text
 	void Windows_SetTitleBar(const char* NewTitle);
 	//uses the win32 system to put the window into event focus
-	void Windows_Focus(GLboolean NewState);
+	void Windows_Focus();
 	//initialize OpenGL for this window
 	void Windows_InitializeGL();
 	//cleanly shutdown this window(window would still need to be deleted of course)

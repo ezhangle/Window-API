@@ -163,7 +163,7 @@ void FWindow::Linux_SetMousePosition(GLuint X, GLuint Y)
  * @author	Ziyad
  * @date	29/11/2014
  *
- * @param	ShouldBeFullscreen	Whether the window should be in fullscreen mode
+ * @param	ShouldBeFullscreen	Whether the window should be in fullscreen mode.
  **************************************************************************************************/
 
 void FWindow::Linux_FullScreen(GLboolean ShouldBeFullscreen)
@@ -279,9 +279,9 @@ void FWindow::Linux_SetTitleBar(const char* NewTitle)
  * @param	ShouldBeInFocus	State of the new.
  **************************************************************************************************/
 
-void FWindow::Linux_Focus(GLboolean ShouldBeInFocus)
+void FWindow::Linux_Focus()
 {
-	if(ShouldBeInFocus)
+	if(InFocus)
 	{
 		XMapWindow(WindowManager::GetDisplay(), WindowHandle);
 	}

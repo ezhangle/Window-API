@@ -321,9 +321,9 @@ GLboolean FWindow::GetIsFullScreen()
  * @param	NewState	whether the window should be in fullscreen mode.
  **************************************************************************************************/
 
-void FWindow::FullScreen(GLboolean NewState)
+void FWindow::FullScreen(GLboolean ShouldBeFullscreen)
 {
-	if(NewState)
+	if(ShouldBeFullscreen)
 	{
 		CurrentState = WINDOWSTATE_FULLSCREEN;
 	}
@@ -334,11 +334,11 @@ void FWindow::FullScreen(GLboolean NewState)
 	}
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_FullScreen(NewState);
+	Linux_FullScreen();
 #endif
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_FullScreen(NewState);
+	Windows_FullScreen();
 #endif
 }
 
@@ -382,11 +382,11 @@ void FWindow::Minimize(GLboolean NewState)
 	}
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_Minimize(NewState);
+	Windows_Minimize();
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Minimize(NewState);
+	Linux_Minimize();
 #endif	
 }
 
@@ -430,11 +430,11 @@ void FWindow::Maximize(GLboolean NewState)
 	}
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_Maximize(NewState);
+	Windows_Maximize();
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Maximize(NewState);
+	Linux_Maximize();
 #endif
 }
 
@@ -767,16 +767,16 @@ GLboolean FWindow::GetInFocus()
  * @param	NewState	whether to put the window into event focus.
  **************************************************************************************************/
 
-void FWindow::Focus(GLboolean NewState)
+void FWindow::Focus(GLboolean ShouldBeInFocus)
 {
-	InFocus = NewState;
+	InFocus = ShouldBeInFocus;
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Focus(NewState);	
+	Linux_Focus();	
 #endif
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_Focus(NewState);
+	Windows_Focus();
 #endif
 }
 

@@ -173,10 +173,14 @@ class WindowManager
 
 	private:
 
+		//make sure the window exists in the window manager
+		static GLboolean DoesExist(const char* WindowName);
+		static GLboolean DoesExist(GLuint WindowIndex);
+
 		//get a static reference to the window manager
 		static WindowManager* GetInstance();
 
-		std::vector<FWindow*> Windows; /**< The FWindows storage*/
+		std::list<FWindow*> Windows; /**< The FWindows storage*/
 		static WindowManager* Instance; /**< The static reference to the WindowManager */
 
 		GLuint ScreenResolution[2]; /**< the resolution of the screen as an array */
@@ -196,7 +200,7 @@ class WindowManager
 
 		static void CreateTerminal();
 
-		HDC m_DeviceContextHandle; /**< the device context handle for the window*/
+		HDC DeviceContextHandle; /**< the device context handle for the window*/
 		MSG Message; /**< the Win32 message that contains event information */
 #endif
 

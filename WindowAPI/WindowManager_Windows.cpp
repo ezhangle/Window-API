@@ -46,13 +46,28 @@ void WindowManager::Windows_Initialize()
 
 FWindow* WindowManager::GetWindowByHandle(HWND WindowHandle)
 {
-	for (GLuint l_Iter = 0; l_Iter < GetInstance()->Windows.size(); l_Iter++)
+#if defined(CURRENT_OS_WINDOWS)
+
+	for each(auto CurrentWindow in GetInstance()->Windows)
 	{
-		if (GetInstance()->Windows[l_Iter]->GetWindowHandle() == WindowHandle)
+		if (CurrentWindow->WindowHandle == WindowHandle)
 		{
-			return GetInstance()->Windows[l_Iter];
+			return CurrentWindow;
 		}
 	}
+
+#endif
+
+#if defined(CURRENT_OS_LINUX)
+	for (auto CurrentWindow : GetInstance()->Windows)
+	{
+		if (CurrentWindow->WindowHandle == WindowHandle)
+		{
+			return CurrentWindow;
+		}
+	}
+
+#endif
 
 	return nullptr;
 }
@@ -64,7 +79,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 	{
 	case WM_CREATE:
 	{
-		GetWindowByIndex(Windows.size() - 1)->WindowHandle = WindowHandle;
+		GetWindowByIndex(GetInstance()->Windows.size() - 1)->WindowHandle = WindowHandle;
 		l_Window = GetWindowByHandle(WindowHandle);
 
 		l_Window->InitializeGL();
