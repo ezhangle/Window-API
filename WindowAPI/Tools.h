@@ -43,6 +43,46 @@ public:
 		return (OnMouseMove != nullptr);
 	}
 
+	static void PrintSupportedExtensions()
+	{
+#if defined(CONTEXT_CREATED)
+		const char* SupportedExtensions = glGetString(GL_EXTENSIONS);
+		printf("%s \n", SupportedExtensions);
+#else
+		printf("error: an OpenGL context must first be created \n");
+#endif
+	}
+
+	static const char* GetSupportedExtensions()
+	{
+#if defined(CONTEXT_CREATED)
+		return glGetString(GL_EXTENSIONS);
+#else
+		printf("error: an OpenGL context must first be created \n");
+		return nullptr;
+#endif
+	}
+
+	static void PrintOpenGLVersion()
+	{
+#if defined(CONTEXT_CREATED)
+		const char* OpenGLVersions = glGetString(GL_VERSION);
+		printf("%s \n", OpenGLVersions);
+#else
+		printf("error: an OpenGL context must first be created \n");
+#endif
+	}
+
+	static const char* GetOpenGLVersion()
+	{
+#if defined(CONTEXT_CREATED)
+		return glGetString(GL_VERSION)
+#else
+		printf("error: an OpenGL context must first be created \n");
+		return nullptr;
+#endif
+	}
+
 	friend WindowManager;
 
 private:

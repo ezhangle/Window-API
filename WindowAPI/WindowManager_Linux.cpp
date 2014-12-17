@@ -25,11 +25,11 @@
 
 FWindow* WindowManager::GetWindowByHandle(Window WindowHandle)
 {
-	for (GLuint l_Iter = 0; l_Iter < GetInstance()->Windows.size(); l_Iter++)
+	for (auto Iter : GetInstance()->Windows)
 	{
-		if (GetInstance()->Windows[l_Iter]->GetWindowHandle() == WindowHandle)
+		if (Iter->GetWindowHandle() == WindowHandle)
 		{
-			return GetInstance()->Windows[l_Iter];
+			return Iter;
 		}
 	}
 

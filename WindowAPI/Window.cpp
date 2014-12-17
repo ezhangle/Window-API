@@ -334,11 +334,11 @@ void FWindow::FullScreen(GLboolean ShouldBeFullscreen)
 	}
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_FullScreen();
+	Linux_FullScreen(ShouldBeFullscreen);
 #endif
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_FullScreen();
+	Windows_Fullscreen();
 #endif
 }
 
@@ -386,7 +386,7 @@ void FWindow::Minimize(GLboolean NewState)
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Minimize();
+	Linux_Minimize(NewState);
 #endif	
 }
 
@@ -434,7 +434,7 @@ void FWindow::Maximize(GLboolean NewState)
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Maximize();
+	Linux_Maximize(NewState);
 #endif
 }
 
@@ -772,7 +772,7 @@ void FWindow::Focus(GLboolean ShouldBeInFocus)
 	InFocus = ShouldBeInFocus;
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Focus();	
+	Linux_Focus(ShouldBeInFocus);	
 #endif
 
 #if defined(CURRENT_OS_WINDOWS)

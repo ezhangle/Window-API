@@ -279,7 +279,7 @@ void FWindow::Linux_SetTitleBar(const char* NewTitle)
  * @param	ShouldBeInFocus	State of the new.
  **************************************************************************************************/
 
-void FWindow::Linux_Focus()
+void FWindow::Linux_Focus(GLboolean ShouldBeInFocus)
 {
 	if(InFocus)
 	{

@@ -3,7 +3,6 @@
  *
  * @brief	Implements the example class.
  **************************************************************************************************/
-
 #include <stdio.h>
 #include "WindowManager.h"
 
@@ -41,8 +40,9 @@ void OnWindowKeyPressed(GLuint KeySym, GLboolean KeyState)
 int main()
 {
 	WindowManager::Initialize();
+	
 	WindowManager::AddWindow(new FWindow("Example"));
-
+	Foundation_Tools::GetSupportedExtensions();
 	WindowManager::SetWindowOnKeyEvent("Example", &OnWindowKeyPressed);
 	while (!WindowManager::GetWindowShouldClose("Example"))
 	{

@@ -102,7 +102,7 @@ FWindow* WindowManager::GetWindowByName(const char* WindowName)
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-		for (auto CurrentWindow in GetInstance()->Windows)
+		for (auto CurrentWindow : GetInstance()->Windows)
 		{
 			if (CurrentWindow->Name == WindowName)
 			{
