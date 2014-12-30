@@ -30,36 +30,36 @@ public:
 	~FWindow();
 
 	//Initializes the window depending on OS
-	void Initialize();
+	GLboolean Initialize();
 
 	//shut down respective OpenGL context
-	void Shutdown();
+	GLboolean Shutdown();
 
 	//return the size/resolution of the window
-	void GetResolution(GLuint& Width, GLuint& Height);
+	GLboolean GetResolution(GLuint& Width, GLuint& Height);
 	//return the size/resolution of the window
 	GLuint* GetResolution();
 	//set the size/Resolution of the window
-	void SetResolution(GLuint Width, GLuint Height);
+	GLboolean SetResolution(GLuint Width, GLuint Height);
 
 	//return the position of the mouse cursor relative to the window co-ordinates
-	void GetMousePosition(GLuint& X, GLuint& Y);
+	GLboolean GetMousePosition(GLuint& X, GLuint& Y);
 	//return the Position of the mouse cursor relative to the window co-ordinates
 	GLuint* GetMousePosition();
 	//set the position of the mouse cursor relative the the window co-ordinates
-	void SetMousePosition(GLuint X, GLuint Y);
+	GLboolean SetMousePosition(GLuint X, GLuint Y);
 
 	//return the Position of the window relative to the screen co-ordinates
-	void GetPosition(GLuint& X, GLuint& Y);
+	GLboolean GetPosition(GLuint& X, GLuint& Y);
 	//return the Position of the window relative to the screen co-ordinates
 	GLuint* GetPosition();
 	//Set the Position of the window relative to the screen co-ordinates
-	void SetPosition(GLuint X, GLuint Y);
+	GLboolean SetPosition(GLuint X, GLuint Y);
 
 	//return the current state of the window
 	GLuint GetCurrentState();
 	//set the current state of the window
-	void SetCurrentState(GLuint NewState);
+	GLboolean SetCurrentState(GLuint NewState);
 	
 	//get the state of a key(Down/Up) by index
 	GLboolean GetKeyState(GLuint Key);
@@ -68,45 +68,51 @@ public:
 	GLboolean GetShouldClose();
 
 	//make the window swap draw buffers
-	void SwapDrawBuffers();
+	GLboolean SwapDrawBuffers();
 
 	//toggle full screen mode depending on NewState. (true = Full screen, false = normal)
-	void FullScreen(GLboolean NewState);
+	GLboolean FullScreen(GLboolean NewState);
 	//return if the window is in full screen mode
 	GLboolean GetIsFullScreen();
 
 	//toggle minimization depending on NewState. (true = minimized, false = normal)
-	void Minimize(GLboolean NewState);
+	GLboolean Minimize(GLboolean NewState);
 	//return if the window is Minimized
 	GLboolean GetIsMinimized();
 
 	// set and get for maximizing a window
-	void Maximize(GLboolean NewState);
+	GLboolean Maximize(GLboolean NewState);
 	GLboolean GetIsMaximized();
 
 	//restore the window to its natural state
-	void Restore();
+	GLboolean Restore();
 
 	//creates on OpenGL Context
-	void InitializeGL();
+	GLboolean InitializeGL();
 
 	//get and set for window name
 	const char* GetWindowName();
-	void SetTitleBar(const char* NewText);
+	GLboolean SetTitleBar(const char* NewText);
 
 	//set the window icon
-	void SetIcon();
+	GLboolean SetIcon();
 
 	//make the window the current OpenGL context to be drawn
-	void MakeCurrentContext();
+	GLboolean MakeCurrentContext();
+
+	//returns Whether the current window is the current OpenGL context to be drawn
+	GLboolean GetIsCurrentContext();
+
+	//returns whether the OpenGL context for this window has been created
+	GLboolean GetContextHasBeenCreated();
 
 	//whether the window is in focus
 	GLboolean GetInFocus();
-	void Focus(GLboolean NewState);
+	GLboolean Focus(GLboolean NewState);
 
 	//enable vertical sync if supported
 	//a swap setting of -1 turns on adaptive V-sync on supported systems
-	void SetSwapInterval(GLint SwapSetting);
+	GLboolean SetSwapInterval(GLint SwapSetting);
 
 	//set the on key event callback for this window
 	void SetOnKeyEvent(OnKeyEvent OnKey);
@@ -131,6 +137,18 @@ public:
 	//set the window on Mouse move callback event for this window
 	void SetOnMouseMove(OnMouseMoveEvent OnMouseMove);
 
+	//print the current OpenGL version
+	GLboolean PrintOpenGLVersion();
+
+	//return the current OpenGL version as a string
+	const char* GetOpenGLVersion();
+
+	//print all supported extensions
+	GLboolean PrintOpenGLExtensions();
+
+	//return all the supported extensions
+	const char* GetOpenGLExtensions();
+
 	friend class WindowManager; // lets window use private variables of WindowManager
 
 private:
@@ -147,9 +165,12 @@ private:
 	GLuint MousePosition[2]; /**< Position of the Mouse cursor relative to the window co-ordinates*/
 	GLboolean ShouldClose; /**< Whether the FWindow should be closing*/
 	GLboolean InFocus; /**< Whether the FWindow is currently in focus(if it is the current window be used)*/
+	GLboolean Initialized; /**< Whether the FWindoa has been fully Initialized*/
+	GLboolean ContextCreated; /**< Whether the OpenGL context for this window has been created*/
+	GLboolean IsCurrentContext; /**< Whether the window is the current window that is being drawn to */
 	GLuint CurrentState; /**< The current state of the window. these states include Normal, Minimized, Maximized and Full screen*/
 	GLuint CurrentSwapInterval; /**< The current swap interval of the window(V-Sync). a value of -1 enables adaptive V-Sync on supported systems */
-	//set all the Events to null 
+//set all the Events to null 
 	void InitializeEvents();
 	//Initializes OpenGL extensions
 	void InitGLExtensions();
@@ -232,7 +253,7 @@ private:
 
 #if defined(CURRENT_OS_LINUX)
 	//uses the X11 system to initialize the window
-	void Linux_Initialize();
+	GLboolean Linux_Initialize();
 	//uses the X11 system to set the size/resolution of the window
 	void Linux_SetResolution(GLuint Width, GLuint Height);
 	//uses the X11 system to set the window position relative to screen co-ordinates
@@ -252,7 +273,7 @@ private:
 	//uses the X11 system to set the title bar of the window
 	void Linux_SetTitleBar(const char* NewName);
 	//uses the X11 system to initialize create an OpenGL context for the window
-	void Linux_InitializeGL();
+	GLboolean Linux_InitializeGL();
 	//uses OpenGL extensions for Linux to toggle Vertical syncing
 	void Linux_VerticalSync(GLint EnableSync);
 	//shut down the window. closes all connections to the X11 system

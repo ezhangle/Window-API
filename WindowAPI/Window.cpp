@@ -51,13 +51,15 @@ FWindow::FWindow(const char*  WindowName,
 
 	if(!Foundation_Tools::IsValid(WindowName))
 	{
-		printf("that was not a valid window name");
+		Foundation_Tools::PrintErrorMessage(ERROR_INVALIDWINDOWNAME);
 		exit(0);
 	}
 
 	InitializeEvents();
 
 	CurrentState = WINDOWSTATE_NORMAL;
+	ContextCreated = GL_FALSE;
+	IsCurrentContext = GL_FALSE;
 }
 
 /**********************************************************************************************//**
@@ -83,15 +85,23 @@ FWindow::~FWindow()
  * @date	29/11/2014
  **************************************************************************************************/
 
-void FWindow::Shutdown()
+GLboolean FWindow::Shutdown()
 {
+	if(ContextCreated)
+	{
+		ContextCreated = GL_FALSE;
 #if defined (CURRENT_OS_WINDOWS)
-	Windows_Shutdown();
+		Windows_Shutdown();
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Shutdown();
+		Linux_Shutdown();
 #endif
+
+		return FOUNDATION_OKAY;
+	}
+
+	return 	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
 }
 
 /**********************************************************************************************//**
@@ -103,14 +113,14 @@ void FWindow::Shutdown()
  * @date	29/11/2014
  **************************************************************************************************/
 
-void FWindow::Initialize()
+GLboolean FWindow::Initialize()
 {
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_Initialize(Name);
+	return Windows_Initialize(Name);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Initialize();
+	return Linux_Initialize();
 #endif
 }
 
@@ -179,14 +189,14 @@ GLboolean FWindow::GetKeyState(GLuint Key)
  * @date	29/11/2014
  **************************************************************************************************/
 
-void FWindow::InitializeGL()
+GLboolean FWindow::InitializeGL()
 {
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_InitializeGL();
+	return Windows_InitializeGL();
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_InitializeGL();
+	return Linux_InitializeGL();
 #endif
 }
 
@@ -199,15 +209,22 @@ void FWindow::InitializeGL()
  * @date	29/11/2014
  **************************************************************************************************/
 
-void FWindow::SwapDrawBuffers()
+GLboolean FWindow::SwapDrawBuffers()
 {
+	if(ContextCreated)
+	{
 #if defined(CURRENT_OS_WINDOWS)
-	SwapBuffers(DeviceContextHandle);
+		SwapBuffers(DeviceContextHandle);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	glXSwapBuffers(WindowManager::GetDisplay(), WindowHandle);
+		glXSwapBuffers(WindowManager::GetDisplay(), WindowHandle);
 #endif
+
+		return FOUNDATION_OKAY;
+	}
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
 }
 
 /**********************************************************************************************//**
@@ -221,8 +238,10 @@ void FWindow::SwapDrawBuffers()
  * @param	SwapSetting	The swap setting.
  **************************************************************************************************/
 
-void FWindow::SetSwapInterval(GLint SwapSetting)
+GLboolean FWindow::SetSwapInterval(GLint SwapSetting)
 {
+	if(ContextCreated)
+	{
 	CurrentSwapInterval = SwapSetting;
 #if defined(CURRENT_OS_WINDOWS)
 	Windows_VerticalSync(SwapSetting);
@@ -231,6 +250,11 @@ void FWindow::SetSwapInterval(GLint SwapSetting)
 #if defined(CURRENT_OS_LINUX)
 	Linux_VerticalSync(SwapSetting);
 #endif
+
+	return FOUNDATION_OKAY;
+	}
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
 }
 
 /**********************************************************************************************//**
@@ -260,11 +284,15 @@ GLuint FWindow::GetCurrentState()
  * @param	NewState	new state of the window.
  **************************************************************************************************/
 
-void FWindow::SetCurrentState(GLuint NewState)
+GLboolean FWindow::SetCurrentState(GLuint NewState)
 {
 	/**
 	* first we restore the window to make moving from state to state as easy as possible
 	*/
+
+	if(ContextCreated)
+	{
+
 	Restore();
 
 	switch(NewState)
@@ -292,6 +320,9 @@ void FWindow::SetCurrentState(GLuint NewState)
 				break;
 			}
 	}
+	}
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
 }
 
 /**********************************************************************************************//**
@@ -307,7 +338,12 @@ void FWindow::SetCurrentState(GLuint NewState)
 
 GLboolean FWindow::GetIsFullScreen()
 {
-	return (CurrentState == WINDOWSTATE_FULLSCREEN);
+	if(ContextCreated)
+	{
+		return (CurrentState == WINDOWSTATE_FULLSCREEN);
+	}
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
 }
 
 /**********************************************************************************************//**
@@ -321,8 +357,10 @@ GLboolean FWindow::GetIsFullScreen()
  * @param	NewState	whether the window should be in fullscreen mode.
  **************************************************************************************************/
 
-void FWindow::FullScreen(GLboolean ShouldBeFullscreen)
+GLboolean FWindow::FullScreen(GLboolean ShouldBeFullscreen)
 {
+	if(ContextCreated)
+	{
 	if(ShouldBeFullscreen)
 	{
 		CurrentState = WINDOWSTATE_FULLSCREEN;
@@ -340,6 +378,11 @@ void FWindow::FullScreen(GLboolean ShouldBeFullscreen)
 #if defined(CURRENT_OS_WINDOWS)
 	Windows_Fullscreen();
 #endif
+
+	return FOUNDATION_OKAY;
+	}
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
 }
 
 /**********************************************************************************************//**
@@ -369,25 +412,32 @@ GLboolean FWindow::GetIsMinimized()
  * @param	NewState	whether the window should be minimized.
  **************************************************************************************************/
 
-void FWindow::Minimize(GLboolean NewState)
+GLboolean FWindow::Minimize(GLboolean NewState)
 {
-	if(NewState)
+	if(ContextCreated)
 	{
-		CurrentState = WINDOWSTATE_MINIMIZED;
-	}
+		if(NewState)
+		{
+			CurrentState = WINDOWSTATE_MINIMIZED;
+		}
 
-	else
-	{
-		CurrentState = WINDOWSTATE_NORMAL;
-	}
+		else
+		{
+			CurrentState = WINDOWSTATE_NORMAL;
+		}
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_Minimize();
+	 	Windows_Minimize();
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Minimize(NewState);
-#endif	
+	 	Linux_Minimize(NewState);
+#endif
+
+	 	return FOUNDATION_OKAY;
+	}	
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -417,25 +467,30 @@ GLboolean FWindow::GetIsMaximized()
  * @param	NewState	Whether to minimize the window.
  **************************************************************************************************/
 
-void FWindow::Maximize(GLboolean NewState)
+GLboolean FWindow::Maximize(GLboolean NewState)
 {
-	if(NewState)
+	if(Context)
 	{
-		CurrentState = WINDOWSTATE_MAXIMIZED;
-	}
+		if(NewState)
+		{
+			CurrentState = WINDOWSTATE_MAXIMIZED;
+		}
 
-	else
-	{
-		CurrentState = WINDOWSTATE_NORMAL;
-	}
+		else
+		{
+			CurrentState = WINDOWSTATE_NORMAL;
+		}
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_Maximize();
+		 Windows_Maximize();
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Maximize(NewState);
+	 	Linux_Maximize(NewState);
 #endif
+		 return FOUNDATION_OKAY;
+	}
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);	
 }
 
 /**********************************************************************************************//**
@@ -447,7 +502,7 @@ void FWindow::Maximize(GLboolean NewState)
  * @date	29/11/2014
  **************************************************************************************************/
 
-void FWindow::Restore()
+GLboolean FWindow::Restore()
 {
 	switch(CurrentState)
 	{
@@ -486,10 +541,16 @@ void FWindow::Restore()
  * @param [in,out]	Height	The height.
  **************************************************************************************************/
 
-void FWindow::GetResolution(GLuint& Width, GLuint& Height)
+GLboolean FWindow::GetResolution(GLuint& Width, GLuint& Height)
 {
-	Width = Resolution[0];
-	Height = Resolution[1];
+	if(Context)
+	{
+		Width = Resolution[0];
+		Height = Resolution[1];
+		return FOUNDATION_OKAY;
+	}
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
 }
 
 /**********************************************************************************************//**
@@ -521,20 +582,33 @@ GLuint* FWindow::GetResolution()
  * @param	Height	The new height of the window.
  **************************************************************************************************/
 
-void FWindow::SetResolution(GLuint Width, GLuint Height)
+GLboolean FWindow::SetResolution(GLuint Width, GLuint Height)
 {
-	Resolution[0] = Width;
-	Resolution[1] = Height;
+	if(Context)
+	{
+		if(Width > 0 && Height > 0)
+		{
+			Resolution[0] = Width;
+			Resolution[1] = Height;
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_SetResolution(Resolution[0], Resolution[1]);
+			Windows_SetResolution(Resolution[0], Resolution[1]);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_SetResolution(Width, Height);	
+			Linux_SetResolution(Width, Height);	
 #endif
 
-	glViewport(0, 0, Resolution[0], Resolution[1]);
+			glViewport(0, 0, Resolution[0], Resolution[1]);
+		}
+
+		else
+		{
+			return Foundation_Tools::PrintErrorMessage(ERROR_INVALIDRESOLUTION);
+		}
+	}
+
+		return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
 }
 
 /**********************************************************************************************//**
@@ -549,10 +623,16 @@ void FWindow::SetResolution(GLuint Width, GLuint Height)
  * @param [in,out]	Y	The Y position of the mouse.
  **************************************************************************************************/
 
-void FWindow::GetMousePosition(GLuint& X, GLuint& Y)
+GLboolean FWindow::GetMousePosition(GLuint& X, GLuint& Y)
 {
-	X = MousePosition[0];
-	Y = MousePosition[1];
+	if(Context)
+	{
+		X = MousePosition[0];
+		Y = MousePosition[1];
+		return FOUNDATION_OKAY;
+	}
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
 }
 
 /**********************************************************************************************//**
@@ -569,7 +649,13 @@ void FWindow::GetMousePosition(GLuint& X, GLuint& Y)
 
 GLuint* FWindow::GetMousePosition()
 {
-	return MousePosition;
+	if(Context)
+	{
+		return MousePosition;
+	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	return nullptr;
 }
 
 /**********************************************************************************************//**
@@ -584,17 +670,26 @@ GLuint* FWindow::GetMousePosition()
  * @param	Y	The new Y position of the mouse relative to the window coordinates.
  **************************************************************************************************/
 
-void FWindow::SetMousePosition(GLuint X, GLuint Y)
+GLboolean FWindow::SetMousePosition(GLuint X, GLuint Y)
 {
-	MousePosition[0] = X;
-	MousePosition[1] = Y;
+	if(Context)
+	{ 
+		MousePosition[0] = X;
+		MousePosition[1] = Y;
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_SetMousePosition(X, Y);
+		Windows_SetMousePosition(X, Y);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_SetMousePosition(X, Y);
+		Linux_SetMousePosition(X, Y);
 #endif
+
+		return FOUNDATION_OKAY;
+	}
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+
+
 }
 
 /**********************************************************************************************//**
@@ -609,10 +704,17 @@ void FWindow::SetMousePosition(GLuint X, GLuint Y)
  * @param [in,out]	Y	The Y coordinates of the window position relative to screen coordinates.
  **************************************************************************************************/
 
-void FWindow::GetPosition(GLuint& X, GLuint& Y)
+GLboolean FWindow::GetPosition(GLuint& X, GLuint& Y)
 {
-	X = Position[0];
-	Y = Position[1];
+	if(Context)
+	{
+		X = Position[0];
+		Y = Position[1];
+
+		return FOUNDATION_OKAY;
+	}
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
 }
 
 /**********************************************************************************************//**
@@ -645,17 +747,22 @@ GLuint* FWindow::GetPosition()
  * @param	Y	The new Y coordinate of the window position relative to screen coordinates.
  **************************************************************************************************/
 
-void FWindow::SetPosition(GLuint X, GLuint Y)
+GLboolean FWindow::SetPosition(GLuint X, GLuint Y)
 {
-	Position[0] = X;
-	Position[1] = Y;
+	if(Context)
+	{
+		Position[0] = X;
+		Position[1] = Y;
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_SetPosition(Position[0], Position[1]);
+		Windows_SetPosition(Position[0], Position[1]);
 #endif
 	
 #if defined(CURRENT_OS_LINUX)
-	Linux_SetPosition(X, Y);
+		Linux_SetPosition(X, Y);
 #endif
+	}
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
 }
 
 /**********************************************************************************************//**
@@ -671,7 +778,13 @@ void FWindow::SetPosition(GLuint X, GLuint Y)
 
 const char* FWindow::GetWindowName()
 {
-	return Name;
+	if(Context)
+	{
+		return Name;
+	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	return nullptr;
 }
 
 /**********************************************************************************************//**
@@ -685,38 +798,72 @@ const char* FWindow::GetWindowName()
  * @param	NewTitle	The new title bar of the window.
  **************************************************************************************************/
 
-void FWindow::SetTitleBar(const char* NewTitle)
+GLboolean FWindow::SetTitleBar(const char* NewTitle)
 {
-	if(NewTitle != nullptr)
+	if(Context)
 	{
+		if(NewTitle != nullptr)
+		{
 #if defined(CURRENT_OS_LINUX)
-		Linux_SetTitleBar(NewTitle);
+			Linux_SetTitleBar(NewTitle);
 #endif
 
 #if defined(CURRENT_OS_WINDOWS)
-		Windows_SetTitleBar(NewTitle);
+			Windows_SetTitleBar(NewTitle);
 #endif
+			return FOUNDATION_OKAY;
+		}
+
+		else
+		{
+			Foundation_Tools::PrintErrorMessage(ERROR_INVALIDTITLEBAR);
+		}
 	}
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
 }
 
 /**********************************************************************************************//**
  * @fn	void FWindow::MakeCurrentContext()
  *
- * @brief	Makes the window be the current OpenGL context to be drawn to.
+ * @brief	Makes the window be the current OpenGL context to be drawn to. NOTE: Does not change the 
+ * IsCurrentContext variable foe other windows.
  *
  * @author	Ziyad
  * @date	29/11/2014
  **************************************************************************************************/
 
-void FWindow::MakeCurrentContext()
+GLboolean FWindow::MakeCurrentContext()
 {
+	if(ContextCreated)
+	{
+		IsCurrentContext = true;
 #if defined(CURRENT_OS_WINDOWS)
-	wglMakeCurrent(DeviceContextHandle, GLRenderingContextHandle);
+		wglMakeCurrent(DeviceContextHandle, GLRenderingContextHandle);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	glXMakeCurrent(WindowManager::GetDisplay(), WindowHandle, Context);
+		glXMakeCurrent(WindowManager::GetDisplay(), WindowHandle, Context);
 #endif
+		return FOUNDATION_OKAY;
+	}
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+}
+
+GLboolean FWindow::GetIsCurrentContext()
+{
+	if(ContextCreated)
+	{
+		return IsCurrentContext;
+	}
+	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	return GL_FALSE;
+}
+
+GLboolean FWindow::GetContextHasBeenCreated()
+{
+	return (Context != GL_FALSE);
 }
 
 /**********************************************************************************************//**
@@ -737,9 +884,54 @@ void FWindow::InitGLExtensions()
 #if defined(CURRENT_OS_LINUX)
 	Linux_InitGLExtensions();
 #endif
-
 }
 
+GLboolean FWindow::PrintOpenGLVersion()
+{
+	if(ContextCreated)
+	{
+		printf("%s\n", glGetString(GL_VERSION));
+		return FOUNDATION_OKAY;
+	}
+
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+}
+
+const char* FWindow::GetOpenGLVersion()
+{
+	if(ContextCreated)
+	{
+		return (const char*)glGetString(GL_VERSION);
+	}
+	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	return nullptr;
+}
+
+GLboolean FWindow::PrintOpenGLExtensions()
+{
+	if(ContextCreated)
+	{
+		printf("%s \n", (const char*)glGetString(GL_EXTENSIONS));
+		return FOUNDATION_OKAY;
+	}
+
+		return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+}
+
+const char* FWindow::GetOpenGLExtensions()
+{
+	if(ContextCreated)
+	{
+		return (const char*)glGetString(GL_EXTENSIONS);
+	}
+
+	else
+	{
+		Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+		return nullptr;
+	}
+}
 /**********************************************************************************************//**
  * @fn	GLboolean FWindow::GetInFocus()
  *
@@ -767,17 +959,24 @@ GLboolean FWindow::GetInFocus()
  * @param	NewState	whether to put the window into event focus.
  **************************************************************************************************/
 
-void FWindow::Focus(GLboolean ShouldBeInFocus)
+GLboolean FWindow::Focus(GLboolean ShouldBeInFocus)
 {
-	InFocus = ShouldBeInFocus;
+	if(Context)
+	{
+		InFocus = ShouldBeInFocus;
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_Focus(ShouldBeInFocus);	
+		Linux_Focus(ShouldBeInFocus);	
 #endif
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_Focus();
+		Windows_Focus();
 #endif
+
+		return FOUNDATION_OKAY;
+	}
+
+	return Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
 }
 
 /**********************************************************************************************//**

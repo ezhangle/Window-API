@@ -402,7 +402,6 @@ GLuint* WindowManager::GetScreenResolution()
 #if defined(CURRENT_OS_LINUX)
 	GetInstance()->ScreenResolution[0] = WidthOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
 	GetInstance()->ScreenResolution[1] = HeightOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
-	//
 
 	return GetInstance()->ScreenResolution;
 #endif

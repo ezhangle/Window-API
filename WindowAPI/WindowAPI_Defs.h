@@ -111,6 +111,23 @@
 #define WINDOWSTATE_MINIMIZED 2 /**< the window is currently minimized */
 #define WINDOWSTATE_FULLSCREEN 3	/**< the window is currently fullscreen */
 
+#define FOUNDATION_ERROR 0
+#define FOUNDATION_OKAY 1
+
+#define ERROR_NOCONTEXT 0
+#define ERROR_INVALIDWINDOWNAME 1
+#define ERROR_INVALIDWINDOWSTATE 2
+#define ERROR_INVALIDRESOLUTION 3
+#define ERROR_INVALIDCONTEXT 4
+#define ERROR_EXISTINGCONTEXT 5
+#define ERROR_ALREADYINITIALIZED 6
+#define ERROR_INVALIDTITLEBAR 7
+#define ERROR_LINUX_CANNOTCONNECTXSERVER 8
+#define ERROR_LINUX_INVALIDVISUALINFO 9
+#define ERROR_LINUX_CANNOTCREATEWINDOW 10
+
+#define WARNING_NOTCURRENTCONTEXT 0
+#define WARNING_NOGLEXTENSIONS 1
 typedef void (*OnKeyEvent)(GLuint Key, GLboolean KeyState);	/**<To be called when a key event has occurred*/
 typedef void (*OnMouseButtonEvent)(GLuint Button, GLboolean ButtonState);	/**<To be called when a Mouse button event has occurred*/
 typedef void (*OnMouseWheelEvent)(GLuint WheelDirection);  /**<To be called when a mouse wheel event has occurred.*/

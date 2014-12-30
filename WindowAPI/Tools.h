@@ -83,12 +83,98 @@ public:
 #endif
 	}
 
-	friend WindowManager;
+	static void PrintWarningMessage(GLuint WarningNumber)
+	{
+		switch(WarningNumber)
+		{
+			case WARNING_NOGLEXTENSIONS:
+				{
+					printf("Warning: no OpenGL extensions available \n");
+					break;
+				}
+
+			case WARNING_NOTCURRENTCONTEXT:
+				{
+					printf("Warning: window not the current OpenGL context being rendered to \n");
+					break;
+				}
+
+			default:
+				{
+					printf("Warning: unsecified warning \n");
+					break;
+				}
+		}
+	}
+
+
+	static GLboolean PrintErrorMessage(GLuint ErrorNumber)
+	{
+		switch(ErrorNumber)
+		{
+			case ERROR_NOCONTEXT:
+				{
+					printf("Error: An OpenGL context must first be created(initialize the window) \n");
+					return GL_FALSE;
+				}
+
+			case ERROR_INVALIDWINDOWNAME:
+				{
+					printf("Error: invalid window anme \n");
+					return GL_FALSE;
+				}
+
+			case ERROR_INVALIDWINDOWSTATE:
+				{
+					printf("Error: invalid window state \n");
+					return GL_FALSE;
+				}
+
+			case ERROR_INVALIDRESOLUTION:
+				{
+					printf("Error: invalid resolution \n");
+					return GL_FALSE;
+				}
+
+			case ERROR_INVALIDCONTEXT:
+				{
+					printf("Error: Failed to create OpenGL context \n");
+					return GL_FALSE;
+				}
+
+			case ERROR_LINUX_CANNOTCONNECTXSERVER:
+				{
+					printf("Error: cannot connect to X server \n");
+					return GL_FALSE;
+				}
+
+			case ERROR_LINUX_INVALIDVISUALINFO:
+				{
+					printf("Error: Invalid visual information given \n");
+					return GL_FALSE;
+				}
+
+			case ERROR_LINUX_CANNOTCREATEWINDOW:
+				{
+					printf("Error: failed to create window \n");
+					return GL_FALSE;
+
+			default:
+				{
+					printf("Error: unspecified Error \n");
+					return GL_FALSE;
+				}	
+		}
+	}
+	}
+
+	friend class WindowManager;
 
 private:
 	//these are internal. do not mess with these
 #if defined(CURRENT_OS_WINDOWS)
 	static GLuint Windows_TranslateKey(WPARAM WordParam, LPARAM LongParam);
+
 #endif
 
 #if defined(CURRENT_OS_LINUX)

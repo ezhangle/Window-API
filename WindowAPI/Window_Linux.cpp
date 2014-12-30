@@ -18,15 +18,14 @@
  * @date	29/11/2014
  **************************************************************************************************/
 
-void FWindow::Linux_Initialize()
+GLboolean FWindow::Linux_Initialize()
 {
-	Attributes = new GLuint[5]{GLX_RGBA, GLX_DEPTH_SIZE, DepthBits, GLX_DOUBLEBUFFER/*, GLX_STENCIL_SIZE, StencilBits, 
-		GLX_RED_SIZE, ColourBits, GLX_GREEN_SIZE, ColourBits, GLX_RED_SIZE, ColourBits, GLX_ALPHA_SIZE, ColourBits/ 4*/, None};
+	Attributes = new GLuint[15]{GLX_RGBA, GLX_DEPTH_SIZE, DepthBits, GLX_DOUBLEBUFFER, GLX_STENCIL_SIZE, StencilBits, 
+		GLX_RED_SIZE, ColourBits, GLX_GREEN_SIZE, ColourBits, GLX_RED_SIZE, ColourBits, GLX_ALPHA_SIZE, ColourBits, None};
 
 	if (!WindowManager::GetDisplay())
 	{
-		printf("Cannot Connect to X Server \n");
-		exit(0);
+		return Foundation_Tools::PrintErrorMessage(ERROR_LINUX_CANNOTCONNECTXSERVER);
 	}
 
 	VisualInfo = glXChooseVisual(WindowManager::GetDisplay(), 0,
@@ -34,8 +33,7 @@ void FWindow::Linux_Initialize()
 
 	if (!VisualInfo)
 	{
-		printf("No appropriate visual found\n");
-		exit(0);
+		return Foundation_Tools::PrintErrorMessage(ERROR_LINUX_INVALIDVISUALINFO);
 	}
 
 	SetAttributes.colormap = XCreateColormap(WindowManager::GetDisplay(),
@@ -55,15 +53,20 @@ void FWindow::Linux_Initialize()
 		VisualInfo->visual, CWColormap | CWEventMask,
 		&SetAttributes);
 
+	if(!WindowHandle)
+	{
+		return Foundation_Tools::PrintErrorMessage(ERROR_LINUX_CANNOTCREATEWINDOW);
+	}
+
 	XMapWindow(WindowManager::GetDisplay(), WindowHandle);
 	XStoreName(WindowManager::GetDisplay(), WindowHandle,
 		Name);
 
 	InitializeAtomics();
 
-	XSetWMProtocols(WindowManager::GetDisplay(),	WindowHandle, &AtomClose, GL_TRUE);	
+	XSetWMProtocols(WindowManager::GetDisplay(), WindowHandle, &AtomClose, GL_TRUE);	
 
-	Linux_InitializeGL();
+	return Linux_InitializeGL();
 }
 
 /**********************************************************************************************//**
@@ -334,34 +337,48 @@ void FWindow::Linux_VerticalSync(GLint EnableSync)
  * @date	29/11/2014
  **************************************************************************************************/
 
-void FWindow::Linux_InitializeGL()
+GLboolean FWindow::Linux_InitializeGL()
 {
-	Context = glXCreateContext(
+	if(!Context)
+	{
+
+		Context = glXCreateContext(
 			WindowManager::GetDisplay(),
 			VisualInfo, 0, GL_TRUE);
 
-	glXMakeCurrent(WindowManager::GetDisplay(),
+		if(Context)
+		{
+			
+			glXMakeCurrent(WindowManager::GetDisplay(),
 			WindowHandle, Context);
 
-	XWindowAttributes l_Attributes;
+			XWindowAttributes l_Attributes;
 
-	XGetWindowAttributes(WindowManager::GetDisplay(),
+			XGetWindowAttributes(WindowManager::GetDisplay(),
 			WindowHandle, &l_Attributes);
-	Position[0] = l_Attributes.x;
-	Position[1] = l_Attributes.y;
+			Position[0] = l_Attributes.x;
+			Position[1] = l_Attributes.y;
 
-	const char* l_ExtensionsAvailable = 0;
+			const char* ExtensionsAvailable = 0;
 
-	l_ExtensionsAvailable = glXQueryExtensionsString(WindowManager::GetDisplay(), 0);
+			ExtensionsAvailable = glXQueryExtensionsString(WindowManager::GetDisplay(), 0);
 
-	if(!l_ExtensionsAvailable)
-	{
-		printf("no extensions available \n");
+			if(!ExtensionsAvailable)
+			{
+				Foundation_Tools::PrintWarningMessage(WARNING_NOGLEXTENSIONS);
+			}
+
+			else
+			{
+				InitGLExtensions();
+			}
+			return FOUNDATION_OKAY;
+		}
 	}
 
 	else
 	{
-		InitGLExtensions();
+		return Foundation_Tools::PrintErrorMessage(ERROR_EXISTINGCONTEXT);	
 	}
 }
 

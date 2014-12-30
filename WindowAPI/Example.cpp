@@ -42,7 +42,7 @@ int main()
 	WindowManager::Initialize();
 	
 	WindowManager::AddWindow(new FWindow("Example"));
-	Foundation_Tools::GetSupportedExtensions();
+	//Foundation_Tools::PrintSupportedExtensions();
 	WindowManager::SetWindowOnKeyEvent("Example", &OnWindowKeyPressed);
 	while (!WindowManager::GetWindowShouldClose("Example"))
 	{
