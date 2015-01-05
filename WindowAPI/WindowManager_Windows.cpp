@@ -18,17 +18,25 @@
  * @date	29/11/2014
  **************************************************************************************************/
 
-void WindowManager::Windows_Initialize()
+GLboolean WindowManager::Windows_Initialize()
 {
 	CreateTerminal();
 	RECT l_Desktop;
 
 	HWND l_DesktopHandle = GetDesktopWindow();
 
-	GetWindowRect(l_DesktopHandle, &l_Desktop);
 
-	GetInstance()->ScreenResolution[0] = l_Desktop.right;
-	GetInstance()->ScreenResolution[1] = l_Desktop.bottom;
+	if (l_DesktopHandle)
+	{
+		GetWindowRect(l_DesktopHandle, &l_Desktop);
+
+		GetInstance()->ScreenResolution[0] = l_Desktop.right;
+		GetInstance()->ScreenResolution[1] = l_Desktop.bottom;
+		return FOUNDATION_OKAY;
+	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_WINDOWS_CANNOTINITIALIZE);
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -96,7 +104,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 		}
 
 		l_Window->Shutdown();
-		break;
+		return 0;
 	}
 	case WM_MOVE:
 	{
@@ -473,11 +481,17 @@ LRESULT CALLBACK WindowManager::StaticWindowProcedure(HWND WindowHandle, UINT Me
 	return WindowManager::GetInstance()->WindowProcedure(WindowHandle, Message, WordParam, LongParam);
 }
 
-void WindowManager::Windows_PollForEvents()
+GLboolean WindowManager::Windows_PollForEvents()
 {
-	GetMessage(&GetInstance()->Message, 0, 0, 0);
-	TranslateMessage(&GetInstance()->Message);
-	DispatchMessage(&GetInstance()->Message);
+	if (GetInstance()->Initialized)
+	{
+		GetMessage(&GetInstance()->Message, 0, 0, 0);
+		TranslateMessage(&GetInstance()->Message);
+		DispatchMessage(&GetInstance()->Message);
+	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return FOUNDATION_ERROR;
 }
 
 void WindowManager::CreateTerminal()
@@ -498,12 +512,18 @@ void WindowManager::CreateTerminal()
 	setvbuf(stdout, nullptr, _IONBF, 0);
 }
 
-void WindowManager::Windows_SetMousePositionInScreen(GLuint X, GLuint Y)
+GLboolean WindowManager::Windows_SetMousePositionInScreen(GLuint X, GLuint Y)
 {
-	POINT l_MousePoint;
-	l_MousePoint.x = X;
-	l_MousePoint.y = Y;
-	SetCursorPos(l_MousePoint.x, l_MousePoint.y);
+	if (GetInstance()->Initialized)
+	{
+		POINT l_MousePoint;
+		l_MousePoint.x = X;
+		l_MousePoint.y = Y;
+		SetCursorPos(l_MousePoint.x, l_MousePoint.y);
+	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return FOUNDATION_ERROR;
 }
 
 #endif

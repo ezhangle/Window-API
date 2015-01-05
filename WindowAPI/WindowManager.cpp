@@ -30,15 +30,25 @@ WindowManager::WindowManager()
  * @date	29/11/2014
  **************************************************************************************************/
 
-void WindowManager::Initialize()
+GLboolean WindowManager::Initialize()
 {
 #if defined(CURRENT_OS_LINUX)
-	Linux_Initialize();
+	return Linux_Initialize();
 #endif	
 
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_Initialize();
+	return Windows_Initialize();
 #endif
+}
+
+GLboolean WindowManager::IsInitialized()
+{
+	if (Initialized)
+	{
+		return FOUNDATION_OKAY;
+	}
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -62,14 +72,11 @@ WindowManager::~WindowManager()
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-
 		for (auto CurrentWindow : GetInstance()->Windows)
 		{
 			delete CurrentWindow;
 		}
-
 #endif
-
 		GetInstance()->Windows.clear();
 	}
 }
@@ -98,7 +105,7 @@ FWindow* WindowManager::GetWindowByName(const char* WindowName)
 			{
 				return CurrentWindow;
 			}
-			}
+		}
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -110,9 +117,9 @@ FWindow* WindowManager::GetWindowByName(const char* WindowName)
 			}
 		}
 #endif
+		Foundation_Tools::PrintErrorMessage(ERROR_WINDOWNOTFOUND);
 		return nullptr;
-		}
-
+	}
 	return nullptr;
 }
 
@@ -146,13 +153,15 @@ FWindow* WindowManager::GetWindowByIndex(GLuint WindowIndex)
 #if defined(CURRENT_OS_LINUX)
 		for (auto CurrentWindow : GetInstance()->Windows)
 		{
-			return CurrentWindow;
+			if(CurrentWindow->ID == WindowIndex)
+			{
+				return CurrentWindow;
+			}
 		}
 #endif
+		Foundation_Tools::PrintErrorMessage(ERROR_WINDOWNOTFOUND);
 		return nullptr;
 	}
-
-	return nullptr;
 }
 
 /**********************************************************************************************//**
@@ -170,13 +179,19 @@ FWindow* WindowManager::GetWindowByIndex(GLuint WindowIndex)
 
 WindowManager* WindowManager::AddWindow(FWindow* NewWindow)
 {
-	if(NewWindow != nullptr)
+	if (GetInstance()->IsInitialized())
 	{
-		GetInstance()->Windows.push_back(NewWindow);
-		NewWindow->ID = GetInstance()->Windows.size() - 1;
-		NewWindow->Initialize();
-		return GetInstance();
+		if (NewWindow != nullptr)
+		{
+			GetInstance()->Windows.push_back(NewWindow);
+			NewWindow->ID = GetInstance()->Windows.size() - 1;
+			NewWindow->Initialize();
+			return GetInstance();
+		}
+		Foundation_Tools::PrintErrorMessage(ERROR_INVALIDWINDOW);
+		return nullptr;
 	}
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
 	return nullptr;
 }
 
@@ -220,28 +235,32 @@ WindowManager* WindowManager::GetInstance()
 
 GLboolean WindowManager::DoesExist(const char* WindowName)
 {
-	if (Foundation_Tools::IsValid(WindowName))
+	if (GetInstance()->IsInitialized())
 	{
-#if defined(CURRENT_OS_WINDOWS)
-		for each(auto iter in GetInstance()->Windows)
+		if (Foundation_Tools::IsValid(WindowName))
 		{
-			if (iter->Name == WindowName)
+#if defined(CURRENT_OS_WINDOWS)
+			for each(auto iter in GetInstance()->Windows)
 			{
-				return GL_TRUE;
+				if (iter->Name == WindowName)
+				{
+					return GL_TRUE;
+				}
 			}
-		}
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-		for (auto iter : GetInstance()->Windows)
-		{
-			if (iter->Name == WindowName)
+			for (auto iter : GetInstance()->Windows)
 			{
-				return GL_TRUE;
+				if (iter->Name == WindowName)
+				{
+					return GL_TRUE;
+				}
 			}
-		}
-
 #endif
+		}
+		Foundation_Tools::PrintErrorMessage(ERROR_INVALIDWINDOWNAME);
+		return GL_FALSE;
 	}
 	return GL_FALSE;
 }
@@ -256,12 +275,22 @@ GLboolean WindowManager::DoesExist(const char* WindowName)
  *
  * @param	WindowIndex	Zero-based index of the window.
  *
- * @return	whether the window id in the window manager.
+ * @return	whether the window index given is lower then the current size of the windows container.
  **************************************************************************************************/
 
 GLboolean WindowManager::DoesExist(GLuint WindowIndex)
 {
-	return (WindowIndex <= (GetInstance()->Windows.size() - 1));
+	if (GetInstance()->IsInitialized())
+	{
+		if (WindowIndex <= (GetInstance()->Windows.size() - 1))
+		{
+			return FOUNDATION_OKAY;
+		}
+
+		Foundation_Tools::PrintErrorMessage(ERROR_INVALIDWINDOWINDEX);
+		return FOUNDATION_ERROR;
+	}
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -327,10 +356,18 @@ void WindowManager::ShutDown()
  * @param [in,out]	Y	The Y coordinate of the mouse relative to screen position.
  **************************************************************************************************/
 
-void WindowManager::GetMousePositionInScreen(GLuint& X, GLuint& Y)
+GLboolean WindowManager::GetMousePositionInScreen(GLuint& X, GLuint& Y)
 {
-	X = GetInstance()->ScreenMousePosition[0];
-	Y = GetInstance()->ScreenMousePosition[1];
+	if (GetInstance()->Initialized)
+	{
+		X = GetInstance()->ScreenMousePosition[0];
+		Y = GetInstance()->ScreenMousePosition[1];
+		return FOUNDATION_OKAY;
+	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return FOUNDATION_ERROR;
+
 }
 
 /**********************************************************************************************//**
@@ -346,7 +383,13 @@ void WindowManager::GetMousePositionInScreen(GLuint& X, GLuint& Y)
 
 GLuint* WindowManager::GetMousePositionInScreen()
 {
-	return GetInstance()->ScreenMousePosition;
+	if (GetInstance()->Initialized)
+	{
+		return GetInstance()->ScreenMousePosition;
+	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return nullptr;
 }
 
 /**********************************************************************************************//**
@@ -361,17 +404,22 @@ GLuint* WindowManager::GetMousePositionInScreen()
  * @param	Y	The new Y position of the mouse cursor relative to screen coordinates.
  **************************************************************************************************/
 
-void WindowManager::SetMousePositionInScreen(GLuint X, GLuint Y)
+GLboolean WindowManager::SetMousePositionInScreen(GLuint X, GLuint Y)
 {
-	GetInstance()->ScreenMousePosition[0] = X;
-	GetInstance()->ScreenMousePosition[1] = Y;
+	if (GetInstance()->Initialized)
+	{
+		GetInstance()->ScreenMousePosition[0] = X;
+		GetInstance()->ScreenMousePosition[1] = Y;
 #if defined(CURRENT_OS_WINDOWS)
-	Windows_SetMousePositionInScreen(X, Y);
+		return Windows_SetMousePositionInScreen(X, Y);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	Linux_SetMousePositionInScreen(X, Y);
+		return Linux_SetMousePositionInScreen(X, Y);
 #endif
+	}
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -388,23 +436,29 @@ void WindowManager::SetMousePositionInScreen(GLuint X, GLuint Y)
 
 GLuint* WindowManager::GetScreenResolution()
 {
+	if (GetInstance()->Initialized)
+	{
 #if defined(CURRENT_OS_WINDOWS)
-	RECT l_Screen;
-	HWND m_Desktop = GetDesktopWindow();
-	GetWindowRect(m_Desktop, &l_Screen);
+		RECT l_Screen;
+		HWND m_Desktop = GetDesktopWindow();
+		GetWindowRect(m_Desktop, &l_Screen);
 
-	GetInstance()->ScreenResolution[0] = l_Screen.right;
-	GetInstance()->ScreenResolution[1] = l_Screen.bottom;
-	return GetInstance()->ScreenResolution;
+		GetInstance()->ScreenResolution[0] = l_Screen.right;
+		GetInstance()->ScreenResolution[1] = l_Screen.bottom;
+		return GetInstance()->ScreenResolution;
 
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-	GetInstance()->ScreenResolution[0] = WidthOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
-	GetInstance()->ScreenResolution[1] = HeightOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
+		GetInstance()->ScreenResolution[0] = WidthOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
+		GetInstance()->ScreenResolution[1] = HeightOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
 
-	return GetInstance()->ScreenResolution;
+		return GetInstance()->ScreenResolution;
 #endif
+	}
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return nullptr;
+
 }
 
 /**********************************************************************************************//**
@@ -416,15 +470,21 @@ GLuint* WindowManager::GetScreenResolution()
  * @date	29/11/2014
  **************************************************************************************************/
 
-void WindowManager::PollForEvents()
+GLboolean WindowManager::PollForEvents()
 {
+	if (GetInstance()->Initialized)
+	{
 #if defined(CURRENT_OS_WINDOWS)
-	GetInstance()->Windows_PollForEvents();
+		return GetInstance()->Windows_PollForEvents();
 #endif
 
 #if defined (CURRENT_OS_LINUX)
-	GetInstance()->Linux_PollForEvents();
+		return GetInstance()->Linux_PollForEvents();
 #endif
+	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -439,26 +499,33 @@ void WindowManager::PollForEvents()
  * @param [in,out]	Height	The height.
  **************************************************************************************************/
 
-void WindowManager::GetScreenResolution(GLuint& Width, GLuint& Height)
+GLboolean WindowManager::GetScreenResolution(GLuint& Width, GLuint& Height)
 {
+	if (GetInstance()->Initialized)
+	{
 #if defined(CURRENT_OS_WINDOWS)
 
-	RECT l_Screen;
-	HWND m_Desktop = GetDesktopWindow();
-	GetWindowRect(m_Desktop, &l_Screen);
-	Width = l_Screen.right;
-	Height = l_Screen.bottom;
+		RECT l_Screen;
+		HWND m_Desktop = GetDesktopWindow();
+		GetWindowRect(m_Desktop, &l_Screen);
+		Width = l_Screen.right;
+		Height = l_Screen.bottom;
 #endif
 
 #if defined(CURRENT_OS_LINUX)
 
-	Width = WidthOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
-	Height = HeightOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
+		Width = WidthOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
+		Height = HeightOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
 
 
-	GetInstance()->ScreenResolution[0] = Width;
-	GetInstance()->ScreenResolution[1] = Height;
+		GetInstance()->ScreenResolution[0] = Width;
+		GetInstance()->ScreenResolution[1] = Height;
 #endif
+
+		return FOUNDATION_OKAY;
+	}
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -474,12 +541,23 @@ void WindowManager::GetScreenResolution(GLuint& Width, GLuint& Height)
  * @param [in,out]	Height	The height.
  **************************************************************************************************/
 
-void WindowManager::GetWindowResolution(const char* WindowName, GLuint& Width, GLuint& Height)
+GLboolean WindowManager::GetWindowResolution(const char* WindowName, GLuint& Width, GLuint& Height)
 {
-	if(DoesExist(WindowName))
+	if (GetInstance()->Initialized)
 	{
-		GetWindowByName(WindowName)->GetResolution(Width, Height);
+		if (DoesExist(WindowName))
+		{
+			if (GetWindowByName(WindowName)->GetResolution(Width, Height))
+			{
+				return FOUNDATION_OKAY;
+			}
+			return FOUNDATION_ERROR;
+		}
+		return FOUNDATION_ERROR;
 	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -497,10 +575,15 @@ void WindowManager::GetWindowResolution(const char* WindowName, GLuint& Width, G
 
 void WindowManager::GetWindowResolution(GLuint WindowIndex, GLuint& Width, GLuint& Height)
 {
-	if(DoesExist(WindowIndex))
+	if (GetInstance()->Initialized)
 	{
-		GetWindowByIndex(WindowIndex)->GetResolution(Width, Height);
+		if (DoesExist(WindowIndex))
+		{
+			GetWindowByIndex(WindowIndex)->GetResolution(Width, Height);
+		}
 	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
 }
 
 /**********************************************************************************************//**
@@ -815,7 +898,10 @@ GLuint* WindowManager::GetMousePositionInWindow(GLuint WindowIndex)
 	{
 		return GetWindowByIndex(WindowIndex)->GetMousePosition();
 	}
+	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDWINDOWINDEX);
+	return nullptr;
 }
+
 /**********************************************************************************************//**
  * @fn	void WindowManager::SetMousePositionInWindow(const char* WindowName, GLuint X, GLuint Y)
  *
@@ -1476,7 +1562,7 @@ void WindowManager::SetWindowSwapInterval(const char* WindowName, GLint a_SyncSe
 {
 	if (DoesExist(WindowName))
 	{
-		return GetWindowByName(WindowName)->SetSwapInterval(a_SyncSetting);
+		 GetWindowByName(WindowName)->SetSwapInterval(a_SyncSetting);
 	}
 }
 
@@ -1496,7 +1582,7 @@ void WindowManager::SetWindowSwapInterval(GLuint WindowIndex, GLint a_SyncSettin
 {
 	if (DoesExist(WindowIndex))
 	{
-		return GetWindowByIndex(WindowIndex)->SetSwapInterval(a_SyncSetting);
+		GetWindowByIndex(WindowIndex)->SetSwapInterval(a_SyncSetting);
 	}
 }
 

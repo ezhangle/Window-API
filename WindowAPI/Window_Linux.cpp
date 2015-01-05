@@ -10,12 +10,14 @@
 #include <cstring>
 
 /**********************************************************************************************//**
- * @fn	void FWindow::Linux_Initialize()
+ * @fn	GLboolean FWindow::Linux_Initialize()
  *
  * @brief	Linux initialize.
  *
  * @author	Ziyad
  * @date	29/11/2014
+ *
+ * @return	A GLboolean.
  **************************************************************************************************/
 
 GLboolean FWindow::Linux_Initialize()
@@ -271,6 +273,19 @@ void FWindow::Linux_SetTitleBar(const char* NewTitle)
 			WindowHandle, NewTitle);
 }
 
+void FWindow::Linux_SetIcon(const char* Icon, GLuint Width, GLuint Height)
+{
+	XEvent Event;
+
+	memset(&Event, 0, sizeof(Event));
+
+	l_Event.xany.type = ClientMessage;
+	l_Event.xclient.message_type = AtomState;
+
+
+
+}
+
 /**********************************************************************************************//**
  * @fn	void FWindow::Linux_Focus(GLboolean ShouldBeInFocus)
  *
@@ -329,19 +344,20 @@ void FWindow::Linux_VerticalSync(GLint EnableSync)
 }
 
 /**********************************************************************************************//**
- * @fn	void FWindow::Linux_InitializeGL()
+ * @fn	GLboolean FWindow::Linux_InitializeGL()
  *
  * @brief	Linux initialize OpenGL.
  *
  * @author	Ziyad
  * @date	29/11/2014
+ *
+ * @return	A GLboolean.
  **************************************************************************************************/
 
 GLboolean FWindow::Linux_InitializeGL()
 {
 	if(!Context)
 	{
-
 		Context = glXCreateContext(
 			WindowManager::GetDisplay(),
 			VisualInfo, 0, GL_TRUE);

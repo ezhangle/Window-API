@@ -18,9 +18,9 @@ public:
 		return (OnKeyPressed != nullptr);
 	}
 
-	static GLboolean IsValid(OnMouseWheelEvent OnMouseWheelEvent)
+	static GLboolean IsValid(OnMouseWheelEvent MouseWheelEvent)
 	{
-		return (OnMouseWheelEvent != nullptr);
+		return (MouseWheelEvent != nullptr);
 	}
 
 	static GLboolean IsValid(OnMaximizedEvent OnMaximized)
@@ -43,46 +43,6 @@ public:
 		return (OnMouseMove != nullptr);
 	}
 
-	static void PrintSupportedExtensions()
-	{
-#if defined(CONTEXT_CREATED)
-		const char* SupportedExtensions = glGetString(GL_EXTENSIONS);
-		printf("%s \n", SupportedExtensions);
-#else
-		printf("error: an OpenGL context must first be created \n");
-#endif
-	}
-
-	static const char* GetSupportedExtensions()
-	{
-#if defined(CONTEXT_CREATED)
-		return glGetString(GL_EXTENSIONS);
-#else
-		printf("error: an OpenGL context must first be created \n");
-		return nullptr;
-#endif
-	}
-
-	static void PrintOpenGLVersion()
-	{
-#if defined(CONTEXT_CREATED)
-		const char* OpenGLVersions = glGetString(GL_VERSION);
-		printf("%s \n", OpenGLVersions);
-#else
-		printf("error: an OpenGL context must first be created \n");
-#endif
-	}
-
-	static const char* GetOpenGLVersion()
-	{
-#if defined(CONTEXT_CREATED)
-		return glGetString(GL_VERSION)
-#else
-		printf("error: an OpenGL context must first be created \n");
-		return nullptr;
-#endif
-	}
-
 	static void PrintWarningMessage(GLuint WarningNumber)
 	{
 		switch(WarningNumber)
@@ -101,71 +61,131 @@ public:
 
 			default:
 				{
-					printf("Warning: unsecified warning \n");
+					printf("Warning: unspecified warning \n");
 					break;
 				}
 		}
 	}
 
 
-	static GLboolean PrintErrorMessage(GLuint ErrorNumber)
+	static void PrintErrorMessage(GLuint ErrorNumber)
 	{
 		switch(ErrorNumber)
 		{
 			case ERROR_NOCONTEXT:
-				{
-					printf("Error: An OpenGL context must first be created(initialize the window) \n");
-					return GL_FALSE;
-				}
+			{
+				printf("Error: An OpenGL context must first be created(initialize the window) \n");
+				break;
+			}
 
 			case ERROR_INVALIDWINDOWNAME:
-				{
-					printf("Error: invalid window anme \n");
-					return GL_FALSE;
-				}
+			{
+				printf("Error: invalid window name \n");
+				break;
+			}
+
+			case ERROR_INVALIDWINDOWINDEX:
+			{
+				printf("Error: invalid window index \n");
+				break;
+			}
 
 			case ERROR_INVALIDWINDOWSTATE:
-				{
-					printf("Error: invalid window state \n");
-					return GL_FALSE;
-				}
+			{
+				printf("Error: invalid window state \n");
+				break;
+			}
 
 			case ERROR_INVALIDRESOLUTION:
-				{
-					printf("Error: invalid resolution \n");
-					return GL_FALSE;
-				}
+			{
+				printf("Error: invalid resolution \n");
+				break;
+			}
 
 			case ERROR_INVALIDCONTEXT:
-				{
-					printf("Error: Failed to create OpenGL context \n");
-					return GL_FALSE;
-				}
+			{
+				printf("Error: Failed to create OpenGL context \n");
+				break;
+			}
+
+			case ERROR_EXISTINGCONTEXT:
+			{
+				printf("Error: context already created \n");
+				break;
+			}
+
+			case ERROR_NOTINITIALIZED:
+			{
+				printf("Error: Window manager not initialized \n");
+				break;
+			}
+
+			case ERROR_ALREADYINITIALIZED:
+			{
+				printf("Error: window has already been initialized \n");
+				break;
+			}
+
+			case ERROR_INVALIDTITLEBAR:
+			{
+				printf("Error: invalid title bar name (cannot be null or nullptr) \n");
+				break;
+			}
+
+			case ERROR_INVALIDEVENT:
+			{
+				printf("Error: invalid event callback given \n");
+				break;
+			}
+
+			case ERROR_WINDOWNOTFOUND:
+			{
+				printf("Error: window was not found \n");
+				break;
+			}
+
+			case ERROR_INVALIDWINDOWSTYLE:
+			{
+				printf("Error: invalid window style given \n");
+				break;
+			}
+
+			case ERROR_INVALIDWINDOW:
+			{
+				printf("Error: invalid window given \n");
+				break;
+			}
 
 			case ERROR_LINUX_CANNOTCONNECTXSERVER:
-				{
-					printf("Error: cannot connect to X server \n");
-					return GL_FALSE;
-				}
+			{
+				printf("Error: cannot connect to X server \n");
+				break;
+			}
 
 			case ERROR_LINUX_INVALIDVISUALINFO:
-				{
-					printf("Error: Invalid visual information given \n");
-					return GL_FALSE;
-				}
+			{
+				printf("Error: Invalid visual information given \n");
+				break;
+			}
 
 			case ERROR_LINUX_CANNOTCREATEWINDOW:
-				{
-					printf("Error: failed to create window \n");
-					return GL_FALSE;
+			{
+				printf("Error: failed to create window \n");
+				break;
+			}
+
+			case ERROR_WINDOWS_CANNOTCREATEWINDOW:
+			{
+				printf("Error: failed to create window \n");
+				break;
+			}
 
 			default:
-				{
-					printf("Error: unspecified Error \n");
-					return GL_FALSE;
-				}	
+			{
+				printf("Error: unspecified Error \n");
+				break;
+			}
 		}
-	}
 	}
 
 	friend class WindowManager;

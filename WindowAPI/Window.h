@@ -94,8 +94,11 @@ public:
 	const char* GetWindowName();
 	GLboolean SetTitleBar(const char* NewText);
 
+	//set the style for the window
+	GLboolean SetStyle(GLuint WindowType);
+
 	//set the window icon
-	GLboolean SetIcon();
+	GLboolean SetIcon(const char* Icon, GLuint Width, GLuint Height);
 
 	//make the window the current OpenGL context to be drawn
 	GLboolean MakeCurrentContext();
@@ -115,39 +118,41 @@ public:
 	GLboolean SetSwapInterval(GLint SwapSetting);
 
 	//set the on key event callback for this window
-	void SetOnKeyEvent(OnKeyEvent OnKey);
+	GLboolean SetOnKeyEvent(OnKeyEvent OnKey);
 	//set the on mouse button event callback for this window
-	void SetOnMouseButtonEvent(OnMouseButtonEvent OnMouseButton);
+	GLboolean SetOnMouseButtonEvent(OnMouseButtonEvent OnMouseButton);
 	//set the on mouse wheel event callback for this window
-	void SetOnMouseWheelEvent(OnMouseWheelEvent OnMouseWheelEvent);
+	GLboolean SetOnMouseWheelEvent(OnMouseWheelEvent OnMouseWheel);
 	//set the window on destroyed event callback for this window
-	void SetOnDestroyed(OnDestroyedEvent OnDestroyed);
+	GLboolean SetOnDestroyed(OnDestroyedEvent OnDestroyed);
 	//set the window on maximizes event callback for this window
-	void SetOnMaximized(OnMaximizedEvent OnMaximized);
+	GLboolean SetOnMaximized(OnMaximizedEvent OnMaximized);
 	//set the window on minimized event callback for this window
-	void SetOnMinimized(OnMinimizedEvent OnMinimized);
+	GLboolean SetOnMinimized(OnMinimizedEvent OnMinimized);
 	//set the window on restored event callback for this window
 	//void SetOnRestored(OnRestoredEvent OnRestored);
 	//set the window on focus event callback for this window
-	void SetOnFocus(OnFocusEvent OnFocus);
+	GLboolean SetOnFocus(OnFocusEvent OnFocus);
 	//set the window on moved event callback for this window
-	void SetOnMoved(OnMovedEvent OnMoved);
+	GLboolean SetOnMoved(OnMovedEvent OnMoved);
 	//set the window on resize event callback for this window
-	void SetOnResize(OnResizeEvent OnResize);
+	GLboolean SetOnResize(OnResizeEvent OnResize);
 	//set the window on Mouse move callback event for this window
-	void SetOnMouseMove(OnMouseMoveEvent OnMouseMove);
+	GLboolean SetOnMouseMove(OnMouseMoveEvent OnMouseMove);
 
 	//print the current OpenGL version
 	GLboolean PrintOpenGLVersion();
-
 	//return the current OpenGL version as a string
 	const char* GetOpenGLVersion();
-
 	//print all supported extensions
 	GLboolean PrintOpenGLExtensions();
-
 	//return all the supported extensions
 	const char* GetOpenGLExtensions();
+
+	//enable window decorator
+	GLboolean EnableDecorator(GLbitfield Decorator);
+	//disable window decorator
+	GLboolean DisableDecorator(GLbitfield Decorator);
 
 	friend class WindowManager; // lets window use private variables of WindowManager
 
@@ -170,6 +175,7 @@ private:
 	GLboolean IsCurrentContext; /**< Whether the window is the current window that is being drawn to */
 	GLuint CurrentState; /**< The current state of the window. these states include Normal, Minimized, Maximized and Full screen*/
 	GLuint CurrentSwapInterval; /**< The current swap interval of the window(V-Sync). a value of -1 enables adaptive V-Sync on supported systems */
+	
 //set all the Events to null 
 	void InitializeEvents();
 	//Initializes OpenGL extensions
@@ -197,7 +203,7 @@ private:
 private:
 
 	//tells windows to create a generic window. need to implement window styles sometime later
-	void Windows_Initialize(LPCSTR a_MenuName, UINT a_Style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW,
+	GLboolean Windows_Initialize(UINT a_Style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW,
 		GLint a_ClearScreenExtra = 0, GLint FWindowExtra = 0,
 		HINSTANCE a_Instance = GetModuleHandle(0),
 		HICON a_Icon = LoadIcon(0, IDI_APPLICATION),
@@ -221,14 +227,20 @@ private:
 	void Windows_Restore();
 	//uses the win32 system to set the Title Bar text
 	void Windows_SetTitleBar(const char* NewTitle);
+	//uses the Win32 system to set the window icon
+	void Windows_SetIcon(const char* Icon, GLuint Width, GLuint Height);
 	//uses the win32 system to put the window into event focus
 	void Windows_Focus();
 	//initialize OpenGL for this window
-	void Windows_InitializeGL();
+	GLboolean Windows_InitializeGL();
 	//cleanly shutdown this window(window would still need to be deleted of course)
 	void Windows_Shutdown();
 	//turns of vertical sync using the EXT extension
 	void Windows_VerticalSync(GLint EnableSync);
+	//enables given window decoration via Win32
+	void Windows_EnableDecorator(GLbitfield Decorator);
+	//disables given window decoration via Win32
+	void Windows_DisableDecorator(GLbitfield Decorator);
 	//get the handle of the window. to be used internally only
 	HWND GetWindowHandle();
 
@@ -246,8 +258,10 @@ private:
 	WNDCLASS WindowClass; /**< this describes the type of Window that Win32 will create*/
 	HWND WindowHandle; /**<handle to the Win32 window itself */
 	HINSTANCE InstanceHandle; /**< handle to the Win32 instance */
+	GLbitfield CurrentWindowStyle; /**< the current window style */
 
 	PFNWGLSWAPINTERVALEXTPROC SwapIntervalEXT; /**< OpenGL extension callback for setting the swap interval(V-Sync)*/
+	PFNWGLSWAPBUFFERSMSCOMLPROC SwapIntervalMSCOM; // what the holy fuck is MSCOM?
 	PFNWGLGETEXTENSIONSSTRINGEXTPROC GetExtensionsStringEXT; /**< OpenGL extension for revealing available extensions*/
 #endif
 
@@ -272,12 +286,18 @@ private:
 	void Linux_Focus(GLboolean NewState);
 	//uses the X11 system to set the title bar of the window
 	void Linux_SetTitleBar(const char* NewName);
+	//uses the X11 system to set the icon of the window
+	void Linux_SetIcon(const char* Icon, GLuint Width, GLuint Height);
 	//uses the X11 system to initialize create an OpenGL context for the window
 	GLboolean Linux_InitializeGL();
 	//uses OpenGL extensions for Linux to toggle Vertical syncing
 	void Linux_VerticalSync(GLint EnableSync);
 	//shut down the window. closes all connections to the X11 system
 	void Linux_Shutdown();
+	//enables given window decoration via Win32
+	void Linux_EnableDecorator(GLbitfield Decorator);
+	//disables given window decoration via Win32
+	void Linux_DisableDecorator(GLbitfield Decorator);
 
 	//initialize the window manager Atomics needed for the X11 extended window manager
 	void InitializeAtomics();
@@ -310,7 +330,8 @@ private:
 	Atom AtomActive;  /**<atom for the active window */	//_NET_ACTIVE_WINDOW
 	Atom AtomDemandsAttention; /**<atom for when the window demands attention*/	//_NET_WM_STATE_DEMANDS_ATTENTION
 	Atom AtomFocused; /**<atom for the focused state of the window */	//_NET_WM_STATE_FOCUSED
-
+	Atom AtomCardinal; /**< atom for cardinal coordinates */
+	Atom AtomIcon; /** atom for the icon of the window */
 #endif
 };
 

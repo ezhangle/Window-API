@@ -26,22 +26,48 @@ HWND FWindow::GetWindowHandle()
 }
 
 /**********************************************************************************************//**
- * @fn	void FWindow::Windows_InitializeGL()
+ * @fn	GLboolean FWindow::Windows_InitializeGL()
  *
  * @brief	Windows initialize gl.
  *
  * @author	Ziyad
  * @date	29/11/2014
+ *
+ * @return	A GLboolean.
  **************************************************************************************************/
 
-void FWindow::Windows_InitializeGL()
+GLboolean FWindow::Windows_InitializeGL()
 {
-	DeviceContextHandle = GetDC(WindowHandle);
-	InitializePixelFormat();
-	GLRenderingContextHandle = wglCreateContext(DeviceContextHandle);
-	wglMakeCurrent(DeviceContextHandle, GLRenderingContextHandle);
 
-	Windows_InitGLExtensions();
+		DeviceContextHandle = GetDC(WindowHandle);
+		InitializePixelFormat();
+		GLRenderingContextHandle = wglCreateContext(DeviceContextHandle);
+		wglMakeCurrent(DeviceContextHandle, GLRenderingContextHandle);
+
+		ContextCreated = (GLRenderingContextHandle != nullptr);
+
+		if (ContextCreated)
+		{
+#ifndef CONTEXT_CREATED
+#define CONTEXT_CREATED
+#endif
+			Windows_InitGLExtensions();
+			return FOUNDATION_OKAY;
+		}
+
+	/**********************************************************************************************//**
+	 * @fn	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDCONTEXT);
+	 *
+	 * @brief	Constructor.
+	 *
+	 * @author	Ziyad
+	 * @date	3/01/2015
+	 *
+	 * @param	parameter1	The first parameter.
+	 **************************************************************************************************/
+
+	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDCONTEXT);
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -87,7 +113,7 @@ void FWindow::InitializePixelFormat()
 	return;
 }
 
-void FWindow::Windows_Initialize(LPCSTR a_MenuName, 
+GLboolean FWindow::Windows_Initialize(
 	UINT a_Style /* = CS_OWNDC | CS_HREDRAW | CS_DROPSHADOW */,
 	int a_ClearScreenExtra /* = 0 */, 
 	int WindowExtra /* = 0 */,
@@ -105,18 +131,27 @@ void FWindow::Windows_Initialize(LPCSTR a_MenuName,
 	WindowClass.hIcon = a_Icon;
 	WindowClass.hCursor = a_Cursor;
 	WindowClass.hbrBackground = a_Brush;
-	WindowClass.lpszMenuName = a_MenuName;
-	WindowClass.lpszClassName = a_MenuName;
+	WindowClass.lpszMenuName = Name;
+	WindowClass.lpszClassName = Name;
 	RegisterClass(&WindowClass);
 
+	CurrentWindowStyle = WS_OVERLAPPEDWINDOW;
+
 	WindowHandle =
-		CreateWindow(a_MenuName, a_MenuName, WS_OVERLAPPEDWINDOW, 0,
+		CreateWindow(Name, Name, CurrentWindowStyle, 0,
 		0, Resolution[0],
 		Resolution[1],
 		0, 0, 0, 0);
 
-	ShowWindow(WindowHandle, GL_TRUE);
-	UpdateWindow(WindowHandle);
+	if (WindowHandle)
+	{
+		ShowWindow(WindowHandle, GL_TRUE);
+		UpdateWindow(WindowHandle);
+		return FOUNDATION_OKAY;
+	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_WINDOWS_CANNOTCREATEWINDOW);
+	return FOUNDATION_ERROR;
 }
 
 void FWindow::Windows_Shutdown()
@@ -140,18 +175,19 @@ void FWindow::Windows_Shutdown()
 	DeviceContextHandle = nullptr;
 	WindowHandle = nullptr;
 	GLRenderingContextHandle = nullptr;
+
 	
-	PostQuitMessage(0);
+	//exit here or the loop will just keep running
+	//exit(FOUNDATION_OKAY);
 }
-
-
 
 void FWindow::Windows_FullScreen()
 {
+
 		SetWindowLongPtr(WindowHandle, GWL_STYLE,
 			WS_SYSMENU | WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE);
 
-		MoveWindow(WindowHandle, 0, 0, WindowManager::GetScreenResolution()[0], 
+		MoveWindow(WindowHandle, 0, 0, WindowManager::GetScreenResolution()[0],
 			WindowManager::GetScreenResolution()[1], GL_TRUE);
 /*
 
@@ -251,10 +287,17 @@ void FWindow::Windows_SetTitleBar(const char* NewTitle)
 	SetWindowText(WindowHandle, Name);
 }
 
+void FWindow::Windows_SetIcon(const char* Icon, GLuint Width, GLuint Height)
+{
+	HANDLE icon = LoadImage(InstanceHandle, Icon,
+		IMAGE_ICON, Width, Height, LR_LOADFROMFILE);
+	SendMessage(WindowHandle, (UINT)WM_SETICON, ICON_BIG, (LPARAM)icon);
+}
+
 void FWindow::Windows_SetPosition(GLuint X, GLuint Y)
 {
 	RECT rect = { X, Y, X, Y };
-	AdjustWindowRect(&rect, GWL_STYLE| WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+	AdjustWindowRect(&rect, GWL_STYLE | WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 		GL_FALSE);
 
 	SetWindowPos(WindowHandle, HWND_TOP, X, Y,
@@ -290,6 +333,110 @@ void FWindow::Windows_InitGLExtensions()
 	{
 		EXTSwapControlSupported = GL_TRUE;
 	}
+}
+
+void FWindow::Windows_EnableDecorator(GLbitfield Decorator)
+{
+	CurrentWindowStyle = WS_VISIBLE | WS_CLIPSIBLINGS;
+
+	if (Decorator & DECORATOR_BORDER)
+	{
+		CurrentWindowStyle |= WS_BORDER;
+	}
+
+	if (Decorator & DECORATOR_TITLEBAR)
+	{
+		CurrentWindowStyle |= WS_CAPTION;
+	}
+
+	if (Decorator & DECORATOR_ICON)
+	{
+		CurrentWindowStyle |= WS_ICONIC;
+	}
+
+	if (Decorator & DECORATOR_CLOSEBUTTON)
+	{
+		CurrentWindowStyle |= WS_SYSMENU;
+	}
+
+	if (Decorator & DECORATOR_MINIMIZEBUTTON)
+	{ 
+		CurrentWindowStyle |= WS_MINIMIZEBOX | WS_SYSMENU;
+	}
+
+	if (Decorator & DECORATOR_MAXIMIZEBUTTON)
+	{
+		CurrentWindowStyle |= WS_MAXIMIZEBOX | WS_SYSMENU;
+	}
+
+	if (Decorator & DECORATOR_VERTICALSCROLLBAR)
+	{
+		CurrentWindowStyle |= WS_VSCROLL;
+	}
+
+	if (Decorator & DECORATOR_HORIZONTALSCROLLBAR)
+	{
+		CurrentWindowStyle |= WS_HSCROLL;
+	}
+
+	if (Decorator & DECORATOR_SIZEABLEBORDER)
+	{
+		CurrentWindowStyle |= WS_SIZEBOX;
+	}
+
+	SetWindowLongPtr(WindowHandle, GWL_STYLE,
+		CurrentWindowStyle);
+}
+
+void FWindow::Windows_DisableDecorator(GLbitfield Decorator)
+{
+	if (Decorator & DECORATOR_BORDER)
+	{
+		CurrentWindowStyle &= ~WS_BORDER;
+	}
+
+	if (Decorator & DECORATOR_TITLEBAR)
+	{
+		CurrentWindowStyle &= ~WS_MAXIMIZEBOX;
+	}
+
+	if (Decorator & DECORATOR_ICON)
+	{
+		CurrentWindowStyle &= ~WS_ICONIC;
+	}
+
+	if (Decorator & DECORATOR_CLOSEBUTTON)
+	{
+		CurrentWindowStyle &= ~WS_SYSMENU;
+	}
+
+	if (Decorator & DECORATOR_MINIMIZEBUTTON)
+	{
+		CurrentWindowStyle &= ~WS_MINIMIZEBOX;
+	}
+
+	if (Decorator & DECORATOR_MAXIMIZEBUTTON)
+	{
+		CurrentWindowStyle &= ~WS_MAXIMIZEBOX;
+	}
+
+	if (Decorator & DECORATOR_VERTICALSCROLLBAR)
+	{
+		CurrentWindowStyle &= ~WS_VSCROLL;
+	}
+
+	if (Decorator & DECORATOR_HORIZONTALSCROLLBAR)
+	{
+		CurrentWindowStyle &= ~WS_HSCROLL;
+	}
+
+	if (Decorator & DECORATOR_SIZEABLEBORDER)
+	{
+		CurrentWindowStyle &= ~WS_SIZEBOX;
+	}
+
+	SetWindowLongPtr(WindowHandle, GWL_STYLE,
+		CurrentWindowStyle | WS_VISIBLE);
 }
 
 #endif

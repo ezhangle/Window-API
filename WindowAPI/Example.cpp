@@ -42,8 +42,8 @@ int main()
 	WindowManager::Initialize();
 	
 	WindowManager::AddWindow(new FWindow("Example"));
-	//Foundation_Tools::PrintSupportedExtensions();
 	WindowManager::SetWindowOnKeyEvent("Example", &OnWindowKeyPressed);
+	WindowManager::GetWindowByIndex(0)->SetStyle(WINDOWSTYLE_DEFAULT);
 	while (!WindowManager::GetWindowShouldClose("Example"))
 	{
 		WindowManager::PollForEvents();

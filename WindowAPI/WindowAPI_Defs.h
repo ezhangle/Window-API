@@ -102,32 +102,51 @@
 #define MOUSE_SCROLL_DOWN 0 /**< the mouse wheel up */
 #define MOUSE_SCROLL_UP 1   /**< the mouse wheel down */
 
-#define WINDOWSTYLE_BARE 1  /**< the window has no decorators (no minimize, maximize or close button)*/
+#define WINDOWSTYLE_BARE 1  /**< the window has no decorators but the window border and title bar*/
 #define WINDOWSTYLE_DEFAULT 2   /**< the default window style for the respective platform */
-#define WINDOWSTYLE_POPUP 3 /**< the window has no decorators as well as no borders and title bar */
+#define WINDOWSTYLE_POPUP 3 /**< the window has no decorators*/
 
 #define WINDOWSTATE_NORMAL 0	/**< the window is in its default state */
 #define WINDOWSTATE_MAXIMIZED 1 /**< the window is currently maximized */
 #define WINDOWSTATE_MINIMIZED 2 /**< the window is currently minimized */
-#define WINDOWSTATE_FULLSCREEN 3	/**< the window is currently fullscreen */
+#define WINDOWSTATE_FULLSCREEN 3	/**< the window is currently full screen */
+
+#define DECORATOR_TITLEBAR 0x01
+#define DECORATOR_ICON 0x02
+#define DECORATOR_BORDER 0x04
+#define DECORATOR_MINIMIZEBUTTON 0x08
+#define DECORATOR_MAXIMIZEBUTTON 0x010
+#define DECORATOR_CLOSEBUTTON 0x20
+#define DECORATOR_VERTICALSCROLLBAR 0x40
+#define DECORATOR_HORIZONTALSCROLLBAR 0x80
+#define DECORATOR_SIZEABLEBORDER 0x100
 
 #define FOUNDATION_ERROR 0
 #define FOUNDATION_OKAY 1
 
 #define ERROR_NOCONTEXT 0
 #define ERROR_INVALIDWINDOWNAME 1
-#define ERROR_INVALIDWINDOWSTATE 2
-#define ERROR_INVALIDRESOLUTION 3
-#define ERROR_INVALIDCONTEXT 4
-#define ERROR_EXISTINGCONTEXT 5
-#define ERROR_ALREADYINITIALIZED 6
-#define ERROR_INVALIDTITLEBAR 7
-#define ERROR_LINUX_CANNOTCONNECTXSERVER 8
-#define ERROR_LINUX_INVALIDVISUALINFO 9
-#define ERROR_LINUX_CANNOTCREATEWINDOW 10
+#define ERROR_INVALIDWINDOWINDEX 2
+#define ERROR_INVALIDWINDOWSTATE 3
+#define ERROR_INVALIDRESOLUTION 4
+#define ERROR_INVALIDCONTEXT 5
+#define ERROR_EXISTINGCONTEXT 6
+#define ERROR_NOTINITIALIZED 7
+#define ERROR_ALREADYINITIALIZED 8
+#define ERROR_INVALIDTITLEBAR 9
+#define ERROR_INVALIDEVENT 10
+#define ERROR_WINDOWNOTFOUND 11
+#define ERROR_INVALIDWINDOWSTYLE 12
+#define ERROR_INVALIDWINDOW 13
+#define ERROR_LINUX_CANNOTCONNECTXSERVER 14
+#define ERROR_LINUX_INVALIDVISUALINFO 15
+#define ERROR_LINUX_CANNOTCREATEWINDOW 16
+#define ERROR_WINDOWS_CANNOTCREATEWINDOW 17
+#define ERROR_WINDOWS_CANNOTINITIALIZE 18
 
 #define WARNING_NOTCURRENTCONTEXT 0
 #define WARNING_NOGLEXTENSIONS 1
+
 typedef void (*OnKeyEvent)(GLuint Key, GLboolean KeyState);	/**<To be called when a key event has occurred*/
 typedef void (*OnMouseButtonEvent)(GLuint Button, GLboolean ButtonState);	/**<To be called when a Mouse button event has occurred*/
 typedef void (*OnMouseWheelEvent)(GLuint WheelDirection);  /**<To be called when a mouse wheel event has occurred.*/
