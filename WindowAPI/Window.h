@@ -295,9 +295,9 @@ private:
 	//shut down the window. closes all connections to the X11 system
 	void Linux_Shutdown();
 	//enables given window decoration via Win32
-	void Linux_EnableDecorator(GLbitfield Decorator);
+	GLboolean Linux_EnableDecorator(GLbitfield Decorator);
 	//disables given window decoration via Win32
-	void Linux_DisableDecorator(GLbitfield Decorator);
+	GLboolean Linux_DisableDecorator(GLbitfield Decorator);
 
 	//initialize the window manager Atomics needed for the X11 extended window manager
 	void InitializeAtomics();
@@ -329,9 +329,24 @@ private:
 	Atom AtomClose;  /**< atom for closing the window */	// _NET_WM_CLOSE_WINDOW
 	Atom AtomActive;  /**<atom for the active window */	//_NET_ACTIVE_WINDOW
 	Atom AtomDemandsAttention; /**<atom for when the window demands attention*/	//_NET_WM_STATE_DEMANDS_ATTENTION
-	Atom AtomFocused; /**<atom for the focused state of the window */	//_NET_WM_STATE_FOCUSED
-	Atom AtomCardinal; /**< atom for cardinal coordinates */
-	Atom AtomIcon; /** atom for the icon of the window */
+	Atom AtomFocused; /**<atom for the focused state of the window */ //_NET_WM_STATE_FOCUSED
+	Atom AtomCardinal; /**< atom for cardinal coordinates */ //_NET_WM_CARDINAL
+	Atom AtomIcon; /**< atom for the icon of the window */ //_NET_WM_ICON
+	Atom AtomHints; /**< atom for the window decorations */ //_NET_WM_HINTS
+
+	Atom AtomWindowTypeDesktop; /**< atom for the desktop window type */ //_NET_WM_WINDOW_TYPE_SPLASH
+	Atom AtomWindowTypeSplash; /**< atom for the splash screen window type */
+	Atom AtomWindowTypeNormal; /**<atom for the normal splash screen window type*/
+
+	Atom AtomAllowedActions; /**< atom for allowed window actions */
+
+	Atom AtomActionResize; /**< atom for allowing the window to be resized*/
+	Atom AtomActionMinimize; /**< atom for allowing the window to be minimized */
+	Atom AtomActionShade; /**< atom for allowing the window to be shaded */
+	Atom AtomActionMaximizeHorz; /**< atom for allowing the window to be maximized horizontally */
+	Atom AtomActionMaximizeVert; /**< atom for allowing the window to be maximized vertically */
+	Atom AtomActionClose; /**< atom for allowing the window to be closed*/
+
 #endif
 };
 

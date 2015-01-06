@@ -25,6 +25,8 @@
 
 FWindow* WindowManager::GetWindowByHandle(Window WindowHandle)
 {
+	if(GetInstance()->IsInitialized())
+	{
 	for (auto Iter : GetInstance()->Windows)
 	{
 		if (Iter->GetWindowHandle() == WindowHandle)
@@ -33,6 +35,10 @@ FWindow* WindowManager::GetWindowByHandle(Window WindowHandle)
 		}
 	}
 
+	return nullptr;
+	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
 	return nullptr;
 }
 
@@ -45,14 +51,14 @@ FWindow* WindowManager::GetWindowByHandle(Window WindowHandle)
  * @date	29/11/2014
  **************************************************************************************************/
 
-void WindowManager::Linux_Initialize()
+GLboolean WindowManager::Linux_Initialize()
 {
 	GetInstance()->m_Display = XOpenDisplay(0);
 
 	if(!GetInstance()->m_Display)
 	{
-		printf("Cannot Connect to X server\n");
-		exit(0);
+		Foundation_Tools::PrintErrorMessage(ERROR_LINUX_CANNOTCONNECTXSERVER);
+		return FOUNDATION_ERROR;
 	}
 
 	GetInstance()->ScreenResolution[0] = WidthOfScreen(XScreenOfDisplay(GetInstance()->m_Display, 
@@ -60,6 +66,8 @@ void WindowManager::Linux_Initialize()
 
 	GetInstance()->ScreenResolution[1] = HeightOfScreen(XScreenOfDisplay(GetInstance()->m_Display,
 				DefaultScreen(GetInstance()->m_Display)));
+
+	return FOUNDATION_OKAY;
 }
 
 /**********************************************************************************************//**
@@ -74,13 +82,20 @@ void WindowManager::Linux_Initialize()
  * @param	Y	The GLuint to process.
  **************************************************************************************************/
 
-void WindowManager::Linux_SetMousePositionInScreen(GLuint X, GLuint Y)
+GLboolean WindowManager::Linux_SetMousePositionInScreen(GLuint X, GLuint Y)
 {
-	XWarpPointer(GetInstance()->m_Display, None,
+	if(GetInstance()->IsInitialized())
+	{
+		XWarpPointer(GetInstance()->m_Display, None,
 		   	XDefaultRootWindow(GetInstance()->m_Display), 0, 0, 
 			GetScreenResolution()[0], 
 			GetScreenResolution()[1], 
 			X, Y);
+		return FOUNDATION_OKAY;
+	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -112,6 +127,8 @@ void WindowManager::Linux_Shutdown()
 
 FWindow* WindowManager::GetWindowByEvent(XEvent Event)
 {
+	if(GetInstance()->IsInitialized())
+	{
 	switch(Event.type)
 	{
 		case Expose:
@@ -199,6 +216,9 @@ FWindow* WindowManager::GetWindowByEvent(XEvent Event)
 			return nullptr;
 		}
 	}
+	}
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return nullptr;
 }
 
 /**********************************************************************************************//**
@@ -226,8 +246,10 @@ Display* WindowManager::GetDisplay()
  * @date	29/11/2014
  **************************************************************************************************/
 
-void WindowManager::Linux_PollForEvents()
+GLboolean WindowManager::Linux_PollForEvents()
 {
+	if(GetInstance()->IsInitialized())
+	{
 	XNextEvent(GetInstance()->m_Display, &GetInstance()->m_Event);
 
 	XEvent l_Event = GetInstance()->m_Event;
@@ -671,6 +693,11 @@ void WindowManager::Linux_PollForEvents()
 			break;
 		}
 	}
+	return FOUNDATION_OKAY;
+	}
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+return FOUNDATION_ERROR;
+
 }
 
 #endif

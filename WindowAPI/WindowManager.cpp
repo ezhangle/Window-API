@@ -43,7 +43,7 @@ GLboolean WindowManager::Initialize()
 
 GLboolean WindowManager::IsInitialized()
 {
-	if (Initialized)
+	if (GetInstance()->IsInitialized())
 	{
 		return FOUNDATION_OKAY;
 	}
@@ -306,7 +306,13 @@ GLboolean WindowManager::DoesExist(GLuint WindowIndex)
 
 GLuint WindowManager::GetNumWindows()
 {
-	return GetInstance()->Windows.size();
+	if(GetInstance()->IsInitialized())
+	{
+		return GetInstance()->Windows.size();
+	}
+
+	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -358,7 +364,7 @@ void WindowManager::ShutDown()
 
 GLboolean WindowManager::GetMousePositionInScreen(GLuint& X, GLuint& Y)
 {
-	if (GetInstance()->Initialized)
+	if (GetInstance()->IsInitialized())
 	{
 		X = GetInstance()->ScreenMousePosition[0];
 		Y = GetInstance()->ScreenMousePosition[1];
@@ -383,7 +389,7 @@ GLboolean WindowManager::GetMousePositionInScreen(GLuint& X, GLuint& Y)
 
 GLuint* WindowManager::GetMousePositionInScreen()
 {
-	if (GetInstance()->Initialized)
+	if (GetInstance()->IsInitialized())
 	{
 		return GetInstance()->ScreenMousePosition;
 	}
@@ -406,20 +412,15 @@ GLuint* WindowManager::GetMousePositionInScreen()
 
 GLboolean WindowManager::SetMousePositionInScreen(GLuint X, GLuint Y)
 {
-	if (GetInstance()->Initialized)
-	{
-		GetInstance()->ScreenMousePosition[0] = X;
-		GetInstance()->ScreenMousePosition[1] = Y;
+	GetInstance()->ScreenMousePosition[0] = X;
+	GetInstance()->ScreenMousePosition[1] = Y;
 #if defined(CURRENT_OS_WINDOWS)
-		return Windows_SetMousePositionInScreen(X, Y);
+	return Windows_SetMousePositionInScreen(X, Y);
 #endif
 
 #if defined(CURRENT_OS_LINUX)
-		return Linux_SetMousePositionInScreen(X, Y);
+	return Linux_SetMousePositionInScreen(X, Y);
 #endif
-	}
-	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
-	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -436,7 +437,7 @@ GLboolean WindowManager::SetMousePositionInScreen(GLuint X, GLuint Y)
 
 GLuint* WindowManager::GetScreenResolution()
 {
-	if (GetInstance()->Initialized)
+	if (GetInstance()->IsInitialized())
 	{
 #if defined(CURRENT_OS_WINDOWS)
 		RECT l_Screen;
@@ -472,7 +473,7 @@ GLuint* WindowManager::GetScreenResolution()
 
 GLboolean WindowManager::PollForEvents()
 {
-	if (GetInstance()->Initialized)
+	if (GetInstance()->IsInitialized())
 	{
 #if defined(CURRENT_OS_WINDOWS)
 		return GetInstance()->Windows_PollForEvents();
@@ -501,7 +502,7 @@ GLboolean WindowManager::PollForEvents()
 
 GLboolean WindowManager::GetScreenResolution(GLuint& Width, GLuint& Height)
 {
-	if (GetInstance()->Initialized)
+	if (GetInstance()->IsInitialized())
 	{
 #if defined(CURRENT_OS_WINDOWS)
 
@@ -543,7 +544,7 @@ GLboolean WindowManager::GetScreenResolution(GLuint& Width, GLuint& Height)
 
 GLboolean WindowManager::GetWindowResolution(const char* WindowName, GLuint& Width, GLuint& Height)
 {
-	if (GetInstance()->Initialized)
+	if (GetInstance()->IsInitialized())
 	{
 		if (DoesExist(WindowName))
 		{
@@ -573,17 +574,16 @@ GLboolean WindowManager::GetWindowResolution(const char* WindowName, GLuint& Wid
  * @param [in,out]	Height	The height.
  **************************************************************************************************/
 
-void WindowManager::GetWindowResolution(GLuint WindowIndex, GLuint& Width, GLuint& Height)
+GLboolean WindowManager::GetWindowResolution(GLuint WindowIndex, GLuint& Width, GLuint& Height)
 {
-	if (GetInstance()->Initialized)
+	if (DoesExist(WindowIndex))
 	{
-		if (DoesExist(WindowIndex))
-		{
-			GetWindowByIndex(WindowIndex)->GetResolution(Width, Height);
-		}
+		GetWindowByIndex(WindowIndex)->GetResolution(Width, Height);
+		return FOUNDATION_OKAY;
 	}
 
 	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -647,12 +647,14 @@ GLuint* WindowManager::GetWindowResolution(GLuint WindowIndex)
  * @param	Height	  	The height.
  **************************************************************************************************/
 
-void WindowManager::SetWindowResolution(const char* WindowName, GLuint Width, GLuint Height)
+GLboolean WindowManager::SetWindowResolution(const char* WindowName, GLuint Width, GLuint Height)
 {
 	if(DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->SetResolution(Width, Height);
+		return GetWindowByName(WindowName)->SetResolution(Width, Height);
 	}
+
+	return GL_FALSE;
 }
 
 /**********************************************************************************************//**
@@ -668,12 +670,14 @@ void WindowManager::SetWindowResolution(const char* WindowName, GLuint Width, GL
  * @param	Height	   	The height.
  **************************************************************************************************/
 
-void WindowManager::SetWindowResolution(GLuint WindowIndex, GLuint Width, GLuint Height)
+GLboolean WindowManager::SetWindowResolution(GLuint WindowIndex, GLuint Width, GLuint Height)
 {
 	if(DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->SetResolution(Width, Height);
+		return GetWindowByIndex(WindowIndex)->SetResolution(Width, Height);
 	}
+
+	return GL_FALSE;
 }
 
 /**********************************************************************************************//**
@@ -689,12 +693,14 @@ void WindowManager::SetWindowResolution(GLuint WindowIndex, GLuint Width, GLuint
  * @param [in,out]	Y 	The Y coordinate of the window relative to screen coordinates.
  **************************************************************************************************/
 
-void WindowManager::GetWindowPosition(const char* WindowName, GLuint& X, GLuint& Y)
+GLboolean WindowManager::GetWindowPosition(const char* WindowName, GLuint& X, GLuint& Y)
 {
 	if(DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->GetPosition(X, Y);
+		return GetWindowByName(WindowName)->GetPosition(X, Y);
 	}
+
+	return GL_FALSE;
 }
 
 /**********************************************************************************************//**
@@ -710,12 +716,14 @@ void WindowManager::GetWindowPosition(const char* WindowName, GLuint& X, GLuint&
  * @param [in,out]	Y  	The Y coordinate of the window relative to screen coordinates.
  **************************************************************************************************/
 
-void WindowManager::GetWindowPosition(GLuint WindowIndex, GLuint& X, GLuint& Y)
+GLboolean WindowManager::GetWindowPosition(GLuint WindowIndex, GLuint& X, GLuint& Y)
 {
 	if(DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->GetPosition(X, Y);
+		return GetWindowByIndex(WindowIndex)->GetPosition(X, Y);
 	}
+
+	return GL_FALSE;
 }
 
 /**********************************************************************************************//**
@@ -781,12 +789,14 @@ GLuint* WindowManager::GetWindowPosition(GLuint WindowIndex)
  * @param	Y		  	The new Y coordinate of the window relative to screen coordinates.
  **************************************************************************************************/
 
-void WindowManager::SetWindowPosition(const char* WindowName, GLuint X, GLuint Y)
+GLboolean WindowManager::SetWindowPosition(const char* WindowName, GLuint X, GLuint Y)
 {
 	if(DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->SetPosition(X, Y);
+		return GetWindowByName(WindowName)->SetPosition(X, Y);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -802,12 +812,14 @@ void WindowManager::SetWindowPosition(const char* WindowName, GLuint X, GLuint Y
  * @param	Y		   	The new y coordinate of the window relative to screen coordinates.
  **************************************************************************************************/
 
-void WindowManager::SetWindowPosition(GLuint WindowIndex, GLuint X, GLuint Y)
+GLboolean WindowManager::SetWindowPosition(GLuint WindowIndex, GLuint X, GLuint Y)
 {
 	if(WindowIndex <= GetInstance()->Windows.size() -1)
 	{
-		GetWindowByIndex(WindowIndex)->SetPosition(X, Y);
+		return GetWindowByIndex(WindowIndex)->SetPosition(X, Y);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -823,12 +835,14 @@ void WindowManager::SetWindowPosition(GLuint WindowIndex, GLuint X, GLuint Y)
  * @param [in,out]	Y 	The Y coordinate of the mouse position relative to window coordinates.
  **************************************************************************************************/
 
-void WindowManager::GetMousePositionInWindow(const char* WindowName, GLuint& X, GLuint& Y)
+GLboolean WindowManager::GetMousePositionInWindow(const char* WindowName, GLuint& X, GLuint& Y)
 {
 	if(DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->GetMousePosition(X, Y);
+		return GetWindowByName(WindowName)->GetMousePosition(X, Y);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -844,12 +858,14 @@ void WindowManager::GetMousePositionInWindow(const char* WindowName, GLuint& X, 
  * @param [in,out]	Y  	The Y coordinate of the mouse position relative to window coordinates.
  **************************************************************************************************/
 
-void WindowManager::GetMousePositionInWindow(GLuint WindowIndex, GLuint& X, GLuint& Y)
+GLboolean WindowManager::GetMousePositionInWindow(GLuint WindowIndex, GLuint& X, GLuint& Y)
 {
 	if(DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->GetMousePosition(X, Y);
+		return GetWindowByIndex(WindowIndex)->GetMousePosition(X, Y);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -915,12 +931,14 @@ GLuint* WindowManager::GetMousePositionInWindow(GLuint WindowIndex)
  * @param	Y		  	The new Y coordinate of the mouse position relative to window coordinates.
  **************************************************************************************************/
 
-void WindowManager::SetMousePositionInWindow(const char* WindowName, GLuint X, GLuint Y)
+GLboolean WindowManager::SetMousePositionInWindow(const char* WindowName, GLuint X, GLuint Y)
 {
 	if(DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->SetMousePosition(X, Y);
+		return GetWindowByName(WindowName)->SetMousePosition(X, Y);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -936,12 +954,14 @@ void WindowManager::SetMousePositionInWindow(const char* WindowName, GLuint X, G
  * @param	Y		   	The new Y coordinate of the mouse position relative to window coordinates.
  **************************************************************************************************/
 
-void WindowManager::SetMousePositionInWindow(GLuint WindowIndex, GLuint X, GLuint Y)
+GLboolean WindowManager::SetMousePositionInWindow(GLuint WindowIndex, GLuint X, GLuint Y)
 {
 	if(DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->SetMousePosition(X, Y);
+		return GetWindowByIndex(WindowIndex)->SetMousePosition(X, Y);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -965,7 +985,7 @@ GLboolean WindowManager::WindowGetKey(const char* WindowName, GLuint Key)
 		return GetWindowByName(WindowName)->GetKeyState(Key);
 	}
 
-	return GL_FALSE;
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -989,7 +1009,7 @@ GLboolean WindowManager::WindowGetKey(GLuint WindowIndex, GLuint Key)
 		return GetWindowByIndex(WindowIndex)->GetKeyState(Key);
 	}
 
-	return GL_FALSE;
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1012,7 +1032,7 @@ GLboolean WindowManager::GetWindowShouldClose(const char* WindowName)
 		return GetWindowByName(WindowName)->GetShouldClose();
 	}
 
-	return GL_FALSE;
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1035,7 +1055,7 @@ GLboolean WindowManager::GetWindowShouldClose(GLuint WindowIndex)
 		return GetWindowByIndex(WindowIndex)->GetShouldClose();
 	}
 
-	return GL_FALSE;
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1049,12 +1069,14 @@ GLboolean WindowManager::GetWindowShouldClose(GLuint WindowIndex)
  * @param	WindowName	Name of the window.
  **************************************************************************************************/
 
-void WindowManager::WindowSwapBuffers(const char* WindowName)
+GLboolean WindowManager::WindowSwapBuffers(const char* WindowName)
 {
 	if(DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->SwapDrawBuffers();
+		return GetWindowByName(WindowName)->SwapDrawBuffers();
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1068,12 +1090,14 @@ void WindowManager::WindowSwapBuffers(const char* WindowName)
  * @param	WindowIndex	Zero-based index of the window.
  **************************************************************************************************/
 
-void WindowManager::WindowSwapBuffers(GLuint WindowIndex)
+GLboolean WindowManager::WindowSwapBuffers(GLuint WindowIndex)
 {
 	if(DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->SwapDrawBuffers();
+		return GetWindowByIndex(WindowIndex)->SwapDrawBuffers();
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1095,8 +1119,8 @@ GLboolean WindowManager::GetWindowIsFullScreen(const char* WindowName)
 	{
 		return GetWindowByName(WindowName)->GetIsFullScreen();
 	}
-	printf("invalid parameter\n");
-	return GL_FALSE;
+	
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1118,8 +1142,8 @@ GLboolean WindowManager::GetWindowIsFullScreen(GLuint WindowIndex)
 	{
 		return GetWindowByIndex(WindowIndex)->GetIsFullScreen();
 	}
-	printf("invalid parameter\n");
-	return GL_FALSE;
+	
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1134,12 +1158,14 @@ GLboolean WindowManager::GetWindowIsFullScreen(GLuint WindowIndex)
  * @param	ShouldBeFullscreen	whether the window should be in fullscreen mode.
  **************************************************************************************************/
 
-void WindowManager::SetFullScreen(const char* WindowName, GLboolean ShouldBeFullscreen)
+GLboolean WindowManager::SetFullScreen(const char* WindowName, GLboolean ShouldBeFullscreen)
 {
 	if(DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->FullScreen(ShouldBeFullscreen);
+		return GetWindowByName(WindowName)->FullScreen(ShouldBeFullscreen);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1154,12 +1180,14 @@ void WindowManager::SetFullScreen(const char* WindowName, GLboolean ShouldBeFull
  * @param	ShouldBeFullscreen	whether the window should be in fullscreen mode.
  **************************************************************************************************/
 
-void WindowManager::SetFullScreen(GLuint WindowIndex, GLboolean ShouldBeFullscreen)
+GLboolean WindowManager::SetFullScreen(GLuint WindowIndex, GLboolean ShouldBeFullscreen)
 {
 	if (DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->FullScreen(ShouldBeFullscreen);
+		return GetWindowByIndex(WindowIndex)->FullScreen(ShouldBeFullscreen);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1181,8 +1209,8 @@ GLboolean WindowManager::GetWindowIsMinimized(const char* WindowName)
 	{
 		return GetWindowByName(WindowName)->GetIsMinimized();
 	}
-	printf("invalid parameter\n");
-	return GL_FALSE;
+	
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1204,8 +1232,8 @@ GLboolean WindowManager::GetWindowIsMinimized(GLuint WindowIndex)
 	{
 		return GetWindowByIndex(WindowIndex)->GetIsMinimized();
 	}
-	printf("invalid parameter\n");
-	return GL_FALSE;
+	
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1220,12 +1248,14 @@ GLboolean WindowManager::GetWindowIsMinimized(GLuint WindowIndex)
  * @param	ShouldBeMinimized	whether the window should be minimized.
  **************************************************************************************************/
 
-void WindowManager::MinimizeWindow(const char* WindowName, GLboolean ShouldBeMinimized)
+GLboolean WindowManager::MinimizeWindow(const char* WindowName, GLboolean ShouldBeMinimized)
 {
 	if (DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->FullScreen(ShouldBeMinimized);
+		return GetWindowByName(WindowName)->FullScreen(ShouldBeMinimized);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1240,12 +1270,14 @@ void WindowManager::MinimizeWindow(const char* WindowName, GLboolean ShouldBeMin
  * @param	ShouldBeMinimized	Whether the window should be minimized.
  **************************************************************************************************/
 
-void WindowManager::MinimizeWindow(GLuint WindowIndex, GLboolean ShouldBeMinimized)
+GLboolean WindowManager::MinimizeWindow(GLuint WindowIndex, GLboolean ShouldBeMinimized)
 {
 	if (DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->FullScreen(ShouldBeMinimized);
+		return GetWindowByIndex(WindowIndex)->FullScreen(ShouldBeMinimized);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1268,7 +1300,7 @@ GLboolean WindowManager::GetWindowIsMaximized(const char* WindowName)
 		return GetWindowByName(WindowName)->GetIsMaximized();
 	}
 
-	return GL_FALSE;
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1291,7 +1323,7 @@ GLboolean WindowManager::GetWindowIsMaximized(GLuint WindowIndex)
 		return GetWindowByIndex(WindowIndex)->GetIsMaximized();
 	}
 
-	return GL_FALSE;
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1306,12 +1338,14 @@ GLboolean WindowManager::GetWindowIsMaximized(GLuint WindowIndex)
  * @param	ShouldBeMaximized	Whether the window should be maximized.
  **************************************************************************************************/
 
-void WindowManager::MaximizeWindow(const char* WindowName, GLboolean ShouldBeMaximized)
+GLboolean WindowManager::MaximizeWindow(const char* WindowName, GLboolean ShouldBeMaximized)
 {
 	if (DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->FullScreen(ShouldBeMaximized);
+		return GetWindowByName(WindowName)->FullScreen(ShouldBeMaximized);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1326,12 +1360,14 @@ void WindowManager::MaximizeWindow(const char* WindowName, GLboolean ShouldBeMax
  * @param	ShouldBeMaximized	Whether the window should be maximized.
  **************************************************************************************************/
 
-void WindowManager::MaximizeWindow(GLuint WindowIndex, GLboolean ShouldBeMaximized)
+GLboolean WindowManager::MaximizeWindow(GLuint WindowIndex, GLboolean ShouldBeMaximized)
 {
 	if (DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->FullScreen(ShouldBeMaximized);
+		return GetWindowByIndex(WindowIndex)->FullScreen(ShouldBeMaximized);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1392,12 +1428,14 @@ GLuint WindowManager::GetWindowIndex(const char* WindowName)
  * @param	NewTitle  	The new title bar text.
  **************************************************************************************************/
 
-void WindowManager::SetWindowTitleBar(const char* WindowName, const char* NewTitle)
+GLboolean WindowManager::SetWindowTitleBar(const char* WindowName, const char* NewTitle)
 {
 	if(DoesExist(WindowName) && Foundation_Tools::IsValid(NewTitle))
 	{
-		GetWindowByName(WindowName)->SetTitleBar(NewTitle);
+		return GetWindowByName(WindowName)->SetTitleBar(NewTitle);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1412,12 +1450,14 @@ void WindowManager::SetWindowTitleBar(const char* WindowName, const char* NewTit
  * @param	NewTitle   	The new title bar text.
  **************************************************************************************************/
 
-void WindowManager::SetWindowTitleBar(GLuint WindowIndex, const char* NewTitle)
+GLboolean WindowManager::SetWindowTitleBar(GLuint WindowIndex, const char* NewTitle)
 {
 	if(DoesExist(WindowIndex) && Foundation_Tools::IsValid(NewTitle))
 	{
-		GetWindowByIndex(WindowIndex)->SetTitleBar(NewTitle);
+		return GetWindowByIndex(WindowIndex)->SetTitleBar(NewTitle);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1440,7 +1480,7 @@ GLboolean WindowManager::GetWindowIsInFocus(const char* WindowName)
 		return GetWindowByName(WindowName)->GetInFocus();
 	}
 
-	return GL_FALSE;
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1463,7 +1503,7 @@ GLboolean WindowManager::GetWindowIsInFocus(GLuint WindowIndex)
 		return GetWindowByIndex(WindowIndex)->GetInFocus();
 	}
 
-	return GL_FALSE;
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1478,12 +1518,14 @@ GLboolean WindowManager::GetWindowIsInFocus(GLuint WindowIndex)
  * @param	ShouldBeFocused	Whether the window should be in event focus.
  **************************************************************************************************/
 
-void WindowManager::FocusWindow(const char* WindowName, GLboolean ShouldBeFocused)
+GLboolean WindowManager::FocusWindow(const char* WindowName, GLboolean ShouldBeFocused)
 {
 	if(DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->Focus(ShouldBeFocused);
+		return GetWindowByName(WindowName)->Focus(ShouldBeFocused);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1498,12 +1540,14 @@ void WindowManager::FocusWindow(const char* WindowName, GLboolean ShouldBeFocuse
  * @param	ShouldBeFocused	Whether the window should be in event focus.
  **************************************************************************************************/
 
-void WindowManager::FocusWindow(GLuint WindowIndex, GLboolean ShouldBeFocused)
+GLboolean WindowManager::FocusWindow(GLuint WindowIndex, GLboolean ShouldBeFocused)
 {
 	if(DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->Focus(ShouldBeFocused);
+		return GetWindowByIndex(WindowIndex)->Focus(ShouldBeFocused);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1517,12 +1561,13 @@ void WindowManager::FocusWindow(GLuint WindowIndex, GLboolean ShouldBeFocused)
  * @param	WindowName	Name of the window.
  **************************************************************************************************/
 
-void WindowManager::RestoreWindow(const char* WindowName)
+GLboolean WindowManager::RestoreWindow(const char* WindowName)
 {
 	if(DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->Restore();
+		return GetWindowByName(WindowName)->Restore();
 	}
+	return FOUNDATION_ERROR;
 	//implement window focusing
 }
 
@@ -1537,12 +1582,14 @@ void WindowManager::RestoreWindow(const char* WindowName)
  * @param	WindowIndex	Zero-based index of the window.
  **************************************************************************************************/
 
-void WindowManager::RestoreWindow(GLuint WindowIndex)
+GLboolean WindowManager::RestoreWindow(GLuint WindowIndex)
 {
 	if(DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->Restore();
+		return GetWindowByIndex(WindowIndex)->Restore();
 	}
+
+	return FOUNDATION_ERROR;
 	//implement window focusing
 }
 
@@ -1558,12 +1605,14 @@ void WindowManager::RestoreWindow(GLuint WindowIndex)
  * @param	a_SyncSetting	The synchronize setting.
  **************************************************************************************************/
 
-void WindowManager::SetWindowSwapInterval(const char* WindowName, GLint a_SyncSetting)
+GLboolean WindowManager::SetWindowSwapInterval(const char* WindowName, GLint a_SyncSetting)
 {
 	if (DoesExist(WindowName))
 	{
-		 GetWindowByName(WindowName)->SetSwapInterval(a_SyncSetting);
+		 return GetWindowByName(WindowName)->SetSwapInterval(a_SyncSetting);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1578,12 +1627,14 @@ void WindowManager::SetWindowSwapInterval(const char* WindowName, GLint a_SyncSe
  * @param	a_SyncSetting	The synchronize setting.
  **************************************************************************************************/
 
-void WindowManager::SetWindowSwapInterval(GLuint WindowIndex, GLint a_SyncSetting)
+GLboolean WindowManager::SetWindowSwapInterval(GLuint WindowIndex, GLint a_SyncSetting)
 {
 	if (DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->SetSwapInterval(a_SyncSetting);
+		return GetWindowByIndex(WindowIndex)->SetSwapInterval(a_SyncSetting);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1598,12 +1649,14 @@ void WindowManager::SetWindowSwapInterval(GLuint WindowIndex, GLint a_SyncSettin
  * @param	OnKey	  	The on key event.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnKeyEvent(const char* WindowName, OnKeyEvent OnKey)
+GLboolean WindowManager::SetWindowOnKeyEvent(const char* WindowName, OnKeyEvent OnKey)
 {
 	if (DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->SetOnKeyEvent(OnKey);
+		return GetWindowByName(WindowName)->SetOnKeyEvent(OnKey);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1618,12 +1671,14 @@ void WindowManager::SetWindowOnKeyEvent(const char* WindowName, OnKeyEvent OnKey
  * @param	OnKey	   	The on key event.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnKeyEvent(GLuint WindowIndex, OnKeyEvent OnKey)
+GLboolean WindowManager::SetWindowOnKeyEvent(GLuint WindowIndex, OnKeyEvent OnKey)
 {
 	if (DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->SetOnKeyEvent(OnKey);
+		return GetWindowByIndex(WindowIndex)->SetOnKeyEvent(OnKey);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1638,12 +1693,14 @@ void WindowManager::SetWindowOnKeyEvent(GLuint WindowIndex, OnKeyEvent OnKey)
  * @param	OnMouseButton	The on mouse button event.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnMouseButtonEvent(const char* WindowName, OnMouseButtonEvent OnMouseButton)
+GLboolean WindowManager::SetWindowOnMouseButtonEvent(const char* WindowName, OnMouseButtonEvent OnMouseButton)
 {
 	if (DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->SetOnMouseButtonEvent(OnMouseButton);
+		return GetWindowByName(WindowName)->SetOnMouseButtonEvent(OnMouseButton);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1658,12 +1715,14 @@ void WindowManager::SetWindowOnMouseButtonEvent(const char* WindowName, OnMouseB
  * @param	OnMouseButton	The on mouse button event.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnMouseButtonEvent(GLuint WindowIndex, OnMouseButtonEvent OnMouseButton)
+GLboolean WindowManager::SetWindowOnMouseButtonEvent(GLuint WindowIndex, OnMouseButtonEvent OnMouseButton)
 {
 	if (DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->SetOnMouseButtonEvent(OnMouseButton);
+		return GetWindowByIndex(WindowIndex)->SetOnMouseButtonEvent(OnMouseButton);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1678,12 +1737,14 @@ void WindowManager::SetWindowOnMouseButtonEvent(GLuint WindowIndex, OnMouseButto
  * @param	OnMouseWheel	The on mouse wheel event.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnMouseWheelEvent(const char* WindowName, OnMouseWheelEvent OnMouseWheel)
+GLboolean WindowManager::SetWindowOnMouseWheelEvent(const char* WindowName, OnMouseWheelEvent OnMouseWheel)
 {
 	if (DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->SetOnMouseWheelEvent(OnMouseWheel);
+		return GetWindowByName(WindowName)->SetOnMouseWheelEvent(OnMouseWheel);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1698,12 +1759,14 @@ void WindowManager::SetWindowOnMouseWheelEvent(const char* WindowName, OnMouseWh
  * @param	OnMouseWheel	The on mouse wheel event.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnMouseWheelEvent(GLuint WindowIndex, OnMouseWheelEvent OnMouseWheel)
+GLboolean WindowManager::SetWindowOnMouseWheelEvent(GLuint WindowIndex, OnMouseWheelEvent OnMouseWheel)
 {
 	if (DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->SetOnMouseWheelEvent(OnMouseWheel);
+		return GetWindowByIndex(WindowIndex)->SetOnMouseWheelEvent(OnMouseWheel);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1718,12 +1781,14 @@ void WindowManager::SetWindowOnMouseWheelEvent(GLuint WindowIndex, OnMouseWheelE
  * @param	OnDestroyed	The on destroyed.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnDestroyed(const char* WindowName, OnDestroyedEvent OnDestroyed)
+GLboolean WindowManager::SetWindowOnDestroyed(const char* WindowName, OnDestroyedEvent OnDestroyed)
 {
 	if (DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->SetOnDestroyed(OnDestroyed);
+		return GetWindowByName(WindowName)->SetOnDestroyed(OnDestroyed);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1738,12 +1803,14 @@ void WindowManager::SetWindowOnDestroyed(const char* WindowName, OnDestroyedEven
  * @param	OnDestroyed	The on destroyed.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnDestroyed(GLuint WindowIndex, OnDestroyedEvent OnDestroyed)
+GLboolean WindowManager::SetWindowOnDestroyed(GLuint WindowIndex, OnDestroyedEvent OnDestroyed)
 {
 	if (DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->SetOnDestroyed(OnDestroyed);
+		return GetWindowByIndex(WindowIndex)->SetOnDestroyed(OnDestroyed);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1758,12 +1825,14 @@ void WindowManager::SetWindowOnDestroyed(GLuint WindowIndex, OnDestroyedEvent On
  * @param	OnMaximized	The on maximized.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnMaximized(const char* WindowName, OnMaximizedEvent OnMaximized)
+GLboolean WindowManager::SetWindowOnMaximized(const char* WindowName, OnMaximizedEvent OnMaximized)
 {
 	if (DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->SetOnMaximized(OnMaximized);
+		return GetWindowByName(WindowName)->SetOnMaximized(OnMaximized);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1778,12 +1847,14 @@ void WindowManager::SetWindowOnMaximized(const char* WindowName, OnMaximizedEven
  * @param	OnMaximized	The on maximized.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnMaximized(GLuint WindowIndex, OnMaximizedEvent OnMaximized)
+GLboolean WindowManager::SetWindowOnMaximized(GLuint WindowIndex, OnMaximizedEvent OnMaximized)
 {
 	if (DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->SetOnMaximized(OnMaximized);
+		return GetWindowByIndex(WindowIndex)->SetOnMaximized(OnMaximized);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1798,12 +1869,14 @@ void WindowManager::SetWindowOnMaximized(GLuint WindowIndex, OnMaximizedEvent On
  * @param	OnMinimized	The on minimized.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnMinimized(const char* WindowName, OnMinimizedEvent OnMinimized)
+GLboolean WindowManager::SetWindowOnMinimized(const char* WindowName, OnMinimizedEvent OnMinimized)
 {
 	if (DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->SetOnMinimized(OnMinimized);
+		return GetWindowByName(WindowName)->SetOnMinimized(OnMinimized);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1818,12 +1891,14 @@ void WindowManager::SetWindowOnMinimized(const char* WindowName, OnMinimizedEven
  * @param	OnMinimized	The on minimized.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnMinimized(GLuint WindowIndex, OnMinimizedEvent OnMinimized)
+GLboolean WindowManager::SetWindowOnMinimized(GLuint WindowIndex, OnMinimizedEvent OnMinimized)
 {
 	if (DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->SetOnMinimized(OnMinimized);
+		return GetWindowByIndex(WindowIndex)->SetOnMinimized(OnMinimized);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /*void WindowManager::SetWindowOnRestored(const char* WindowName, OnRestoredEvent OnRestored)
@@ -1854,12 +1929,14 @@ void WindowManager::SetWindowOnRestored(GLuint WindowIndex, OnRestoredEvent OnRe
  * @param	OnFocus   	The on focus.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnFocus(const char* WindowName, OnFocusEvent OnFocus)
+GLboolean WindowManager::SetWindowOnFocus(const char* WindowName, OnFocusEvent OnFocus)
 {
 	if(Foundation_Tools::IsValid(OnFocus))
 	{
-		GetWindowByName(WindowName)->FocusEvent = OnFocus;
+		return GetWindowByName(WindowName)->FocusEvent = OnFocus;
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1874,12 +1951,14 @@ void WindowManager::SetWindowOnFocus(const char* WindowName, OnFocusEvent OnFocu
  * @param	OnFocus	   	The on focus.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnFocus(GLuint WindowIndex, OnFocusEvent OnFocus)
+GLboolean WindowManager::SetWindowOnFocus(GLuint WindowIndex, OnFocusEvent OnFocus)
 {
 	if(DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->FocusEvent = OnFocus;
+		return GetWindowByIndex(WindowIndex)->FocusEvent = OnFocus;
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1894,12 +1973,14 @@ void WindowManager::SetWindowOnFocus(GLuint WindowIndex, OnFocusEvent OnFocus)
  * @param	OnMoved   	The on moved.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnMoved(const char* WindowName, OnMovedEvent OnMoved)
+GLboolean WindowManager::SetWindowOnMoved(const char* WindowName, OnMovedEvent OnMoved)
 {
 	if (DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->SetOnMoved(OnMoved);
+		return GetWindowByName(WindowName)->SetOnMoved(OnMoved);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1914,12 +1995,14 @@ void WindowManager::SetWindowOnMoved(const char* WindowName, OnMovedEvent OnMove
  * @param	OnMoved	   	The on moved.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnMoved(GLuint WindowIndex, OnMovedEvent OnMoved)
+GLboolean WindowManager::SetWindowOnMoved(GLuint WindowIndex, OnMovedEvent OnMoved)
 {
 	if (DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->SetOnMoved(OnMoved);
+		return GetWindowByIndex(WindowIndex)->SetOnMoved(OnMoved);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1934,12 +2017,14 @@ void WindowManager::SetWindowOnMoved(GLuint WindowIndex, OnMovedEvent OnMoved)
  * @param	OnResize  	The on resize.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnResize(const char* WindowName, OnResizeEvent OnResize)
+GLboolean WindowManager::SetWindowOnResize(const char* WindowName, OnResizeEvent OnResize)
 {
 	if (DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->SetOnResize(OnResize);
+		return GetWindowByName(WindowName)->SetOnResize(OnResize);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1954,12 +2039,14 @@ void WindowManager::SetWindowOnResize(const char* WindowName, OnResizeEvent OnRe
  * @param	OnResize   	The on resize.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnResize(GLuint WindowIndex, OnResizeEvent OnResize)
+GLboolean WindowManager::SetWindowOnResize(GLuint WindowIndex, OnResizeEvent OnResize)
 {
 	if (DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->SetOnResize(OnResize);
+		return GetWindowByIndex(WindowIndex)->SetOnResize(OnResize);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1974,12 +2061,14 @@ void WindowManager::SetWindowOnResize(GLuint WindowIndex, OnResizeEvent OnResize
  * @param	OnMouseMove	The on mouse move.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnMouseMove(const char* WindowName, OnMouseMoveEvent OnMouseMove)
+GLboolean WindowManager::SetWindowOnMouseMove(const char* WindowName, OnMouseMoveEvent OnMouseMove)
 {
 	if (DoesExist(WindowName))
 	{
-		GetWindowByName(WindowName)->SetOnMouseMove(OnMouseMove);
+		return GetWindowByName(WindowName)->SetOnMouseMove(OnMouseMove);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 /**********************************************************************************************//**
@@ -1994,12 +2083,14 @@ void WindowManager::SetWindowOnMouseMove(const char* WindowName, OnMouseMoveEven
  * @param	OnMouseMove	The on mouse move.
  **************************************************************************************************/
 
-void WindowManager::SetWindowOnMouseMove(GLuint WindowIndex, OnMouseMoveEvent OnMouseMove)
+GLboolean WindowManager::SetWindowOnMouseMove(GLuint WindowIndex, OnMouseMoveEvent OnMouseMove)
 {
 	if (DoesExist(WindowIndex))
 	{
-		GetWindowByIndex(WindowIndex)->SetOnMouseMove(OnMouseMove);
+		return GetWindowByIndex(WindowIndex)->SetOnMouseMove(OnMouseMove);
 	}
+
+	return FOUNDATION_ERROR;
 }
 
 WindowManager* WindowManager::Instance = 0;

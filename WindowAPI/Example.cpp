@@ -43,7 +43,7 @@ int main()
 	
 	WindowManager::AddWindow(new FWindow("Example"));
 	WindowManager::SetWindowOnKeyEvent("Example", &OnWindowKeyPressed);
-	WindowManager::GetWindowByIndex(0)->SetStyle(WINDOWSTYLE_DEFAULT);
+	WindowManager::GetWindowByIndex(0)->EnableDecorator(DECORATOR_TITLEBAR);
 	while (!WindowManager::GetWindowShouldClose("Example"))
 	{
 		WindowManager::PollForEvents();

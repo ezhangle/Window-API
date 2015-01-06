@@ -214,7 +214,7 @@ class WindowManager
 		static FWindow* GetWindowByEvent(XEvent Event);
 
 		static GLboolean Linux_Initialize();
-		static GLboolean Linux_Shutdown();
+		static void Linux_Shutdown();
 
 		static GLboolean Linux_PollForEvents();
 		static GLboolean Linux_SetMousePositionInScreen(GLuint X, GLuint Y);

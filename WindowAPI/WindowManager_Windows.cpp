@@ -54,6 +54,8 @@ GLboolean WindowManager::Windows_Initialize()
 
 FWindow* WindowManager::GetWindowByHandle(HWND WindowHandle)
 {
+	if(GetInstance()->IsInitialized())
+	{
 #if defined(CURRENT_OS_WINDOWS)
 
 	for each(auto CurrentWindow in GetInstance()->Windows)
@@ -76,6 +78,9 @@ FWindow* WindowManager::GetWindowByHandle(HWND WindowHandle)
 	}
 
 #endif
+
+	return nullptr;
+	}
 
 	return nullptr;
 }
@@ -483,7 +488,7 @@ LRESULT CALLBACK WindowManager::StaticWindowProcedure(HWND WindowHandle, UINT Me
 
 GLboolean WindowManager::Windows_PollForEvents()
 {
-	if (GetInstance()->Initialized)
+	if (GetInstance()->IsInitialized())
 	{
 		GetMessage(&GetInstance()->Message, 0, 0, 0);
 		TranslateMessage(&GetInstance()->Message);
@@ -514,7 +519,7 @@ void WindowManager::CreateTerminal()
 
 GLboolean WindowManager::Windows_SetMousePositionInScreen(GLuint X, GLuint Y)
 {
-	if (GetInstance()->Initialized)
+	if (GetInstance()->IsInitialized())
 	{
 		POINT l_MousePoint;
 		l_MousePoint.x = X;

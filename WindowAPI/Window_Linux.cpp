@@ -27,7 +27,8 @@ GLboolean FWindow::Linux_Initialize()
 
 	if (!WindowManager::GetDisplay())
 	{
-		return Foundation_Tools::PrintErrorMessage(ERROR_LINUX_CANNOTCONNECTXSERVER);
+		Foundation_Tools::PrintErrorMessage(ERROR_LINUX_CANNOTCONNECTXSERVER);
+		return FOUNDATION_ERROR;
 	}
 
 	VisualInfo = glXChooseVisual(WindowManager::GetDisplay(), 0,
@@ -35,7 +36,8 @@ GLboolean FWindow::Linux_Initialize()
 
 	if (!VisualInfo)
 	{
-		return Foundation_Tools::PrintErrorMessage(ERROR_LINUX_INVALIDVISUALINFO);
+		Foundation_Tools::PrintErrorMessage(ERROR_LINUX_INVALIDVISUALINFO);
+		return FOUNDATION_ERROR;
 	}
 
 	SetAttributes.colormap = XCreateColormap(WindowManager::GetDisplay(),
@@ -57,7 +59,8 @@ GLboolean FWindow::Linux_Initialize()
 
 	if(!WindowHandle)
 	{
-		return Foundation_Tools::PrintErrorMessage(ERROR_LINUX_CANNOTCREATEWINDOW);
+		Foundation_Tools::PrintErrorMessage(ERROR_LINUX_CANNOTCREATEWINDOW);
+		return FOUNDATION_ERROR;
 	}
 
 	XMapWindow(WindowManager::GetDisplay(), WindowHandle);
@@ -275,15 +278,12 @@ void FWindow::Linux_SetTitleBar(const char* NewTitle)
 
 void FWindow::Linux_SetIcon(const char* Icon, GLuint Width, GLuint Height)
 {
-	XEvent Event;
+	//XEvent Event;
 
-	memset(&Event, 0, sizeof(Event));
+	//memset(&Event, 0, sizeof(Event));
 
-	l_Event.xany.type = ClientMessage;
-	l_Event.xclient.message_type = AtomState;
-
-
-
+	//l_Event.xany.type = ClientMessage;
+	//l_Event.xclient.message_type = AtomState;
 }
 
 /**********************************************************************************************//**
@@ -394,7 +394,8 @@ GLboolean FWindow::Linux_InitializeGL()
 
 	else
 	{
-		return Foundation_Tools::PrintErrorMessage(ERROR_EXISTINGCONTEXT);	
+		Foundation_Tools::PrintErrorMessage(ERROR_EXISTINGCONTEXT);
+		return FOUNDATION_ERROR;	
 	}
 }
 
@@ -418,6 +419,22 @@ void FWindow::InitializeAtomics()
 	AtomActive = XInternAtom(WindowManager::GetDisplay(), "_NET_ACTIVE_WINDOW", GL_FALSE);
 	AtomDemandsAttention = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_STATE_DEMANDS_ATTENTION", GL_FALSE);	
 	AtomFocused = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_STATE_FOCUSED", GL_FALSE);
+	AtomCardinal = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_CARDONAL", GL_FALSE);
+	AtomIcon = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_ICON", GL_FALSE);
+	AtomHints = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_HINTS", GL_FALSE);
+
+	AtomWindowTypeDesktop = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_WINDOW_TYPE_DESKTOP", GL_FALSE);
+ 	AtomWindowTypeSplash = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_WINDOW_TYPE_SPLASH", GL_FALSE);
+	AtomWindowTypeNormal = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_WINDOW_TYPE_NORMAL", GL_FALSE);
+
+	AtomAllowedActions = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_ALLOWED_ACTIONS", GL_FALSE);
+
+	AtomActionResize = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_ACTION_RESIZE", GL_FALSE);
+	AtomActionMinimize = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_ACTION_MINIMIZE", GL_FALSE);
+	AtomActionShade = XInternAtom(WindowManager::GetDisplay(), "_NEt_WM_ACTION_SHADE", GL_FALSE);
+	AtomActionMaximizeHorz = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_ACTION_MAXIMIZE_HORZ", GL_FALSE);
+	AtomActionMaximizeVert = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_ACTION_MAXIMIZE_VERT", GL_FALSE);
+	AtomActionClose = XInternAtom(WindowManager::GetDisplay(), "_NET_WM_ACTION_CLOSE", GL_FALSE);
 }
 
 /**********************************************************************************************//**
@@ -472,5 +489,23 @@ void FWindow::Linux_InitGLExtensions()
 Window FWindow::GetWindowHandle()
 {
 	return WindowHandle;
+}
+
+GLboolean FWindow::Linux_EnableDecorator(GLbitfield Decorator)
+{
+	if(ContextCreated)
+	{
+		//XChangeProperty(WindowManager::GetDisplay(), WindowHandle, AtomAllowedActions, AtomActionMinimize, 32, 
+			//PropModeReplace, 	
+	}
+
+	return FOUNDATION_ERROR;
+
+
+}
+
+GLboolean FWindow::Linux_DisableDecorator(GLbitfield Decorator)
+{
+	return FOUNDATION_ERROR;
 }
 #endif
