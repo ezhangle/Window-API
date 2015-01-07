@@ -23,8 +23,8 @@ class FWindow
 {
 public:
 	//window constructor
-	FWindow(const char*  WindowName, GLuint Width = 1280, GLuint Height = 720, GLuint ColourBits = 32,
-		GLuint DepthBits = 8, GLuint StencilBits = 8);
+	FWindow(const char*  WindowName, GLuint Width = 1280, GLuint Height = 720, GLuint ColourBits = 8,
+		GLuint DepthBits = 24, GLuint StencilBits = 8);
 
 	//window deconstruction
 	~FWindow();
@@ -307,10 +307,12 @@ private:
 	//get the Handle To the Window
 	Window GetWindowHandle();
 
+	GLXFBConfig GetBestFrameBufferConfig();
+
 	Window WindowHandle; /**< the X11 handle to the window. I wish they didn't name the type 'Window' */
 	GLXContext Context; /**< the handle to the GLX rendering context */
 	XVisualInfo* VisualInfo; /**< the handle to the Visual Information. similar purpose to PixelformatDesriptor*/
-	GLint* Attributes;/**< attributes of the window. RGB, depth, stencil, etc */
+	GLuint* Attributes;/**< attributes of the window. RGB, depth, stencil, etc */
 	XSetWindowAttributes SetAttributes; /**< the attributes to be set for the window */
 	
 	//these are the callbacks for the GLX swap interval extension. 

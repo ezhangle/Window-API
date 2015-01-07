@@ -22,22 +22,22 @@
 
 GLboolean FWindow::Linux_Initialize()
 {
-	Attributes = new GLuint[15]{GLX_RGBA, GLX_DEPTH_SIZE, DepthBits, GLX_DOUBLEBUFFER, GLX_STENCIL_SIZE, StencilBits, 
-		GLX_RED_SIZE, ColourBits, GLX_GREEN_SIZE, ColourBits, GLX_RED_SIZE, ColourBits, GLX_ALPHA_SIZE, ColourBits, None};
+	Attributes = new GLuint[7]{GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, DepthBits, GLX_STENCIL_SIZE, StencilBits, None};
 
 	if (!WindowManager::GetDisplay())
 	{
 		Foundation_Tools::PrintErrorMessage(ERROR_LINUX_CANNOTCONNECTXSERVER);
-		return FOUNDATION_ERROR;
+		exit(0);
 	}
 
-	VisualInfo = glXChooseVisual(WindowManager::GetDisplay(), 0,
-		Attributes);
+	VisualInfo = glXGetVisualFromFBConfig(WindowManager::GetDisplay(), GetBestFrameBufferConfig()); 
+
+	//VisualInfo = glXChooseVisual(WindowManager::GetDisplay(), 0, Attributes);
 
 	if (!VisualInfo)
 	{
 		Foundation_Tools::PrintErrorMessage(ERROR_LINUX_INVALIDVISUALINFO);
-		return FOUNDATION_ERROR;
+		exit(0);
 	}
 
 	SetAttributes.colormap = XCreateColormap(WindowManager::GetDisplay(),
@@ -60,7 +60,7 @@ GLboolean FWindow::Linux_Initialize()
 	if(!WindowHandle)
 	{
 		Foundation_Tools::PrintErrorMessage(ERROR_LINUX_CANNOTCREATEWINDOW);
-		return FOUNDATION_ERROR;
+		exit(0);
 	}
 
 	XMapWindow(WindowManager::GetDisplay(), WindowHandle);
@@ -388,6 +388,7 @@ GLboolean FWindow::Linux_InitializeGL()
 			{
 				InitGLExtensions();
 			}
+			ContextCreated = GL_TRUE;
 			return FOUNDATION_OKAY;
 		}
 	}
@@ -507,5 +508,54 @@ GLboolean FWindow::Linux_EnableDecorator(GLbitfield Decorator)
 GLboolean FWindow::Linux_DisableDecorator(GLbitfield Decorator)
 {
 	return FOUNDATION_ERROR;
+}
+
+GLXFBConfig FWindow::GetBestFrameBufferConfig()
+{
+	GLuint VisualAttributes[]=
+	{
+		GLX_X_RENDERABLE, GL_TRUE,
+		GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+		GLX_X_VISUAL_TYPE, GLX_TRUE_COLOR,
+		GLX_RED_SIZE, ColourBits, 
+		GLX_GREEN_SIZE, ColourBits,
+		GLX_BLUE_SIZE, ColourBits,
+		GLX_ALPHA_SIZE, ColourBits,
+		GLX_DEPTH_SIZE, DepthBits,
+		GLX_STENCIL_SIZE, StencilBits,
+		GLX_DOUBLEBUFFER, GL_TRUE,
+		None
+	};
+
+	GLuint FrameBufferCount;
+	GLuint BestBufferConfig, BestNumSamples = 0;
+	GLXFBConfig* Configs = glXChooseFBConfig(WindowManager::GetDisplay(), DefaultScreen(WindowManager::GetDisplay()), VisualAttributes, &FrameBufferCount);
+
+	for(GLuint CurrentConfig = 0; CurrentConfig < FrameBufferCount; CurrentConfig++)
+	{
+		XVisualInfo* VisInfo = glXGetVisualFromFBConfig(WindowManager::GetDisplay(), Configs[CurrentConfig]);
+
+		if(VisInfo)
+		{
+			printf("%i %i %i\n", VisInfo->depth, VisInfo->bits_per_rgb, VisInfo->colormap_size);
+			GLint Samples, SampleBuffer;
+			glXGetFBConfigAttrib(WindowManager::GetDisplay(), Configs[CurrentConfig], GLX_SAMPLE_BUFFERS, &SampleBuffer);
+			glXGetFBConfigAttrib(WindowManager::GetDisplay(), Configs[CurrentConfig], GLX_SAMPLES, &Samples);
+
+			if(SampleBuffer && Samples > -1)
+			{
+				BestBufferConfig = CurrentConfig;
+				BestNumSamples = Samples;
+			}
+		}
+
+		XFree(VisInfo);
+	}
+
+	GLXFBConfig BestConfig = Configs[BestBufferConfig];
+
+	XFree(Configs);	
+
+	return BestConfig;
 }
 #endif

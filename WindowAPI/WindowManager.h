@@ -189,7 +189,7 @@ class WindowManager
 		GLuint ScreenResolution[2]; /**< the resolution of the screen as an array */
 		GLuint ScreenMousePosition[2]; /**< the position of the mouse relative to screen coordinates */
 
-		static GLboolean Initialized;
+		GLboolean Initialized;
 
 #if defined(CURRENT_OS_WINDOWS)
 		LRESULT CALLBACK WindowProcedure(HWND WindowHandle, GLuint Message, WPARAM WordParam, LPARAM LongParam);

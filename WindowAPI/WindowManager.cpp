@@ -18,7 +18,7 @@
 
 WindowManager::WindowManager()
 {
-
+	//GetInstance()->Initialized = GL_FALSE;
 }
 
 /**********************************************************************************************//**
@@ -32,6 +32,7 @@ WindowManager::WindowManager()
 
 GLboolean WindowManager::Initialize()
 {
+	GetInstance()->Initialized = GL_FALSE;
 #if defined(CURRENT_OS_LINUX)
 	return Linux_Initialize();
 #endif	
@@ -43,12 +44,7 @@ GLboolean WindowManager::Initialize()
 
 GLboolean WindowManager::IsInitialized()
 {
-	if (GetInstance()->IsInitialized())
-	{
-		return FOUNDATION_OKAY;
-	}
-	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
-	return FOUNDATION_ERROR;
+	return GetInstance()->Initialized;
 }
 
 /**********************************************************************************************//**

@@ -67,6 +67,8 @@ GLboolean WindowManager::Linux_Initialize()
 	GetInstance()->ScreenResolution[1] = HeightOfScreen(XScreenOfDisplay(GetInstance()->m_Display,
 				DefaultScreen(GetInstance()->m_Display)));
 
+	GetInstance()->Initialized = GL_TRUE;
+
 	return FOUNDATION_OKAY;
 }
 
