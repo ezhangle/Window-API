@@ -1,0 +1,5 @@
+./source/Example.cpp:48:18: warning: format specifies type 'int' but the argument has type 'long' [-Wformat]
+                printf("%i\n", 1L<<i);
+                        ~~     ^~~~~
+                        %li
+1 warning generated.
