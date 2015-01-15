@@ -39,14 +39,6 @@ void OnWindowKeyPressed(GLuint KeySym, GLboolean KeyState)
 
 int main()
 {
-#if defined(DEBUG)
-	printf("blarg \n");
-#endif
-
-	for (int i = 0; i < 20; i++)
-	{
-		printf("%i\n", 1L<<i);
-	}
 	WindowManager::Initialize();
 	
 	WindowManager::AddWindow(new FWindow("Example"));
