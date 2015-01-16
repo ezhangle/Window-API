@@ -7,7 +7,6 @@
 #include <limits.h>
 #include "Window.h"
 #include "WindowManager.h"
-#include "Tools.h"
 
 #if defined(CURRENT_OS_LINUX)
 #include <cstring>
@@ -49,9 +48,9 @@ FWindow::FWindow(const char*  WindowName,
 	SGISwapControlSupported = GL_FALSE;
 	MESASwapControlSupported = GL_FALSE;
 
-	if(!Foundation_Tools::IsValid(WindowName))
+	if(!IsValidString(WindowName))
 	{
-		Foundation_Tools::PrintErrorMessage(ERROR_INVALIDWINDOWNAME);
+		PrintErrorMessage(ERROR_INVALIDWINDOWNAME);
 		exit(0);
 	}
 
@@ -102,7 +101,7 @@ GLboolean FWindow::Shutdown()
 		return FOUNDATION_OKAY;
 	}
 
-		Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+		PrintErrorMessage(ERROR_NOCONTEXT);
 		return FOUNDATION_ERROR;
 }
 
@@ -232,7 +231,7 @@ GLboolean FWindow::SwapDrawBuffers()
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -265,7 +264,7 @@ GLboolean FWindow::SetSwapInterval(GLint SwapSetting)
 	return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -336,7 +335,7 @@ GLboolean FWindow::SetCurrentState(GLuint NewState)
 	}
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -358,7 +357,7 @@ GLboolean FWindow::GetIsFullScreen()
 		return (CurrentState == WINDOWSTATE_FULLSCREEN);
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -400,7 +399,7 @@ GLboolean FWindow::FullScreen(GLboolean ShouldBeFullscreen)
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_OKAY;
 }
 
@@ -513,7 +512,7 @@ GLboolean FWindow::Maximize(GLboolean NewState)
 #endif
 		 return FOUNDATION_OKAY;
 	}
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);	
+	PrintErrorMessage(ERROR_NOCONTEXT);	
 	return FOUNDATION_ERROR;
 }
 
@@ -559,7 +558,7 @@ GLboolean FWindow::Restore()
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -586,7 +585,7 @@ GLboolean FWindow::GetResolution(GLuint& Width, GLuint& Height)
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -643,12 +642,12 @@ GLboolean FWindow::SetResolution(GLuint Width, GLuint Height)
 
 		else
 		{
-			Foundation_Tools::PrintErrorMessage(ERROR_INVALIDRESOLUTION);
+			PrintErrorMessage(ERROR_INVALIDRESOLUTION);
 			return FOUNDATION_ERROR;
 		}
 	}   /**< . */
 
-		Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+		PrintErrorMessage(ERROR_NOCONTEXT);
 		return FOUNDATION_ERROR;
 }
 
@@ -673,7 +672,7 @@ GLboolean FWindow::GetMousePosition(GLuint& X, GLuint& Y)
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -696,7 +695,7 @@ GLuint* FWindow::GetMousePosition()
 		return MousePosition;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return nullptr;
 }
 
@@ -729,7 +728,7 @@ GLboolean FWindow::SetMousePosition(GLuint X, GLuint Y)
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -755,7 +754,7 @@ GLboolean FWindow::GetPosition(GLuint& X, GLuint& Y)
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -804,7 +803,7 @@ GLboolean FWindow::SetPosition(GLuint X, GLuint Y)
 #endif
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -826,7 +825,7 @@ const char* FWindow::GetWindowName()
 		return Name;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return nullptr;
 }
 
@@ -859,12 +858,12 @@ GLboolean FWindow::SetTitleBar(const char* NewTitle)
 
 		else
 		{
-			Foundation_Tools::PrintErrorMessage(ERROR_INVALIDTITLEBAR);
+			PrintErrorMessage(ERROR_INVALIDTITLEBAR);
 			return FOUNDATION_ERROR;
 		}
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -913,13 +912,13 @@ GLboolean FWindow::SetStyle(GLuint WindowType)
 
 			default:
 			{
-				Foundation_Tools::PrintErrorMessage(ERROR_INVALIDWINDOWSTYLE);
+				PrintErrorMessage(ERROR_INVALIDWINDOWSTYLE);
 				return FOUNDATION_ERROR;
 			}
 		}
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 
 }
@@ -951,7 +950,7 @@ GLboolean FWindow::MakeCurrentContext()
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -972,7 +971,7 @@ GLboolean FWindow::GetIsCurrentContext()
 	{
 		return IsCurrentContext;
 	}
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return GL_FALSE;
 }
 
@@ -1031,7 +1030,7 @@ GLboolean FWindow::PrintOpenGLVersion()
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -1041,7 +1040,7 @@ const char* FWindow::GetOpenGLVersion()
 	{
 		return (const char*)glGetString(GL_VERSION);
 	}
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return nullptr;
 }
 
@@ -1053,7 +1052,7 @@ GLboolean FWindow::PrintOpenGLExtensions()
 		return FOUNDATION_OKAY;
 	}
 
-		Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+		PrintErrorMessage(ERROR_NOCONTEXT);
 		return FOUNDATION_ERROR;
 }
 
@@ -1077,7 +1076,7 @@ const char* FWindow::GetOpenGLExtensions()
 
 	else
 	{
-		Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+		PrintErrorMessage(ERROR_NOCONTEXT);
 		return nullptr;
 	}
 }
@@ -1126,7 +1125,7 @@ GLboolean FWindow::Focus(GLboolean ShouldBeInFocus)
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -1145,7 +1144,7 @@ GLboolean FWindow::Focus(GLboolean ShouldBeInFocus)
 
 GLboolean FWindow::SetOnKeyEvent(OnKeyEvent OnKey)
 {
-	if (Foundation_Tools::IsValid(OnKey))
+	if (IsValidKeyEvent(OnKey))
 	{
 		KeyEvent = OnKey;
 		return FOUNDATION_OKAY;
@@ -1170,13 +1169,13 @@ GLboolean FWindow::SetOnKeyEvent(OnKeyEvent OnKey)
 GLboolean FWindow::SetOnMouseButtonEvent(OnMouseButtonEvent OnMouseButtonEvent)
 {
 	//we don't really need to check if the context has been created
-	if(Foundation_Tools::IsValid(OnMouseButtonEvent))
+	if(IsValidKeyEvent(OnMouseButtonEvent))
 	{
 		MouseButtonEvent = OnMouseButtonEvent;
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDEVENT);
+	PrintErrorMessage(ERROR_INVALIDEVENT);
 	return FOUNDATION_ERROR;
 }
 
@@ -1195,13 +1194,13 @@ GLboolean FWindow::SetOnMouseButtonEvent(OnMouseButtonEvent OnMouseButtonEvent)
 
 GLboolean FWindow::SetOnMouseWheelEvent(OnMouseWheelEvent OnMouseWheel)
 {
-	if(Foundation_Tools::IsValid(OnMouseWheel))
+	if(IsValidMouseWheelEvent(OnMouseWheel))
 	{
 		MouseWheelEvent = OnMouseWheel;
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDEVENT);
+	PrintErrorMessage(ERROR_INVALIDEVENT);
 	return FOUNDATION_ERROR;
 }
 
@@ -1220,13 +1219,13 @@ GLboolean FWindow::SetOnMouseWheelEvent(OnMouseWheelEvent OnMouseWheel)
 
 GLboolean FWindow::SetOnDestroyed(OnDestroyedEvent OnDestroyed)
 {
-	if(Foundation_Tools::IsValid(OnDestroyed))
+	if(IsValidDestroyedEvent(OnDestroyed))
 	{
 		DestroyedEvent = OnDestroyed;
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDEVENT);
+	PrintErrorMessage(ERROR_INVALIDEVENT);
 	return FOUNDATION_ERROR;
 }
 
@@ -1245,12 +1244,12 @@ GLboolean FWindow::SetOnDestroyed(OnDestroyedEvent OnDestroyed)
 
 GLboolean FWindow::SetOnMaximized(OnMaximizedEvent OnMaximized)
 {
-	if(Foundation_Tools::IsValid(OnMaximized))
+	if(IsValidDestroyedEvent(OnMaximized))
 	{
 		MaximizedEvent = OnMaximized;
 		return FOUNDATION_OKAY;
 	}
-	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDEVENT);
+	PrintErrorMessage(ERROR_INVALIDEVENT);
 	return FOUNDATION_ERROR;
 }
 
@@ -1269,19 +1268,19 @@ GLboolean FWindow::SetOnMaximized(OnMaximizedEvent OnMaximized)
 
 GLboolean FWindow::SetOnMinimized(OnMinimizedEvent OnMinimized)
 {
-	if(Foundation_Tools::IsValid(OnMinimized))
+	if(IsValidDestroyedEvent(OnMinimized))
 	{
 		MinimizedEvent = OnMinimized;
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDEVENT);
+	PrintErrorMessage(ERROR_INVALIDEVENT);
 	return FOUNDATION_ERROR;
 }
 
 /*void FWindow::SetOnRestored(OnRestoredEvent OnRestored)
 {
-	if (Foundation_Tools::IsValid(OnRestored))
+	if (IsValid(OnRestored))
 	{
 		RestoredEvent = OnRestored;
 	}
@@ -1302,13 +1301,13 @@ GLboolean FWindow::SetOnMinimized(OnMinimizedEvent OnMinimized)
 
 GLboolean FWindow::SetOnFocus(OnFocusEvent OnFocus)
 {
-	if(Foundation_Tools::IsValid(OnFocus))
+	if(IsValidFocusEvent(OnFocus))
 	{
 		FocusEvent = OnFocus;
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDEVENT);
+	PrintErrorMessage(ERROR_INVALIDEVENT);
 	return FOUNDATION_ERROR;
 }
 
@@ -1325,12 +1324,12 @@ GLboolean FWindow::SetOnFocus(OnFocusEvent OnFocus)
 
 GLboolean FWindow::SetOnMoved(OnMovedEvent OnMoved)
 {
-	if(Foundation_Tools::IsValid(OnMoved))
+	if(IsValidMovedEvent(OnMoved))
 	{
 		MovedEvent = OnMoved;
 		return FOUNDATION_OKAY;
 	}
-	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDEVENT);
+	PrintErrorMessage(ERROR_INVALIDEVENT);
 	return FOUNDATION_ERROR;
 }
 
@@ -1347,13 +1346,13 @@ GLboolean FWindow::SetOnMoved(OnMovedEvent OnMoved)
 
 GLboolean FWindow::SetOnResize(OnResizeEvent OnResize)
 {
-	if(Foundation_Tools::IsValid(OnResize))
+	if(IsValidMovedEvent(OnResize))
 	{
 		ResizeEvent = OnResize;
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDEVENT);
+	PrintErrorMessage(ERROR_INVALIDEVENT);
 	return FOUNDATION_ERROR;
 }
 
@@ -1370,13 +1369,13 @@ GLboolean FWindow::SetOnResize(OnResizeEvent OnResize)
 
 GLboolean FWindow::SetOnMouseMove(OnMouseMoveEvent OnMouseMove)
 {
-	if(Foundation_Tools::IsValid(OnMouseMove))
+	if(IsValidMouseMoveEvent(OnMouseMove))
 	{
 		MouseMoveEvent = OnMouseMove;
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDEVENT);
+	PrintErrorMessage(ERROR_INVALIDEVENT);
 	return FOUNDATION_ERROR;
 }
 
@@ -1394,7 +1393,7 @@ GLboolean FWindow::EnableDecorator(GLbitfield Decorator)
 
 		return FOUNDATION_OKAY;
 	}
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -1412,6 +1411,6 @@ GLboolean FWindow::DisableDecorator(GLbitfield Decorator)
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOCONTEXT);
+	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 }

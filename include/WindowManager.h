@@ -4,15 +4,12 @@
 
 #include "WindowAPI_Defs.h"
 #include "Window.h"
-#include "Tools.h"
 
 class FWindow;
-class Foundation_Tools;
 
 class WindowManager
 {
 	friend FWindow;
-	friend Foundation_Tools;
 	public:
 
 	WindowManager();
@@ -204,6 +201,7 @@ class WindowManager
 		static GLboolean Windows_SetMousePositionInScreen(GLuint X, GLuint Y);
 
 		static void CreateTerminal();
+		static GLuint Windows_TranslateKey(WPARAM WordParam, LPARAM LongParam);
 
 		HDC DeviceContextHandle; /**< the device context handle for the window*/
 		MSG Message; /**< the Win32 message that contains event information */
@@ -219,6 +217,9 @@ class WindowManager
 		static GLboolean Linux_PollForEvents();
 		static GLboolean Linux_SetMousePositionInScreen(GLuint X, GLuint Y);
 		static Display* GetDisplay();
+
+		static GLuint Linux_TranslateKey(GLuint KeySym);
+		static const char* Linux_GetEventType(XEvent Event);
 
 		Display* m_Display; /**< a reference to the X11 display */
 		XEvent m_Event; /**< the current X11 event*/

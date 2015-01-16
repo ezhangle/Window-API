@@ -5,7 +5,6 @@
  **************************************************************************************************/
 
 #include "WindowManager.h"
-#include "Tools.h"
 
 /**********************************************************************************************//**
  * @fn	WindowManager::WindowManager()
@@ -113,7 +112,7 @@ FWindow* WindowManager::GetWindowByName(const char* WindowName)
 			}
 		}
 #endif
-		Foundation_Tools::PrintErrorMessage(ERROR_WINDOWNOTFOUND);
+		PrintErrorMessage(ERROR_WINDOWNOTFOUND);
 		return nullptr;
 	}
 	return nullptr;
@@ -155,7 +154,7 @@ FWindow* WindowManager::GetWindowByIndex(GLuint WindowIndex)
 			}
 		}
 #endif
-		Foundation_Tools::PrintErrorMessage(ERROR_WINDOWNOTFOUND);
+		PrintErrorMessage(ERROR_WINDOWNOTFOUND);
 		return nullptr;
 	}
 
@@ -186,10 +185,10 @@ WindowManager* WindowManager::AddWindow(FWindow* NewWindow)
 			NewWindow->Initialize();
 			return GetInstance();
 		}
-		Foundation_Tools::PrintErrorMessage(ERROR_INVALIDWINDOW);
+		PrintErrorMessage(ERROR_INVALIDWINDOW);
 		return nullptr;
 	}
-	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	PrintErrorMessage(ERROR_NOTINITIALIZED);
 	return nullptr;
 }
 
@@ -235,7 +234,7 @@ GLboolean WindowManager::DoesExist(const char* WindowName)
 {
 	if (GetInstance()->IsInitialized())
 	{
-		if (Foundation_Tools::IsValid(WindowName))
+		if (IsValidString(WindowName))
 		{
 #if defined(CURRENT_OS_WINDOWS)
 			for each(auto iter in GetInstance()->Windows)
@@ -257,7 +256,7 @@ GLboolean WindowManager::DoesExist(const char* WindowName)
 			}
 #endif
 		}
-		Foundation_Tools::PrintErrorMessage(ERROR_INVALIDWINDOWNAME);
+		PrintErrorMessage(ERROR_INVALIDWINDOWNAME);
 		return GL_FALSE;
 	}
 	return GL_FALSE;
@@ -285,7 +284,7 @@ GLboolean WindowManager::DoesExist(GLuint WindowIndex)
 			return FOUNDATION_OKAY;
 		}
 
-		Foundation_Tools::PrintErrorMessage(ERROR_INVALIDWINDOWINDEX);
+		PrintErrorMessage(ERROR_INVALIDWINDOWINDEX);
 		return FOUNDATION_ERROR;
 	}
 	return FOUNDATION_ERROR;
@@ -309,7 +308,7 @@ GLuint WindowManager::GetNumWindows()
 		return GetInstance()->Windows.size();
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	PrintErrorMessage(ERROR_NOTINITIALIZED);
 	return FOUNDATION_ERROR;
 }
 
@@ -369,7 +368,7 @@ GLboolean WindowManager::GetMousePositionInScreen(GLuint& X, GLuint& Y)
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	PrintErrorMessage(ERROR_NOTINITIALIZED);
 	return FOUNDATION_ERROR;
 
 }
@@ -392,7 +391,7 @@ GLuint* WindowManager::GetMousePositionInScreen()
 		return GetInstance()->ScreenMousePosition;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	PrintErrorMessage(ERROR_NOTINITIALIZED);
 	return nullptr;
 }
 
@@ -455,7 +454,7 @@ GLuint* WindowManager::GetScreenResolution()
 		return GetInstance()->ScreenResolution;
 #endif
 	}
-	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	PrintErrorMessage(ERROR_NOTINITIALIZED);
 	return nullptr;
 
 }
@@ -482,7 +481,7 @@ GLboolean WindowManager::PollForEvents()
 #endif
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	PrintErrorMessage(ERROR_NOTINITIALIZED);
 	return FOUNDATION_ERROR;
 }
 
@@ -523,7 +522,7 @@ GLboolean WindowManager::GetScreenResolution(GLuint& Width, GLuint& Height)
 
 		return FOUNDATION_OKAY;
 	}
-	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	PrintErrorMessage(ERROR_NOTINITIALIZED);
 	return FOUNDATION_ERROR;
 }
 
@@ -555,7 +554,7 @@ GLboolean WindowManager::GetWindowResolution(const char* WindowName, GLuint& Wid
 		return FOUNDATION_ERROR;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	PrintErrorMessage(ERROR_NOTINITIALIZED);
 	return FOUNDATION_ERROR;
 }
 
@@ -580,7 +579,7 @@ GLboolean WindowManager::GetWindowResolution(GLuint WindowIndex, GLuint& Width, 
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	PrintErrorMessage(ERROR_NOTINITIALIZED);
 	return FOUNDATION_ERROR;
 }
 
@@ -912,7 +911,7 @@ GLuint* WindowManager::GetMousePositionInWindow(GLuint WindowIndex)
 	{
 		return GetWindowByIndex(WindowIndex)->GetMousePosition();
 	}
-	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDWINDOWINDEX);
+	PrintErrorMessage(ERROR_INVALIDWINDOWINDEX);
 	return nullptr;
 }
 
@@ -1428,7 +1427,7 @@ GLuint WindowManager::GetWindowIndex(const char* WindowName)
 
 GLboolean WindowManager::SetWindowTitleBar(const char* WindowName, const char* NewTitle)
 {
-	if(DoesExist(WindowName) && Foundation_Tools::IsValid(NewTitle))
+	if(DoesExist(WindowName) && IsValidString(NewTitle))
 	{
 		return GetWindowByName(WindowName)->SetTitleBar(NewTitle);
 	}
@@ -1450,7 +1449,7 @@ GLboolean WindowManager::SetWindowTitleBar(const char* WindowName, const char* N
 
 GLboolean WindowManager::SetWindowTitleBar(GLuint WindowIndex, const char* NewTitle)
 {
-	if(DoesExist(WindowIndex) && Foundation_Tools::IsValid(NewTitle))
+	if(DoesExist(WindowIndex) && IsValidString(NewTitle))
 	{
 		return GetWindowByIndex(WindowIndex)->SetTitleBar(NewTitle);
 	}
@@ -1929,7 +1928,7 @@ void WindowManager::SetWindowOnRestored(GLuint WindowIndex, OnRestoredEvent OnRe
 
 GLboolean WindowManager::SetWindowOnFocus(const char* WindowName, OnFocusEvent OnFocus)
 {
-	if(Foundation_Tools::IsValid(OnFocus))
+	if(IsValidString(WindowName))
 	{
 		GetWindowByName(WindowName)->FocusEvent = OnFocus;
 		return FOUNDATION_OKAY;

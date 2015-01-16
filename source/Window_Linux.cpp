@@ -26,7 +26,7 @@ GLboolean FWindow::Linux_Initialize()
 
 	if (!WindowManager::GetDisplay())
 	{
-		Foundation_Tools::PrintErrorMessage(ERROR_LINUX_CANNOTCONNECTXSERVER);
+		PrintErrorMessage(ERROR_LINUX_CANNOTCONNECTXSERVER);
 		exit(0);
 	}
 
@@ -36,7 +36,7 @@ GLboolean FWindow::Linux_Initialize()
 
 	if (!VisualInfo)
 	{
-		Foundation_Tools::PrintErrorMessage(ERROR_LINUX_INVALIDVISUALINFO);
+		PrintErrorMessage(ERROR_LINUX_INVALIDVISUALINFO);
 		exit(0);
 	}
 
@@ -59,7 +59,7 @@ GLboolean FWindow::Linux_Initialize()
 
 	if(!WindowHandle)
 	{
-		Foundation_Tools::PrintErrorMessage(ERROR_LINUX_CANNOTCREATEWINDOW);
+		PrintErrorMessage(ERROR_LINUX_CANNOTCREATEWINDOW);
 		exit(0);
 	}
 
@@ -416,7 +416,7 @@ GLboolean FWindow::Linux_InitializeGL()
 
 			if(!ExtensionsAvailable)
 			{
-				Foundation_Tools::PrintWarningMessage(WARNING_NOGLEXTENSIONS);
+				PrintWarningMessage(WARNING_NOGLEXTENSIONS);
 			}
 
 			else
@@ -430,7 +430,7 @@ GLboolean FWindow::Linux_InitializeGL()
 
 	else
 	{
-		Foundation_Tools::PrintErrorMessage(ERROR_EXISTINGCONTEXT);
+		PrintErrorMessage(ERROR_EXISTINGCONTEXT);
 		return FOUNDATION_ERROR;	
 	}
 
@@ -537,7 +537,7 @@ GLboolean FWindow::Linux_EnableDecorator(GLbitfield Decorator)
 	{
 
 		// Im sorry to push this function out unfinished but i have been having ALOT of trouble with this function
-		Foundation_Tools::PrintErrorMessage(ERROR_LINUX_FUNCTIONNOTIMPLEMENTED);
+		PrintErrorMessage(ERROR_LINUX_FUNCTIONNOTIMPLEMENTED);
 		return FOUNDATION_OKAY;	
 
 		//THIS IS TESTING CODE. NOT EVEN REMOTELY FINISHED!!!
@@ -570,7 +570,7 @@ GLboolean FWindow::Linux_DisableDecorator(GLbitfield Decorator)
 {
 	if(ContextCreated)
 	{
-		Foundation_Tools::PrintErrorMessage(ERROR_LINUX_FUNCTIONNOTIMPLEMENTED);
+		PrintErrorMessage(ERROR_LINUX_FUNCTIONNOTIMPLEMENTED);
 		return FOUNDATION_OKAY;
 	}
 
