@@ -124,6 +124,12 @@
 #define DECORATOR_HORIZONTALSCROLLBAR 0x80
 #define DECORATOR_SIZEABLEBORDER 0x100
 
+#define LINUX_DECORATOR_BORDER 1L << 1
+#define LINUX_DECORATOR_MOVE 1L << 2
+#define LINUX_DECORATOR_MINIMIZE 1L << 3
+#define LINUX_DECORATOR_MAXIMIZE 1L << 4
+#define LINUX_DECORATOR_CLOSE 1L << 5
+
 #define FOUNDATION_ERROR 0
 #define FOUNDATION_OKAY 1
 
@@ -152,6 +158,11 @@
 
 #define WARNING_NOTCURRENTCONTEXT 0
 #define WARNING_NOGLEXTENSIONS 1
+
+#define LINUX_FUNCTION 1
+#define LINUX_DECORATOR 2
+
+
 
 typedef void (*OnKeyEvent)(GLuint Key, GLboolean KeyState);	/**<To be called when a key event has occurred*/
 typedef void (*OnMouseButtonEvent)(GLuint Button, GLboolean ButtonState);	/**<To be called when a Mouse button event has occurred*/

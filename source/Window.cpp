@@ -889,7 +889,22 @@ GLboolean FWindow::SetStyle(GLuint WindowType)
 {
 	if (ContextCreated)
 	{
-		switch (WindowType)
+#if defined(CURRENT_OS_WINDOWS)
+		Windows_SetStyle(WindowType);
+#endif
+
+#if defined(CURRENT_OS_LINUX)
+		Linux_SetStyle(WindowType);
+#endif
+
+		PrintErrorMessage(ERROR_NOCONTEXT);
+		return FOUNDATION_OKAY;
+	}
+
+	return FOUNDATION_ERROR;
+}
+
+		/*switch (WindowType)
 		{
 			case WINDOWSTYLE_DEFAULT:
 			{
@@ -921,7 +936,7 @@ GLboolean FWindow::SetStyle(GLuint WindowType)
 	PrintErrorMessage(ERROR_NOCONTEXT);
 	return FOUNDATION_ERROR;
 
-}
+}*/
 
 /**********************************************************************************************//**
  * @fn	GLboolean FWindow::MakeCurrentContext()

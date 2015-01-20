@@ -24,6 +24,9 @@ GLboolean FWindow::Linux_Initialize()
 	Attributes = new GLint[12]{GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, DepthBits, GLX_STENCIL_SIZE, StencilBits,
 	   GLX_RED_SIZE, ColourBits, GLX_GREEN_SIZE, ColourBits, GLX_BLUE_SIZE, ColourBits, None};
 
+	Decorators = 1;
+	CurrentWindowStyle |= LINUX_DECORATOR_CLOSE | LINUX_DECORATOR_MAXIMIZE | LINUX_DECORATOR_MINIMIZE | LINUX_DECORATOR_MOVE;
+
 	if (!WindowManager::GetDisplay())
 	{
 		PrintErrorMessage(ERROR_LINUX_CANNOTCONNECTXSERVER);
@@ -531,51 +534,197 @@ Window FWindow::GetWindowHandle()
 	return WindowHandle;
 }
 
-GLboolean FWindow::Linux_EnableDecorator(GLbitfield Decorator)
+void FWindow::Linux_EnableDecorator(GLbitfield Decorator)
 {
-	if(ContextCreated)
-	{
-
-		// Im sorry to push this function out unfinished but i have been having ALOT of trouble with this function
-		PrintErrorMessage(ERROR_LINUX_FUNCTIONNOTIMPLEMENTED);
-		return FOUNDATION_OKAY;	
-
-		//THIS IS TESTING CODE. NOT EVEN REMOTELY FINISHED!!!
-		//
-		//here I'm just trying to figure out what combination of numbers produce results(blind programing)
-		/*typedef struct WindowHints
+		if(Decorator & DECORATOR_CLOSEBUTTON)
 		{
-			unsigned long Flags;
-			unsigned long Functions;
-			unsigned long Decorations;
-			long InputMode;
-			unsigned long status;
-		} Hints;
+			CurrentWindowStyle |= LINUX_DECORATOR_CLOSE;
+			Decorators = 1;
+		}
 
-		Hints l_Hints;
-		l_Hints.Flags = 1;
-		l_Hints.Decorations = 0;
+		if(Decorator & DECORATOR_MINIMIZEBUTTON)
+		{
+			CurrentWindowStyle |= LINUX_DECORATOR_MINIMIZE;
+			Decorators = 1;
+		}
 
-		long hints[5] = {2, 0, 8, 0, 0};
+		if(Decorator & DECORATOR_MAXIMIZEBUTTON)
+		{
+			CurrentWindowStyle |= LINUX_DECORATOR_MAXIMIZE;
+			Decorators = 1;
+		}
+
+		if(Decorator & DECORATOR_ICON)
+		{
+			//Linux (at least cinammon) doesnt have icons in the window. only in the taskbar icon
+		}
+
+		//just need to set it to 1 to enable all decorators that include title bar 
+		if(Decorator & DECORATOR_TITLEBAR)
+		{
+			Decorators = 1;
+		}
+
+		if(Decorator & DECORATOR_BORDER)
+		{
+			Decorators = 1;
+		}
+
+		if(Decorator & DECORATOR_SIZEABLEBORDER)
+		{
+			Decorators = 1;
+		}	
+
+		long hints[5] = {LINUX_FUNCTION | LINUX_DECORATOR, CurrentWindowStyle, Decorators, 0, 0};
+
 		XChangeProperty(WindowManager::GetDisplay(), WindowHandle, AtomHints, XA_ATOM, 32, 
 			   PropModeReplace,(unsigned char*) hints, 5); 
 
-	XMapWindow(WindowManager::GetDisplay(), WindowHandle);	*/
-	}
-
-	return FOUNDATION_ERROR;
+		XMapWindow(WindowManager::GetDisplay(), WindowHandle);
 }
 
-GLboolean FWindow::Linux_DisableDecorator(GLbitfield Decorator)
+void FWindow::Linux_DisableDecorator(GLbitfield Decorator)
+{		
+		if(Decorator & DECORATOR_CLOSEBUTTON)
+		{
+			//I hate doing this but it is neccessary to keep functionality going.
+			GLboolean MinimizeEnabled, MaximizeEnabled;
+
+			if(Decorator & DECORATOR_MAXIMIZEBUTTON)
+			{
+				MaximizeEnabled = GL_TRUE;
+			}
+
+			if(Decorator & DECORATOR_MINIMIZEBUTTON)
+			{
+				MinimizeEnabled = GL_TRUE;
+			}
+
+			CurrentWindowStyle &= ~LINUX_DECORATOR_CLOSE;
+
+			if(MaximizeEnabled)
+			{
+				CurrentWindowStyle |= LINUX_DECORATOR_MAXIMIZE;
+			}
+
+			if(MinimizeEnabled)
+			{
+				CurrentWindowStyle |= LINUX_DECORATOR_MINIMIZE;
+			}
+
+			Decorators = 1;
+		}
+
+		if(Decorator & DECORATOR_MINIMIZEBUTTON)
+		{
+			CurrentWindowStyle &= ~LINUX_DECORATOR_MINIMIZE;
+			Decorators = 1;
+		}
+
+		if(Decorator & DECORATOR_MAXIMIZEBUTTON)
+		{
+			GLboolean MinimizeEnabled;
+
+			if(Decorator & DECORATOR_MINIMIZEBUTTON)
+			{
+				MinimizeEnabled = GL_TRUE;
+			}
+
+		  	CurrentWindowStyle &= ~LINUX_DECORATOR_MAXIMIZE;
+
+			if(MinimizeEnabled)
+			{
+				CurrentWindowStyle |= LINUX_DECORATOR_MINIMIZE;
+			}
+
+			Decorators = 1;
+		}
+
+		if(Decorator & DECORATOR_ICON)
+		{
+			//Linux (at least cinammon) doesnt have icons in the window. only in the taskbar icon
+		}
+
+		//just need to set it to 1 to enable all decorators that include title bar 
+		if(Decorator & DECORATOR_TITLEBAR)
+		{
+			Decorators = LINUX_DECORATOR_BORDER;
+		}
+
+		if(Decorator & DECORATOR_BORDER)
+		{
+			Decorators = 0;
+		}
+
+		if(Decorator & DECORATOR_SIZEABLEBORDER)
+		{
+			Decorators = 0;
+		}	
+
+		long hints[5] = {LINUX_FUNCTION | LINUX_DECORATOR, CurrentWindowStyle, Decorators, 0, 0};
+
+		XChangeProperty(WindowManager::GetDisplay(), WindowHandle, AtomHints, XA_ATOM, 32, 
+			   PropModeReplace,(unsigned char*) hints, 5); 
+
+		XMapWindow(WindowManager::GetDisplay(), WindowHandle);
+}
+
+void FWindow::Linux_SetStyle(GLuint WindowStyle)
 {
-	if(ContextCreated)
+	switch(WindowStyle)
 	{
-		PrintErrorMessage(ERROR_LINUX_FUNCTIONNOTIMPLEMENTED);
-		return FOUNDATION_OKAY;
-	}
+		case WINDOWSTYLE_DEFAULT:
+			{
+				Decorators = (1L << 2);
+				CurrentWindowStyle = LINUX_DECORATOR_MOVE | LINUX_DECORATOR_CLOSE | 
+					LINUX_DECORATOR_MAXIMIZE | LINUX_DECORATOR_MINIMIZE; 
+				long Hints[5] = {LINUX_FUNCTION | LINUX_DECORATOR, CurrentWindowStyle, Decorators, 0, 0};
 
-	return FOUNDATION_ERROR;
-}
+				XChangeProperty(WindowManager::GetDisplay(), WindowHandle, AtomHints, XA_ATOM, 32, PropModeReplace, 
+						(unsigned char*)Hints, 5);
+
+				XMapWindow(WindowManager::GetDisplay(), WindowHandle);
+
+
+				break;
+			}
+
+		case WINDOWSTYLE_BARE:
+			{
+				Decorators = (1L << 2);
+				CurrentWindowStyle = (1L << 2);
+				long Hints[5] = {LINUX_FUNCTION | LINUX_DECORATOR, CurrentWindowStyle, Decorators, 0, 0};
+
+				XChangeProperty(WindowManager::GetDisplay(), WindowHandle, AtomHints, XA_ATOM, 32, PropModeReplace, 
+						(unsigned char*)Hints, 5);
+
+				XMapWindow(WindowManager::GetDisplay(), WindowHandle);
+
+
+				break;
+			}
+
+		case WINDOWSTYLE_POPUP:
+			{
+				Decorators = 0;
+				CurrentWindowStyle = (1L << 2);
+				long Hints[5] = {LINUX_FUNCTION | LINUX_DECORATOR, CurrentWindowStyle, Decorators, 0, 0};
+
+				XChangeProperty(WindowManager::GetDisplay(), WindowHandle, AtomHints, XA_ATOM, 32, PropModeReplace, 
+						(unsigned char*)Hints, 5);
+
+				XMapWindow(WindowManager::GetDisplay(), WindowHandle);
+
+				break;
+			}
+
+			default:
+			{
+				PrintErrorMessage(ERROR_INVALIDWINDOWSTYLE);
+				break;
+			}
+	}
+}	
 
 GLXFBConfig FWindow::GetBestFrameBufferConfig()
 {

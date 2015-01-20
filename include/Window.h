@@ -175,7 +175,8 @@ private:
 	GLboolean IsCurrentContext; /**< Whether the window is the current window that is being drawn to */
 	GLuint CurrentState; /**< The current state of the window. these states include Normal, Minimized, Maximized and Full screen*/
 	GLuint CurrentSwapInterval; /**< The current swap interval of the window(V-Sync). a value of -1 enables adaptive V-Sync on supported systems */
-	
+	GLbitfield CurrentWindowStyle; /**< the current window style */
+
 //set all the Events to null 
 	void InitializeEvents();
 	//Initializes OpenGL extensions
@@ -241,6 +242,8 @@ private:
 	void Windows_EnableDecorator(GLbitfield Decorator);
 	//disables given window decoration via Win32
 	void Windows_DisableDecorator(GLbitfield Decorator);
+
+	void Windows_SetStyle(GLuint WindowType);
 	//get the handle of the window. to be used internally only
 	HWND GetWindowHandle();
 
@@ -258,8 +261,7 @@ private:
 	WNDCLASS WindowClass; /**< this describes the type of Window that Win32 will create*/
 	HWND WindowHandle; /**<handle to the Win32 window itself */
 	HINSTANCE InstanceHandle; /**< handle to the Win32 instance */
-	GLbitfield CurrentWindowStyle; /**< the current window style */
-
+	
 	PFNWGLSWAPINTERVALEXTPROC SwapIntervalEXT; /**< OpenGL extension callback for setting the swap interval(V-Sync)*/
 	PFNWGLSWAPBUFFERSMSCOMLPROC SwapIntervalMSCOM; // what the holy fuck is MSCOM?
 	PFNWGLGETEXTENSIONSSTRINGEXTPROC GetExtensionsStringEXT; /**< OpenGL extension for revealing available extensions*/
@@ -295,9 +297,11 @@ private:
 	//shut down the window. closes all connections to the X11 system
 	void Linux_Shutdown();
 	//enables given window decoration via Win32
-	GLboolean Linux_EnableDecorator(GLbitfield Decorator);
+	void Linux_EnableDecorator(GLbitfield Decorator);
 	//disables given window decoration via Win32
-	GLboolean Linux_DisableDecorator(GLbitfield Decorator);
+	void Linux_DisableDecorator(GLbitfield Decorator);
+
+	void Linux_SetStyle(GLuint WindowStyle);
 
 	//initialize the window manager Atomics needed for the X11 extended window manager
 	void InitializeAtomics();
@@ -314,6 +318,7 @@ private:
 	XVisualInfo* VisualInfo; /**< the handle to the Visual Information. similar purpose to PixelformatDesriptor*/
 	GLint* Attributes;/**< attributes of the window. RGB, depth, stencil, etc */
 	XSetWindowAttributes SetAttributes; /**< the attributes to be set for the window */
+	GLbitfield Decorators; /**< enabled window decorators */
 	
 	//these are the callbacks for the GLX swap interval extension. 
 	PFNGLXSWAPINTERVALMESAPROC SwapIntervalMESA; /**< the mesa swap interval extension */
