@@ -1,4 +1,4 @@
-CURRENT_COMPILER=clang
+CURRENT_COMPILER=g++
 
 #one set for debug, another for release
 CLANG_DEBUGFLAGS= -c -std=c++11 -stdlib=libstdc++ -g -DDEBUG -pedantic -Wno-deprecated-declarations -Wno-c++11-extensions
@@ -23,8 +23,8 @@ BUILDOBJECTS=./*.o
 DEBUGTARGET=Debug
 RELEASETARGET=Release
 EXAMPLETARGET=Example
-DEBUGLIBRARY_OBJECT= ./bin/D_libWindowAPI.a
-RELEASELIBRARY_OBJECT= ./bin/R_libWindowAPI.a
+DEBUGLIBRARY_OBJECT= ./bin/libWindowAPI_D.a
+RELEASELIBRARY_OBJECT= ./bin/libWindowAPI_R.a
 
 LIBRARIES=-lGLU -lGL -lX11 -lpthread -lstdc++
 ERROR_LOG=errors.txt
