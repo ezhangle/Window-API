@@ -20,7 +20,7 @@
 
 void OnWindowKeyPressed(GLuint KeySym, GLboolean KeyState)
 {
-    if(KeySym == KEY_RIGHTWINDOW && KeyState == KEYSTATE_DOWN)
+    if(KeySym == ' ' && KeyState == KEYSTATE_DOWN)
 	{
 		printf("1234\n");
 	}
@@ -42,6 +42,8 @@ int main()
 	WindowManager::Initialize();
 	WindowManager::AddWindow(new FWindow("Example"));//->AddWindow(new FWindow("Example2"));
 	WindowManager::SetWindowOnKeyEvent("Example", &OnWindowKeyPressed);
+	WindowManager::SetWindowStyle("Example", WINDOWSTYLE_BARE);
+	WindowManager::EnableWindowDecorator("Example", DECORATOR_MINIMIZEBUTTON);
 	while (!WindowManager::GetWindowShouldClose("Example"))
 	{
 		WindowManager::PollForEvents();

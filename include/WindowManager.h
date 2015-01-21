@@ -137,6 +137,15 @@ class WindowManager
 		//remove a window from the manager
 		static GLboolean RemoveWindow(FWindow* WindowToBeRemoved);
 
+		static GLboolean SetWindowStyle(const char* WindowName, GLuint WindowStyle);
+		static GLboolean SetWindowStyle(GLuint WindowIndex, GLuint WindowStyle);
+
+		static GLboolean EnableWindowDecorator(const char* WindowName, GLbitfield Decorators);
+		static GLboolean EnableWindowDecorator(GLuint WindowIndex, GLbitfield Decorators);
+
+		static GLboolean DisableWindowDecorator(const char* WindowName, GLbitfield Decorators);
+		static GLboolean DisableWindowDecorator(GLuint WindowIndex, GLbitfield Decorators); 
+
 		//set callbacks for the selected window
 		static GLboolean SetWindowOnKeyEvent(const char* WindowName, OnKeyEvent OnKey);
 		static GLboolean SetWindowOnKeyEvent(GLuint WindowIndex, OnKeyEvent OnKey);

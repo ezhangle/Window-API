@@ -28,7 +28,7 @@ HWND FWindow::GetWindowHandle()
 /**********************************************************************************************//**
  * @fn	GLboolean FWindow::Windows_InitializeGL()
  *
- * @brief	Windows initialize gl.
+ * @brief	Windows initialize OpenGL.
  *
  * @author	Ziyad
  * @date	29/11/2014
@@ -56,7 +56,7 @@ GLboolean FWindow::Windows_InitializeGL()
 		}
 
 	/**********************************************************************************************//**
-	 * @fn	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDCONTEXT);
+	 * @fn	PrintErrorMessage(ERROR_INVALIDCONTEXT);
 	 *
 	 * @brief	Constructor.
 	 *
@@ -66,7 +66,7 @@ GLboolean FWindow::Windows_InitializeGL()
 	 * @param	parameter1	The first parameter.
 	 **************************************************************************************************/
 
-	Foundation_Tools::PrintErrorMessage(ERROR_INVALIDCONTEXT);
+	PrintErrorMessage(ERROR_INVALIDCONTEXT);
 	return FOUNDATION_ERROR;
 }
 
@@ -150,7 +150,7 @@ GLboolean FWindow::Windows_Initialize(
 		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_WINDOWS_CANNOTCREATEWINDOW);
+	PrintErrorMessage(ERROR_WINDOWS_CANNOTCREATEWINDOW);
 	return FOUNDATION_ERROR;
 }
 
@@ -167,7 +167,6 @@ void FWindow::Windows_Shutdown()
 		DeleteObject(PaletteHandle);
 	}
 	ReleaseDC(WindowHandle, DeviceContextHandle);
-	DestroyWindow(WindowHandle);
 	UnregisterClass(Name, InstanceHandle);
 
 	FreeModule(InstanceHandle);
@@ -189,6 +188,8 @@ void FWindow::Windows_FullScreen()
 
 		MoveWindow(WindowHandle, 0, 0, WindowManager::GetScreenResolution()[0],
 			WindowManager::GetScreenResolution()[1], GL_TRUE);
+
+		//
 /*
 
 		DEVMODE l_ScreenSettings;
@@ -437,6 +438,37 @@ void FWindow::Windows_DisableDecorator(GLbitfield Decorator)
 
 	SetWindowLongPtr(WindowHandle, GWL_STYLE,
 		CurrentWindowStyle | WS_VISIBLE);
+}
+
+void FWindow::Windows_SetStyle(GLuint WindowType)
+{
+	switch (WindowType)
+	{
+	case WINDOWSTYLE_DEFAULT:
+	{
+		EnableDecorator(DECORATOR_TITLEBAR | DECORATOR_BORDER |
+			DECORATOR_CLOSEBUTTON | DECORATOR_MINIMIZEBUTTON | DECORATOR_MAXIMIZEBUTTON);
+		break;
+	}
+
+	case WINDOWSTYLE_POPUP:
+	{
+		EnableDecorator(0);
+		break;
+	}
+
+	case WINDOWSTYLE_BARE:
+	{
+		EnableDecorator(DECORATOR_TITLEBAR | DECORATOR_BORDER);
+		break;
+	}
+
+	default:
+	{
+		PrintErrorMessage(ERROR_INVALIDWINDOWSTYLE);
+		break;
+	}
+	}
 }
 
 #endif

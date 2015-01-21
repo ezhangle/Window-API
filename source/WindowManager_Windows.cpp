@@ -31,6 +31,8 @@ GLboolean WindowManager::Windows_Initialize()
 
 		GetInstance()->ScreenResolution[0] = l_Desktop.right;
 		GetInstance()->ScreenResolution[1] = l_Desktop.bottom;
+
+		GetInstance()->Initialized = GL_TRUE;
 		return FOUNDATION_OKAY;
 	}
 
@@ -102,7 +104,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 	{
 		l_Window->ShouldClose = GL_TRUE;
 
-		if (Foundation_Tools::IsValid(l_Window->DestroyedEvent))
+		if (IsValidDestroyedEvent(l_Window->DestroyedEvent))
 		{
 			l_Window->DestroyedEvent();
 		}
@@ -115,7 +117,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 		l_Window->Position[0] = LOWORD(LongParam);
 		l_Window->Position[1] = HIWORD(LongParam);
 		
-		if (Foundation_Tools::IsValid(l_Window->MovedEvent))
+		if (IsValidMovedEvent(l_Window->MovedEvent))
 		{
 			l_Window->MovedEvent(l_Window->Position[0], l_Window->Position[1]);
 		}
@@ -128,7 +130,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 		l_Window->Position[0] = LOWORD(LongParam);
 		l_Window->Position[1] = HIWORD(LongParam);
 
-		if (Foundation_Tools::IsValid(l_Window->MovedEvent))
+		if (IsValidMovedEvent(l_Window->MovedEvent))
 		{
 			l_Window->MovedEvent(l_Window->Position[0], l_Window->Position[1]);
 		}
@@ -144,7 +146,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 		{
 			case SIZE_MAXIMIZED:
 			{
-				if (Foundation_Tools::IsValid(l_Window->MaximizedEvent))
+				if (IsValidDestroyedEvent(l_Window->MaximizedEvent))
 				{
 					l_Window->MaximizedEvent();
 				}
@@ -154,7 +156,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 
 			case SIZE_MINIMIZED:
 			{
-				if (Foundation_Tools::IsValid(l_Window->MinimizedEvent))
+				if (IsValidDestroyedEvent(l_Window->MinimizedEvent))
 				{
 					l_Window->MinimizedEvent();
 				}
@@ -163,7 +165,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 
 			/*case SIZE_RESTORED:
 			{
-				if (Foundation_Tools::IsValid(l_Window->MaximizedEvent))
+				if (IsValid(l_Window->MaximizedEvent))
 				{
 					l_Window->RestoredEvent();
 				}
@@ -172,7 +174,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 
 			default:
 			{
-				if (Foundation_Tools::IsValid(l_Window->ResizeEvent))
+				if (IsValidMovedEvent(l_Window->ResizeEvent))
 				{
 					l_Window->ResizeEvent(l_Window->Resolution[0],
 						l_Window->Resolution[1]);
@@ -190,7 +192,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 		l_Window->Resolution[0] = (GLuint)LOWORD(LongParam);
 		l_Window->Resolution[1] = (GLuint)HIWORD(LongParam);
 
-		if (Foundation_Tools::IsValid(l_Window->ResizeEvent))
+		if (IsValidMovedEvent(l_Window->ResizeEvent))
 		{
 			l_Window->ResizeEvent(l_Window->Resolution[0],
 				l_Window->Resolution[1]);
@@ -236,13 +238,13 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 
 			default:
 			{
-				l_TranslatedKey = Foundation_Tools::Windows_TranslateKey(WordParam, LongParam);
+				l_TranslatedKey = Windows_TranslateKey(WordParam, LongParam);
 				l_Window->Keys[l_TranslatedKey] = KEYSTATE_DOWN;
 				break;
 			}
 		}
 
-		if (Foundation_Tools::IsValid(l_Window->KeyEvent))
+		if (IsValidKeyEvent(l_Window->KeyEvent))
 		{
 			l_Window->KeyEvent(l_TranslatedKey, KEYSTATE_DOWN);
 		}
@@ -285,13 +287,13 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 
 			default:
 			{
-				l_TranslatedKey = Foundation_Tools::Windows_TranslateKey(WordParam, LongParam);
+				l_TranslatedKey = Windows_TranslateKey(WordParam, LongParam);
 				l_Window->Keys[l_TranslatedKey] = KEYSTATE_UP;
 				break;
 			}
 		}
 
-		if (Foundation_Tools::IsValid(l_Window->KeyEvent))
+		if (IsValidKeyEvent(l_Window->KeyEvent))
 		{
 			l_Window->KeyEvent(l_TranslatedKey, KEYSTATE_UP);
 		}
@@ -323,7 +325,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 		}
 		}
 
-		if (Foundation_Tools::IsValid(l_Window->KeyEvent))
+		if (IsValidKeyEvent(l_Window->KeyEvent))
 		{
 			l_Window->KeyEvent(l_TranslatedKey, KEYSTATE_DOWN);
 		}
@@ -357,7 +359,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 		}
 		}
 
-		if (Foundation_Tools::IsValid(l_Window->KeyEvent))
+		if (IsValidKeyEvent(l_Window->KeyEvent))
 		{
 			l_Window->KeyEvent(l_TranslatedKey, KEYSTATE_UP);
 		}
@@ -377,7 +379,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 
 		//printf("%i %i \n", l_Point.x, l_Point.y);
 
-		if (Foundation_Tools::IsValid(l_Window->MouseMoveEvent))
+		if (IsValidMouseMoveEvent(l_Window->MouseMoveEvent))
 		{
 			l_Window->MouseMoveEvent(l_Window->MousePosition[0],
 				l_Window->MousePosition[1], l_Point.x, l_Point.y);
@@ -389,7 +391,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 	{
 		l_Window->MouseButton[MOUSE_LEFTBUTTON] = MOUSE_BUTTONDOWN;
 
-		if (Foundation_Tools::IsValid(l_Window->MouseButtonEvent))
+		if (IsValidKeyEvent(l_Window->MouseButtonEvent))
 		{
 			l_Window->MouseButtonEvent(MOUSE_LEFTBUTTON, MOUSE_BUTTONDOWN);
 		}
@@ -400,7 +402,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 	{
 		l_Window->MouseButton[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
 
-		if (Foundation_Tools::IsValid(l_Window->MouseButtonEvent))
+		if (IsValidKeyEvent(l_Window->MouseButtonEvent))
 		{
 			l_Window->MouseButtonEvent(MOUSE_LEFTBUTTON, MOUSE_BUTTONUP);
 		}
@@ -411,7 +413,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 	{
 		l_Window->MouseButton[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
 
-		if (Foundation_Tools::IsValid(l_Window->MouseButtonEvent))
+		if (IsValidKeyEvent(l_Window->MouseButtonEvent))
 		{
 			l_Window->MouseButtonEvent(MOUSE_RIGHTBUTTON, MOUSE_BUTTONDOWN);
 		}
@@ -422,7 +424,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 	{
 		l_Window->MouseButton[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONUP;
 
-		if (Foundation_Tools::IsValid(l_Window->MouseButtonEvent))
+		if (IsValidKeyEvent(l_Window->MouseButtonEvent))
 		{
 			l_Window->MouseButtonEvent(MOUSE_RIGHTBUTTON, MOUSE_BUTTONUP);
 		}
@@ -433,7 +435,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 	{
 		l_Window->MouseButton[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
 
-		if (Foundation_Tools::IsValid(l_Window->MouseButtonEvent))
+		if (IsValidKeyEvent(l_Window->MouseButtonEvent))
 		{
 			l_Window->MouseButtonEvent(MOUSE_MIDDLEBUTTON, MOUSE_BUTTONDOWN);
 		}
@@ -444,7 +446,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 	{
 		l_Window->MouseButton[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONUP;
 
-		if (Foundation_Tools::IsValid(l_Window->MouseButtonEvent))
+		if (IsValidKeyEvent(l_Window->MouseButtonEvent))
 		{
 			l_Window->MouseButtonEvent(MOUSE_MIDDLEBUTTON, MOUSE_BUTTONUP);
 		}
@@ -455,7 +457,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 	{
 		if ((WordParam % WHEEL_DELTA) > 0)
 		{
-			if (Foundation_Tools::IsValid(l_Window->MouseWheelEvent))
+			if (IsValidMouseWheelEvent(l_Window->MouseWheelEvent))
 			{
 				l_Window->MouseWheelEvent(MOUSE_SCROLL_DOWN);
 			}
@@ -463,7 +465,7 @@ LRESULT CALLBACK WindowManager::WindowProcedure(HWND WindowHandle, UINT Message,
 
 		else
 		{
-			if (Foundation_Tools::IsValid(l_Window->MouseWheelEvent))
+			if (IsValidMouseWheelEvent(l_Window->MouseWheelEvent))
 			{
 				l_Window->MouseWheelEvent(MOUSE_SCROLL_UP);
 			}
@@ -492,10 +494,15 @@ GLboolean WindowManager::Windows_PollForEvents()
 		GetMessage(&GetInstance()->Message, 0, 0, 0);
 		TranslateMessage(&GetInstance()->Message);
 		DispatchMessage(&GetInstance()->Message);
+		return FOUNDATION_OKAY;
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
-	return FOUNDATION_ERROR;
+	else
+	{
+
+		PrintErrorMessage(ERROR_NOTINITIALIZED);
+		return FOUNDATION_ERROR;
+	}
 }
 
 void WindowManager::CreateTerminal()
@@ -526,7 +533,7 @@ GLboolean WindowManager::Windows_SetMousePositionInScreen(GLuint X, GLuint Y)
 		SetCursorPos(l_MousePoint.x, l_MousePoint.y);
 	}
 
-	Foundation_Tools::PrintErrorMessage(ERROR_NOTINITIALIZED);
+	PrintErrorMessage(ERROR_NOTINITIALIZED);
 	return FOUNDATION_ERROR;
 }
 

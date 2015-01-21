@@ -90,7 +90,7 @@ GLboolean FWindow::Shutdown()
 {
 	if(ContextCreated)
 	{
-		ContextCreated = GL_FALSE;
+		
 #if defined (CURRENT_OS_WINDOWS)
 		Windows_Shutdown();
 #endif
@@ -98,6 +98,7 @@ GLboolean FWindow::Shutdown()
 #if defined(CURRENT_OS_LINUX)
 		Linux_Shutdown();
 #endif
+		ContextCreated = GL_FALSE;
 		return FOUNDATION_OKAY;
 	}
 
@@ -903,40 +904,6 @@ GLboolean FWindow::SetStyle(GLuint WindowType)
 
 	return FOUNDATION_ERROR;
 }
-
-		/*switch (WindowType)
-		{
-			case WINDOWSTYLE_DEFAULT:
-			{
-				EnableDecorator(DECORATOR_TITLEBAR | DECORATOR_BORDER |
-					DECORATOR_CLOSEBUTTON | DECORATOR_MINIMIZEBUTTON | DECORATOR_MAXIMIZEBUTTON);
-				return FOUNDATION_OKAY;
-			}
-
-			case WINDOWSTYLE_POPUP:
-			{
-				EnableDecorator(0);
-				return FOUNDATION_OKAY;
-			}
-
-			case WINDOWSTYLE_BARE:
-			{
-				EnableDecorator(DECORATOR_TITLEBAR | DECORATOR_BORDER);
-				return FOUNDATION_OKAY;
-			}
-
-			default:
-			{
-				PrintErrorMessage(ERROR_INVALIDWINDOWSTYLE);
-				return FOUNDATION_ERROR;
-			}
-		}
-	}
-
-	PrintErrorMessage(ERROR_NOCONTEXT);
-	return FOUNDATION_ERROR;
-
-}*/
 
 /**********************************************************************************************//**
  * @fn	GLboolean FWindow::MakeCurrentContext()

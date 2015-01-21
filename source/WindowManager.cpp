@@ -1634,6 +1634,67 @@ GLboolean WindowManager::SetWindowSwapInterval(GLuint WindowIndex, GLint a_SyncS
 	return FOUNDATION_ERROR;
 }
 
+GLboolean WindowManager::SetWindowStyle(const char* WindowName, GLuint WindowStyle)
+{
+	if (DoesExist(WindowName))
+	{
+		return GetWindowByName(WindowName)->SetStyle(WindowStyle);
+	}
+
+	return FOUNDATION_ERROR;
+}
+
+GLboolean WindowManager::SetWindowStyle(GLuint WindowIndex, GLuint WindowStyle)
+{
+	if (DoesExist(WindowIndex))
+	{
+		return GetWindowByIndex(WindowIndex)->SetStyle(WindowStyle);
+	}
+
+	return FOUNDATION_ERROR;
+}
+
+GLboolean WindowManager::EnableWindowDecorator(const char* WindowName, GLbitfield Decorators)
+{
+	if (DoesExist(WindowName))
+	{
+		return GetWindowByName(WindowName)->EnableDecorator(Decorators);
+	}
+
+	return FOUNDATION_ERROR;
+
+}
+
+GLboolean WindowManager::EnableWindowDecorator(GLuint WindowIndex, GLbitfield Decorators)
+{
+	if (DoesExist(WindowIndex))
+	{
+		return GetWindowByIndex(WindowIndex)->EnableDecorator(Decorators);
+	}
+
+	return FOUNDATION_ERROR;
+}
+
+GLboolean WindowManager::DisableWindowDecorator(const char* WindowName, GLbitfield Decorators)
+{
+	if (DoesExist(WindowName))
+	{
+		return GetWindowByName(WindowName)->DisableDecorator(Decorators);
+	}
+
+	return FOUNDATION_ERROR;
+}
+
+GLboolean WindowManager::DisableWindowDecorator(GLuint WindowIndex, GLbitfield Decorators)
+{
+	if (DoesExist(WindowIndex))
+	{
+		return GetWindowByIndex(WindowIndex)->DisableDecorator(Decorators);
+	}
+
+	return FOUNDATION_ERROR;
+}
+
 /**********************************************************************************************//**
  * @fn	void WindowManager::SetWindowOnKeyEvent(const char* WindowName, OnKeyEvent OnKey)
  *
