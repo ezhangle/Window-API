@@ -1,0 +1,22 @@
+Hello and welcome to the Foundation window Managment API
+
+installation:
+
+Linux- To install the Foundation window mangement API on the Linux platform you only need to open a terminal into the root directory of the project and call "make install". This will compile the project, throw all the generated files into a static library (.a) and then proceed to copy the files to your libray directory folder (/usr/lib). When copying files to the library directory you will be asked to sign in as a root/super user. This is to allow the makefile to copy files to a restricted folder. if you do not wish to install the library files to your library directory then you can simply call "make" which will automatically store your files in the 'bin' folder of the project directory. When You are finished using the API. you can call "make clean" which will remove all generated library files. 
+
+Windows-  To install the Foundation window management API on the Windows platform, You can either use the pre-compiled libraries with your project or you can compile the source code of the API to generate your own library files to use with your project. 
+
+Linking the API:
+Linux- 
+1. install the API as seen above
+2. create a new c++ file/project and copy the contents of the project folder (include, dependencies, etc.) into your project folder. Add the Aforementioned include directory of the Window API as an additional include directory for your project (usually for g++/clang it's -I/(API directory)/include/). 
+3. link the generated archive files into your project( -L(API Directory)/bin to tell the compiler where to look for the library and -lWindowAPI_D to tell the compiler to link the debug version of the library).
+
+NOTE: the makefile that is included with the example project of the API is also a good place to look if you want to understand amore about compiling and linking projects in Linux. 
+
+Windows/Visual studio:
+1. create a new c++ file/project and copy the contents of the project folder(include/ dependencies, etc.) into your project folder. Add the aforementioned include directory of the API as an additional include directory for you project.
+2. link the library files into your project. first you must addd the location of the library files as an additional library directory and then tell visual studio which library file you want to link(i.e debug or release).
+
+using the API:
+for the best way to understand using the API, please look at the example folder that is included with the API that provides an example of how to create a window, maintain an event loop and create an event callback using the WindowManager interface of the API. If you want to understand more there is also a folder filled with code documentation of the current version of the API. 
