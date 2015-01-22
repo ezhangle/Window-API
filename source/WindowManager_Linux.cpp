@@ -26,15 +26,15 @@ FWindow* WindowManager::GetWindowByHandle(Window WindowHandle)
 {
 	if(GetInstance()->IsInitialized())
 	{
-	for (auto Iter : GetInstance()->Windows)
-	{
-		if (Iter->GetWindowHandle() == WindowHandle)
+		for (auto Iter : GetInstance()->Windows)
 		{
-			return Iter;
+			if (Iter->GetWindowHandle() == WindowHandle)
+			{
+				return Iter;
+			}
 		}
-	}
 
-	return nullptr;
+		return nullptr;
 	}
 
 	PrintErrorMessage(ERROR_NOTINITIALIZED);
