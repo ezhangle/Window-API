@@ -36,6 +36,9 @@ BUILD_EXAMPLE=bash -c "cd Example && make"
 
 CLEAN_LIBS=bash -c "rm ./*.o"
 
+#INSTALL=sudo cp ./bin/* /usr/lib/ && sudo mkdir /usr/include/Foundation_WindowAPI/ && sudo cp -a ./include/. /usr/include/Foundation_WindowAPI
+
+
 all: $(DEBUGTARGET) $(RELEASETARGET)
 
 $(DEBUGTARGET): $(SOURCES)
@@ -43,5 +46,7 @@ $(DEBUGTARGET): $(SOURCES)
 $(RELEASETARGET): $(SOURCES)
 	$(CURRENT_COMPILER) $(CURRENT_RELEASEFLAGS) $(INCLUDES) $(SOURCES) $(LIBRARIES) 2> $(ERROR_LOG) && $(BUILD_RELEASELIB) && $(CLEAN_LIBS)
 
+#install: $(DEBUGTARGET) $(RELEASETARGET)
+	#$(INSTALL)	
 clean: ./
-	rm  $(DEBUGLIBRARY_OBJECT) $(RELEASELIBRARY_OBJECT) $(ERROR_LOG)
+	sudo rm $(DEBUGLIBRARY_OBJECT) $(RELEASELIBRARY_OBJECT) $(ERROR_LOG) #&& sudo rm -r /usr/include/Foundation_WindowAPI

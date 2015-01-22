@@ -251,452 +251,456 @@ GLboolean WindowManager::Linux_PollForEvents()
 {
 	if(GetInstance()->IsInitialized())
 	{
-	XNextEvent(GetInstance()->m_Display, &GetInstance()->m_Event);
-
-	XEvent l_Event = GetInstance()->m_Event;
-	FWindow* l_Window = GetWindowByEvent(l_Event);
-
-	switch (l_Event.type)
-	{
-		case Expose:
+		//if there ARE events to process then tell X to go ahead. else return immediately
+		if(XEventsQueued(GetInstance()->GetDisplay(), QueuedAfterReading))
 		{
-			break;
-		}
+			XNextEvent(GetInstance()->GetDisplay(), &GetInstance()->m_Event);
 
-		case DestroyNotify:
-		{
+			XEvent l_Event = GetInstance()->m_Event;
+			FWindow* l_Window = GetWindowByEvent(l_Event);
 
-			if(IsValidDestroyedEvent(l_Window->DestroyedEvent))
+			switch (l_Event.type)
 			{
-				l_Window->DestroyedEvent();
-			}
-			
-			l_Window->Shutdown();		
-			break;
-		}
-
-		/*case CreateNotify:
-		{	
-			printf("FWindow was created\n");
-			l_Window->InitializeGL();
-
-			if(Foundation_Tools::IsValid(l_Window->m_OnCreated))
-			{
-				l_Window->m_OnCreated();
-			}
-
-			break;
-		}*/
-
-		case KeyPress:
-		{			
-			GLuint l_FunctionKeysym = XKeycodeToKeysym(
-					GetInstance()->m_Display, l_Event.xkey.keycode, 1);
-			
-			if(l_FunctionKeysym <= 255)
-			{
-				l_Window->Keys[l_FunctionKeysym] = KEYSTATE_DOWN;	
-				if(IsValidKeyEvent(l_Window->KeyEvent))
+				case Expose:
 				{
-					l_Window->KeyEvent(l_FunctionKeysym, KEYSTATE_DOWN);
+					break;
 				}
-			}
-			
-			else
-			{
-				l_Window->Keys[
-					Linux_TranslateKey(l_FunctionKeysym)] = KEYSTATE_DOWN;
-				
-				if(IsValidKeyEvent(l_Window->KeyEvent))
+
+				case DestroyNotify:
 				{
-					l_Window->KeyEvent(Linux_TranslateKey(l_FunctionKeysym),  KEYSTATE_DOWN);
-				}
-			}
 
-			break;
-		}
-
-		case KeyRelease:
-		{
-			GLboolean l_IsRetriggered = GL_FALSE;
-			if(XEventsQueued(GetInstance()->m_Display, QueuedAfterReading))
-			{
-				XEvent l_NextEvent;
-				XPeekEvent(GetInstance()->m_Display, &l_NextEvent);
-
-				if(l_NextEvent.type == KeyPress && 
-						l_NextEvent.xkey.time == l_Event.xkey.time && 
-						l_NextEvent.xkey.keycode == l_Event.xkey.keycode)
-				{
-					XNextEvent(GetInstance()->m_Display, &l_Event);
-					l_IsRetriggered = GL_TRUE;
-				}
-			}
-
-			if(!l_IsRetriggered)
-			{
-				GLuint l_FunctionKeysym = XKeycodeToKeysym(GetInstance()->m_Display,
-					   l_Event.xkey.keycode, 1);
-
-				if(l_FunctionKeysym <= 255)
-				{
-					l_Window->Keys[l_FunctionKeysym] = KEYSTATE_UP;
+					if(IsValidDestroyedEvent(l_Window->DestroyedEvent))
+					{
+						l_Window->DestroyedEvent();
+					}
 					
-					if(IsValidKeyEvent(l_Window->KeyEvent))
-					{
-						l_Window->KeyEvent(l_FunctionKeysym, KEYSTATE_UP);
-					}
+					l_Window->Shutdown();		
+					break;
 				}
 
-				else
-				{
-					l_Window->Keys[
-					Linux_TranslateKey(l_FunctionKeysym)] = KEYSTATE_UP;
+				/*case CreateNotify:
+				{	
+					printf("FWindow was created\n");
+					l_Window->InitializeGL();
+
+					if(Foundation_Tools::IsValid(l_Window->m_OnCreated))
+					{
+						l_Window->m_OnCreated();
+					}
+
+					break;
+				}*/
+
+				case KeyPress:
+				{			
+					GLuint l_FunctionKeysym = XKeycodeToKeysym(
+							GetInstance()->m_Display, l_Event.xkey.keycode, 1);
 					
-					if(IsValidKeyEvent(l_Window->KeyEvent))
+					if(l_FunctionKeysym <= 255)
 					{
-						l_Window->KeyEvent(Linux_TranslateKey(l_FunctionKeysym), KEYSTATE_UP);
+						l_Window->Keys[l_FunctionKeysym] = KEYSTATE_DOWN;	
+						if(IsValidKeyEvent(l_Window->KeyEvent))
+						{
+							l_Window->KeyEvent(l_FunctionKeysym, KEYSTATE_DOWN);
+						}
 					}
+					
+					else
+					{
+						l_Window->Keys[
+							Linux_TranslateKey(l_FunctionKeysym)] = KEYSTATE_DOWN;
+						
+						if(IsValidKeyEvent(l_Window->KeyEvent))
+						{
+							l_Window->KeyEvent(Linux_TranslateKey(l_FunctionKeysym),  KEYSTATE_DOWN);
+						}
+					}
+
+					break;
 				}
 
-				if(IsValidKeyEvent(l_Window->KeyEvent))
+				case KeyRelease:
 				{
-					l_Window->KeyEvent(Linux_TranslateKey(l_FunctionKeysym), KEYSTATE_UP);
-				}
-			}
-
-			break;	
-		}
-
-		case ButtonPress:
-		{			
-			switch(l_Event.xbutton.button)
-			{
-				case 1:
+					GLboolean l_IsRetriggered = GL_FALSE;
+					if(XEventsQueued(GetInstance()->m_Display, QueuedAfterReading))
 					{
-						l_Window->MouseButton[MOUSE_LEFTBUTTON] = MOUSE_BUTTONDOWN;	
-						
-						if(IsValidKeyEvent(l_Window->MouseButtonEvent))
+						XEvent l_NextEvent;
+						XPeekEvent(GetInstance()->m_Display, &l_NextEvent);
+
+						if(l_NextEvent.type == KeyPress && 
+								l_NextEvent.xkey.time == l_Event.xkey.time && 
+								l_NextEvent.xkey.keycode == l_Event.xkey.keycode)
 						{
-							l_Window->MouseButtonEvent(MOUSE_LEFTBUTTON, MOUSE_BUTTONDOWN);
+							XNextEvent(GetInstance()->m_Display, &l_Event);
+							l_IsRetriggered = GL_TRUE;
 						}
-						break;
 					}
 
-				case 2:
+					if(!l_IsRetriggered)
 					{
-						l_Window->MouseButton[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
-						
-						if(IsValidKeyEvent(l_Window->MouseButtonEvent))
+						GLuint l_FunctionKeysym = XKeycodeToKeysym(GetInstance()->m_Display,
+							   l_Event.xkey.keycode, 1);
+
+						if(l_FunctionKeysym <= 255)
 						{
-							l_Window->MouseButtonEvent(MOUSE_MIDDLEBUTTON, MOUSE_BUTTONDOWN);
-						}
-						break;
-					}
-
-				case 3:
-					{
-						l_Window->MouseButton[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
-						
-						if(IsValidKeyEvent(l_Window->MouseButtonEvent))
-						{
-							l_Window->MouseButtonEvent(MOUSE_RIGHTBUTTON, MOUSE_BUTTONDOWN);
-						}
-						break;
-					}
-
-				case 4:
-					{
-						l_Window->MouseButton[MOUSE_SCROLL_UP] = MOUSE_BUTTONDOWN;
-						
-						if(IsValidMouseWheelEvent(l_Window->MouseWheelEvent))
-						{
-							l_Window->MouseWheelEvent(MOUSE_SCROLL_UP);
-						}
-						break;
-					}
-
-				case 5:
-					{
-						l_Window->MouseButton[MOUSE_SCROLL_DOWN] = MOUSE_BUTTONDOWN;
-						
-						if(IsValidMouseWheelEvent(l_Window->MouseWheelEvent))
-						{
-							l_Window->MouseWheelEvent(MOUSE_SCROLL_DOWN);
-						}
-						break;
-					}
-
-				default:
-					{
-						break;
-					}
-			}
-
-			break;
-		}
-
-		case ButtonRelease:
-		{
-			switch(l_Event.xbutton.button)
-			{
-				case 1:
-					{
-						l_Window->MouseButton[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
-						
-						if(IsValidKeyEvent(l_Window->MouseButtonEvent))
-						{
-							l_Window->MouseButtonEvent(MOUSE_LEFTBUTTON, MOUSE_BUTTONUP);
-						}
-						break;
-					}
-
-				case 2:
-					{
-						l_Window->MouseButton[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONUP;
-
-						if(IsValidKeyEvent(l_Window->MouseButtonEvent))
-						{
-							l_Window->MouseButtonEvent(MOUSE_MIDDLEBUTTON, MOUSE_BUTTONUP);
-						}
-						break;
-					}
-
-				case 3:
-					{
-						l_Window->MouseButton[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONUP;
-						
-						if(IsValidKeyEvent(l_Window->MouseButtonEvent))
-						{
-							l_Window->MouseButtonEvent(MOUSE_RIGHTBUTTON, MOUSE_BUTTONUP);
-						}
-						break;
-					}
-
-				case 4:
-					{
-						l_Window->MouseButton[MOUSE_SCROLL_UP] = MOUSE_BUTTONDOWN;
-						break;
-					}
-
-				case 5:
-					{
-						l_Window->MouseButton[MOUSE_SCROLL_DOWN] = MOUSE_BUTTONDOWN;
-						break;
-					}
-
-				default:
-					{
-						break;
-					}
-			}
-			break;
-		}
-
-		//when the mouse/pointer device is moved
-		case MotionNotify:
-		{ 
-			//set the windows mouse position to match the event
-			l_Window->MousePosition[0] = 
-				l_Event.xmotion.x;
-
-			l_Window->MousePosition[1] = 
-				l_Event.xmotion.y;
-
-			///set the manager screen  ouse position to match the event
-			GetInstance()->ScreenMousePosition[0] = l_Event.xmotion.x_root;
-			GetInstance()->ScreenMousePosition[1] = l_Event.xmotion.y_root;
-			
-			if(IsValidMouseMoveEvent(l_Window->MouseMoveEvent))
-			{
-				l_Window->MouseMoveEvent(l_Event.xmotion.x, 
-						l_Event.xmotion.y, l_Event.xmotion.x_root, 
-						l_Event.xmotion.y_root);
-			}	
-			break;
-		}
-
-		//when the window goes out of focus
-		case FocusOut:
-		{
-			l_Window->InFocus = GL_FALSE;
-			if(IsValidFocusEvent(l_Window->FocusEvent))
-			{
-				l_Window->FocusEvent(
-						l_Window->InFocus);
-			}
-			break;
-		}
-
-		//when the window is back in focus (use to restore?)
-		case FocusIn:
-		{
-			l_Window->InFocus = GL_TRUE;
-			
-			if(IsValidFocusEvent(l_Window->FocusEvent))
-			{
-				l_Window->FocusEvent(l_Window->InFocus);
-			}
-			break;
-		}
-
-		//when a request to resize the window is made either by 
-		//dragging out the window or programmatically
-		case ResizeRequest:
-		{			
-			glViewport(0, 0,
-					l_Window->GetResolution()[0],
-					l_Window->GetResolution()[1]);
-
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-
-			break;
-		}
-
-		//when a request to configure the window is made
-		case ConfigureNotify:
-		{
-			glViewport(0, 0, l_Event.xconfigure.width,
-						l_Event.xconfigure.height);
-
-			//check if window was resized
-			if((GLuint)l_Event.xconfigure.width != l_Window->Resolution[0] 
-					|| (GLuint)l_Event.xconfigure.height != l_Window->Resolution[1])
-			{
-				if(IsValidMovedEvent(l_Window->ResizeEvent))
-				{
-					l_Window->ResizeEvent(l_Event.xconfigure.width, l_Event.xconfigure.height);
-				}
-
-				l_Window->Resolution[0] = l_Event.xconfigure.width;
-				l_Window->Resolution[1] = l_Event.xconfigure.height;
-			}
-
-			//check if window was moved
-			if((GLuint)l_Event.xconfigure.x != l_Window->Position[0]
-					|| (GLuint)l_Event.xconfigure.y != l_Window->Position[1])
-			{
-				if(IsValidMovedEvent(l_Window->MovedEvent))
-				{
-					l_Window->MovedEvent(l_Event.xconfigure.x, l_Event.xconfigure.y);
-				}
-
-				l_Window->Position[0] = l_Event.xconfigure.x;
-				l_Window->Position[1] = l_Event.xconfigure.y;
-			}
-			break;
-		}
-
-		case PropertyNotify:
-		{
-			//this is needed in order to read from the windows WM_STATE Atomic
-			//to determine if the property notify event was caused by a client
-			//iconify event(minimizing the window) or a maximise event
-				
-			Atom l_Type;
-			GLint l_Format;
-			ulong l_NumItems, l_BytesAfter;
-			unsigned char* l_Properties = nullptr;
-
-			XGetWindowProperty(WindowManager::GetDisplay(), l_Event.xproperty.window, 
-						l_Window->AtomState, 
-						0, LONG_MAX, GL_FALSE, AnyPropertyType, 
-						&l_Type, &l_Format, &l_NumItems, &l_BytesAfter, 
-						&l_Properties);
-
-				if(l_Properties && (l_Format == 32))
-				{
-					for(GLuint l_CurrentItem = 0; l_CurrentItem < l_NumItems; l_CurrentItem++)
-					{
-						long l_Property = ((long*)(l_Properties))[l_CurrentItem];	
-
-						if(l_Property == l_Window->AtomHidden)
-						{
-							if(IsValidDestroyedEvent(l_Window->MinimizedEvent))
-							{								
-								l_Window->MinimizedEvent();
+							l_Window->Keys[l_FunctionKeysym] = KEYSTATE_UP;
+							
+							if(IsValidKeyEvent(l_Window->KeyEvent))
+							{
+								l_Window->KeyEvent(l_FunctionKeysym, KEYSTATE_UP);
 							}
 						}
 
-						if(l_Property == l_Window->AtomMaxVert ||
-								l_Property == l_Window->AtomMaxVert)
-						{	
-							if(IsValidDestroyedEvent(l_Window->MaximizedEvent))
-							{		
-								l_Window->MaximizedEvent();
+						else
+						{
+							l_Window->Keys[
+							Linux_TranslateKey(l_FunctionKeysym)] = KEYSTATE_UP;
+							
+							if(IsValidKeyEvent(l_Window->KeyEvent))
+							{
+								l_Window->KeyEvent(Linux_TranslateKey(l_FunctionKeysym), KEYSTATE_UP);
 							}
 						}
 
-						if(l_Property == l_Window->AtomDemandsAttention)
+						if(IsValidKeyEvent(l_Window->KeyEvent))
 						{
-							//printf("window demands attention \n");
+							l_Window->KeyEvent(Linux_TranslateKey(l_FunctionKeysym), KEYSTATE_UP);
 						}
 					}
+
+					break;	
 				}
 
-			break;
+				case ButtonPress:
+				{			
+					switch(l_Event.xbutton.button)
+					{
+						case 1:
+							{
+								l_Window->MouseButton[MOUSE_LEFTBUTTON] = MOUSE_BUTTONDOWN;	
+								
+								if(IsValidKeyEvent(l_Window->MouseButtonEvent))
+								{
+									l_Window->MouseButtonEvent(MOUSE_LEFTBUTTON, MOUSE_BUTTONDOWN);
+								}
+								break;
+							}
+
+						case 2:
+							{
+								l_Window->MouseButton[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONDOWN;
+								
+								if(IsValidKeyEvent(l_Window->MouseButtonEvent))
+								{
+									l_Window->MouseButtonEvent(MOUSE_MIDDLEBUTTON, MOUSE_BUTTONDOWN);
+								}
+								break;
+							}
+
+						case 3:
+							{
+								l_Window->MouseButton[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONDOWN;
+								
+								if(IsValidKeyEvent(l_Window->MouseButtonEvent))
+								{
+									l_Window->MouseButtonEvent(MOUSE_RIGHTBUTTON, MOUSE_BUTTONDOWN);
+								}
+								break;
+							}
+
+						case 4:
+							{
+								l_Window->MouseButton[MOUSE_SCROLL_UP] = MOUSE_BUTTONDOWN;
+								
+								if(IsValidMouseWheelEvent(l_Window->MouseWheelEvent))
+								{
+									l_Window->MouseWheelEvent(MOUSE_SCROLL_UP);
+								}
+								break;
+							}
+
+						case 5:
+							{
+								l_Window->MouseButton[MOUSE_SCROLL_DOWN] = MOUSE_BUTTONDOWN;
+								
+								if(IsValidMouseWheelEvent(l_Window->MouseWheelEvent))
+								{
+									l_Window->MouseWheelEvent(MOUSE_SCROLL_DOWN);
+								}
+								break;
+							}
+
+						default:
+							{
+								break;
+							}
+					}
+
+					break;
+				}
+
+				case ButtonRelease:
+				{
+					switch(l_Event.xbutton.button)
+					{
+						case 1:
+							{
+								l_Window->MouseButton[MOUSE_LEFTBUTTON] = MOUSE_BUTTONUP;
+								
+								if(IsValidKeyEvent(l_Window->MouseButtonEvent))
+								{
+									l_Window->MouseButtonEvent(MOUSE_LEFTBUTTON, MOUSE_BUTTONUP);
+								}
+								break;
+							}
+
+						case 2:
+							{
+								l_Window->MouseButton[MOUSE_MIDDLEBUTTON] = MOUSE_BUTTONUP;
+
+								if(IsValidKeyEvent(l_Window->MouseButtonEvent))
+								{
+									l_Window->MouseButtonEvent(MOUSE_MIDDLEBUTTON, MOUSE_BUTTONUP);
+								}
+								break;
+							}
+
+						case 3:
+							{
+								l_Window->MouseButton[MOUSE_RIGHTBUTTON] = MOUSE_BUTTONUP;
+								
+								if(IsValidKeyEvent(l_Window->MouseButtonEvent))
+								{
+									l_Window->MouseButtonEvent(MOUSE_RIGHTBUTTON, MOUSE_BUTTONUP);
+								}
+								break;
+							}
+
+						case 4:
+							{
+								l_Window->MouseButton[MOUSE_SCROLL_UP] = MOUSE_BUTTONDOWN;
+								break;
+							}
+
+						case 5:
+							{
+								l_Window->MouseButton[MOUSE_SCROLL_DOWN] = MOUSE_BUTTONDOWN;
+								break;
+							}
+
+						default:
+							{
+								break;
+							}
+					}
+					break;
+				}
+
+				//when the mouse/pointer device is moved
+				case MotionNotify:
+				{ 
+					//set the windows mouse position to match the event
+					l_Window->MousePosition[0] = 
+						l_Event.xmotion.x;
+
+					l_Window->MousePosition[1] = 
+						l_Event.xmotion.y;
+
+					///set the manager screen  ouse position to match the event
+					GetInstance()->ScreenMousePosition[0] = l_Event.xmotion.x_root;
+					GetInstance()->ScreenMousePosition[1] = l_Event.xmotion.y_root;
+					
+					if(IsValidMouseMoveEvent(l_Window->MouseMoveEvent))
+					{
+						l_Window->MouseMoveEvent(l_Event.xmotion.x, 
+								l_Event.xmotion.y, l_Event.xmotion.x_root, 
+								l_Event.xmotion.y_root);
+					}	
+					break;
+				}
+
+				//when the window goes out of focus
+				case FocusOut:
+				{
+					l_Window->InFocus = GL_FALSE;
+					if(IsValidFocusEvent(l_Window->FocusEvent))
+					{
+						l_Window->FocusEvent(
+								l_Window->InFocus);
+					}
+					break;
+				}
+
+				//when the window is back in focus (use to restore?)
+				case FocusIn:
+				{
+					l_Window->InFocus = GL_TRUE;
+					
+					if(IsValidFocusEvent(l_Window->FocusEvent))
+					{
+						l_Window->FocusEvent(l_Window->InFocus);
+					}
+					break;
+				}
+
+				//when a request to resize the window is made either by 
+				//dragging out the window or programmatically
+				case ResizeRequest:
+				{			
+					glViewport(0, 0,
+							l_Window->GetResolution()[0],
+							l_Window->GetResolution()[1]);
+
+					glMatrixMode(GL_PROJECTION);
+					glLoadIdentity();
+
+					break;
+				}
+
+				//when a request to configure the window is made
+				case ConfigureNotify:
+				{
+					glViewport(0, 0, l_Event.xconfigure.width,
+								l_Event.xconfigure.height);
+
+					//check if window was resized
+					if((GLuint)l_Event.xconfigure.width != l_Window->Resolution[0] 
+							|| (GLuint)l_Event.xconfigure.height != l_Window->Resolution[1])
+					{
+						if(IsValidMovedEvent(l_Window->ResizeEvent))
+						{
+							l_Window->ResizeEvent(l_Event.xconfigure.width, l_Event.xconfigure.height);
+						}
+
+						l_Window->Resolution[0] = l_Event.xconfigure.width;
+						l_Window->Resolution[1] = l_Event.xconfigure.height;
+					}
+
+					//check if window was moved
+					if((GLuint)l_Event.xconfigure.x != l_Window->Position[0]
+							|| (GLuint)l_Event.xconfigure.y != l_Window->Position[1])
+					{
+						if(IsValidMovedEvent(l_Window->MovedEvent))
+						{
+							l_Window->MovedEvent(l_Event.xconfigure.x, l_Event.xconfigure.y);
+						}
+
+						l_Window->Position[0] = l_Event.xconfigure.x;
+						l_Window->Position[1] = l_Event.xconfigure.y;
+					}
+					break;
+				}
+
+				case PropertyNotify:
+				{
+					//this is needed in order to read from the windows WM_STATE Atomic
+					//to determine if the property notify event was caused by a client
+					//iconify event(minimizing the window) or a maximise event
+						
+					Atom l_Type;
+					GLint l_Format;
+					ulong l_NumItems, l_BytesAfter;
+					unsigned char* l_Properties = nullptr;
+
+					XGetWindowProperty(WindowManager::GetDisplay(), l_Event.xproperty.window, 
+								l_Window->AtomState, 
+								0, LONG_MAX, GL_FALSE, AnyPropertyType, 
+								&l_Type, &l_Format, &l_NumItems, &l_BytesAfter, 
+								&l_Properties);
+
+						if(l_Properties && (l_Format == 32))
+						{
+							for(GLuint l_CurrentItem = 0; l_CurrentItem < l_NumItems; l_CurrentItem++)
+							{
+								long l_Property = ((long*)(l_Properties))[l_CurrentItem];	
+
+								if(l_Property == l_Window->AtomHidden)
+								{
+									if(IsValidDestroyedEvent(l_Window->MinimizedEvent))
+									{								
+										l_Window->MinimizedEvent();
+									}
+								}
+
+								if(l_Property == l_Window->AtomMaxVert ||
+										l_Property == l_Window->AtomMaxVert)
+								{	
+									if(IsValidDestroyedEvent(l_Window->MaximizedEvent))
+									{		
+										l_Window->MaximizedEvent();
+									}
+								}
+
+								if(l_Property == l_Window->AtomDemandsAttention)
+								{
+									//printf("window demands attention \n");
+								}
+							}
+						}
+
+					break;
+				}
+
+				case GravityNotify:
+				{
+					//this is only supposed to pop up when the parent of this window(if any) has something happen
+					//to it so that this window can react to said event as well.
+					break;
+				}
+
+				case ClientMessage:
+				{
+					const char* l_AtomName = XGetAtomName(WindowManager::GetDisplay(), l_Event.xclient.message_type);
+					if(IsValidString(l_AtomName))
+					{
+						//print the name of the Atom
+						//printf("%s\n", l_AtomName);
+					}
+
+					if((Atom)l_Event.xclient.data.l[0] == l_Window->AtomClose)
+					{
+						//printf("window closed\n");
+						l_Window->ShouldClose = GL_TRUE;
+						l_Window->DestroyedEvent();
+						l_Window->Shutdown();
+						//XDestroyWindow(GetInstance()->m_Display, l_Event.xclient.window);
+						break;
+					}
+
+					if((Atom)l_Event.xclient.data.l[1] == l_Window->AtomFullScreen)
+					{
+						//printf("resized window \n");
+						break;
+					}
+					break;
+				}
+
+				/*case VisibilityNotify:
+				{
+					if(l_Event.xvisibility.state == VisibilityUnobscured)
+					{
+						//printf("window not obscured \n");
+						l_Window->m_IsObscured = GL_FALSE;
+					}
+
+					else
+					{
+						//printf("window obscured\n");
+						l_Window->m_IsObscured = GL_TRUE;
+					}
+				}*/
+
+				default:
+				{
+					return FOUNDATION_OKAY;
+				}
+			}
+			return FOUNDATION_OKAY;
 		}
-
-		case GravityNotify:
-		{
-			//this is only supposed to pop up when the parent of this window(if any) has something happen
-			//to it so that this window can react to said event as well.
-			break;
-		}
-
-		case ClientMessage:
-		{
-			const char* l_AtomName = XGetAtomName(WindowManager::GetDisplay(), l_Event.xclient.message_type);
-			if(IsValidString(l_AtomName))
-			{
-				//print the name of the Atom
-				//printf("%s\n", l_AtomName);
-			}
-
-			if((Atom)l_Event.xclient.data.l[0] == l_Window->AtomClose)
-			{
-				//printf("window closed\n");
-				l_Window->ShouldClose = GL_TRUE;
-				l_Window->DestroyedEvent();
-				l_Window->Shutdown();
-				//XDestroyWindow(GetInstance()->m_Display, l_Event.xclient.window);
-				break;
-			}
-
-			if((Atom)l_Event.xclient.data.l[1] == l_Window->AtomFullScreen)
-			{
-				//printf("resized window \n");
-				break;
-			}
-			break;
-		}
-
-		/*case VisibilityNotify:
-		{
-			if(l_Event.xvisibility.state == VisibilityUnobscured)
-			{
-				//printf("window not obscured \n");
-				l_Window->m_IsObscured = GL_FALSE;
-			}
-
-			else
-			{
-				//printf("window obscured\n");
-				l_Window->m_IsObscured = GL_TRUE;
-			}
-		}*/
-
-		default:
-		{
-			break;
-		}
-	}
-	return FOUNDATION_OKAY;
+		return FOUNDATION_OKAY;
 	}
 	PrintErrorMessage(ERROR_NOTINITIALIZED);
-return FOUNDATION_ERROR;
-
+	return FOUNDATION_ERROR;
 }
 
 const char* WindowManager::Linux_GetEventType(XEvent Event)

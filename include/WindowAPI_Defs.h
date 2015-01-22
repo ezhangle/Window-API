@@ -9,18 +9,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <list>
+#include <time.h>
 
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
 #define CURRENT_OS_WINDOWS  
 #include <windows.h>
 #include <gl/GL.h>
-#include "../dependencies/wglext.h"
+#include "dependencies/wglext.h"
 #endif
 
 #if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
 #define CURRENT_OS_LINUX	
 #include <GL/glx.h>
-#include "../dependencies/glxext.h"
+#include "dependencies/glxext.h"
 #include <GL/glext.h>
 #include <GL/glx.h>
 #include <GL/glu.h>
@@ -176,41 +177,44 @@ typedef void (*OnMovedEvent)(GLuint X, GLuint Y);   /**<To be called when the wi
 typedef void (*OnResizeEvent)(GLuint Width, GLuint Height); /**<To be called when the window has been resized*/
 typedef void (*OnMouseMoveEvent)(GLuint WindowX, GLuint WindowY, GLuint ScreenX, GLuint ScreenY);   /**<To be called when the mouse has been moved within the window*/ 
 
+//return wether the given string is valid
 static inline GLboolean IsValidString(const char* String)
 {
 	return (String != nullptr);
 }
 
+//return whether the given event is valid
 static inline GLboolean IsValidKeyEvent(OnKeyEvent OnKeyPressed)
 {
 	return (OnKeyPressed != nullptr);
 }
-
+//return whether the given event is valid
 static inline GLboolean IsValidMouseWheelEvent(OnMouseWheelEvent MouseWheelEvent)
 {
 	return (MouseWheelEvent != nullptr);
 }
-
+//return whether the given event is valid
 static inline GLboolean IsValidDestroyedEvent(OnMaximizedEvent OnMaximized)
 {
 	return (OnMaximized != nullptr);
 }
-
+//return whether the given event is valid
 static inline GLboolean IsValidFocusEvent(OnFocusEvent OnFocus)
 {
 	return (OnFocus != nullptr);
 }
-
+//return whether the given event is valid
 static inline GLboolean IsValidMovedEvent(OnMovedEvent OnMoved)
 {
 	return (OnMoved != nullptr);
 }
-
+//return whether the given event is valid
 static inline GLboolean IsValidMouseMoveEvent(OnMouseMoveEvent OnMouseMove)
 {
 	return (OnMouseMove != nullptr);
 }
 
+//print the warning message assosciated with the given warning number
 static inline void PrintWarningMessage(GLuint WarningNumber)
 {
 	switch(WarningNumber)
@@ -235,7 +239,7 @@ static inline void PrintWarningMessage(GLuint WarningNumber)
 	}
 }
 
-
+//print out the error associated with the given error number
 static void PrintErrorMessage(GLuint ErrorNumber)
 {
 	switch(ErrorNumber)

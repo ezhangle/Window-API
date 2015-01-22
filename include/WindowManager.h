@@ -134,15 +134,22 @@ class WindowManager
 		//ask the window to poll for window events
 		static GLboolean PollForEvents();
 
+		//NOTE: moved to TinyClock API
+		//static GLdouble GetTotalTime();
+		//static GLdouble GetDeltaTime();
+
 		//remove a window from the manager
 		static GLboolean RemoveWindow(FWindow* WindowToBeRemoved);
 
+		//set the styleof the given window
 		static GLboolean SetWindowStyle(const char* WindowName, GLuint WindowStyle);
 		static GLboolean SetWindowStyle(GLuint WindowIndex, GLuint WindowStyle);
 
+		//enable the given decorators of the given window
 		static GLboolean EnableWindowDecorator(const char* WindowName, GLbitfield Decorators);
 		static GLboolean EnableWindowDecorator(GLuint WindowIndex, GLbitfield Decorators);
 
+		//disable the given decorators of the given window
 		static GLboolean DisableWindowDecorator(const char* WindowName, GLbitfield Decorators);
 		static GLboolean DisableWindowDecorator(GLuint WindowIndex, GLbitfield Decorators); 
 
@@ -195,7 +202,12 @@ class WindowManager
 		GLuint ScreenResolution[2]; /**< the resolution of the screen as an array */
 		GLuint ScreenMousePosition[2]; /**< the position of the mouse relative to screen coordinates */
 
-		GLboolean Initialized;
+		GLboolean Initialized; /**<whether the window manager has been initialized*/
+
+		//NOTE: moved to TinyClock API
+		//GLdouble TotalTime; /**< How long the window manager has been running*/ 
+		//GLdouble PreviousTime; /**the previous amount of time between cycles. used to calculate Delta time */
+		//GLdouble DeltaTime; /** How much time (in ms) between CPU cycles*/
 
 #if defined(CURRENT_OS_WINDOWS)
 		LRESULT CALLBACK WindowProcedure(HWND WindowHandle, GLuint Message, WPARAM WordParam, LPARAM LongParam);

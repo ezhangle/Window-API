@@ -478,7 +478,7 @@ GLboolean WindowManager::PollForEvents()
 
 #if defined (CURRENT_OS_LINUX)
 		return GetInstance()->Linux_PollForEvents();
-#endif
+#endif	
 	}
 
 	PrintErrorMessage(ERROR_NOTINITIALIZED);

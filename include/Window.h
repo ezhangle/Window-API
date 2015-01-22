@@ -300,7 +300,7 @@ private:
 	void Linux_EnableDecorator(GLbitfield Decorator);
 	//disables given window decoration via Win32
 	void Linux_DisableDecorator(GLbitfield Decorator);
-
+	//set the style of the window by enabling/disabling certain decorators
 	void Linux_SetStyle(GLuint WindowStyle);
 
 	//initialize the window manager Atomics needed for the X11 extended window manager
@@ -325,7 +325,7 @@ private:
 	PFNGLXSWAPINTERVALEXTPROC SwapIntervalEXT; /**< the generic swap interval extension*/
 	PFNGLXSWAPINTERVALSGIPROC SwapIntervalSGI;	 /**< the Silicon graphics swap interval extension*/
 
-	/*these atomics are needed to change window states via the extended window manage.
+	/*these atomics are needed to change window states via the extended window manager
 	I might move them to window manager considering these are essentially constants
 	*/
 	Atom AtomState;  /**< atom for the state of the window */	//_NET_WM_STATE
