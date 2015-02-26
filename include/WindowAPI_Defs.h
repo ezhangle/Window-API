@@ -11,15 +11,16 @@
 #include <list>
 #include <time.h>
 
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-#define CURRENT_OS_WINDOWS  
+#if defined(_WIN32) || defined(_WIN64)
+#ifndef WIN32_LEAN_AND_MEAN
+#define  WIN32_LEAN_AND_MEAN 1
+#endif
 #include <windows.h>
 #include <gl/GL.h>
 #include "dependencies/wglext.h"
 #endif
 
-#if defined(__linux__) || defined(__GNUG__) || defined(__GNUC__) || defined(__clang__)
-#define CURRENT_OS_LINUX	
+#if defined(__linux__) 
 #include <GL/glx.h>
 #include "dependencies/glxext.h"
 #include <GL/glext.h>

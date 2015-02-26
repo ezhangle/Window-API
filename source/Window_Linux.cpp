@@ -6,7 +6,7 @@
 
 #include "Window.h"
 #include "WindowManager.h"
-#if defined(CURRENT_OS_LINUX)
+#if defined(__linux__)
 #include <cstring> 
 /**********************************************************************************************//**
  * @fn	GLboolean FWindow::Linux_Initialize()

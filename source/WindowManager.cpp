@@ -32,12 +32,10 @@ WindowManager::WindowManager()
 GLboolean WindowManager::Initialize()
 {
 	GetInstance()->Initialized = GL_FALSE;
-#if defined(CURRENT_OS_LINUX)
-	return Linux_Initialize();
-#endif	
-
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 	return Windows_Initialize();
+#else
+	return Linux_Initialize();
 #endif
 }
 
@@ -59,19 +57,14 @@ WindowManager::~WindowManager()
 {
 	if (!GetInstance()->Windows.empty())
 	{
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_MSC_VER)
 		for each(auto CurrentWindow in GetInstance()->Windows)
-		{
-			delete CurrentWindow;
-		}
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 		for (auto CurrentWindow : GetInstance()->Windows)
+#endif
 		{
 			delete CurrentWindow;
 		}
-#endif
 		GetInstance()->Windows.clear();
 	}
 }
@@ -93,25 +86,17 @@ FWindow* WindowManager::GetWindowByName(const char* WindowName)
 {
 	if (DoesExist(WindowName))
 	{
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_MSC_VER)
 		for each(auto CurrentWindow in GetInstance()->Windows)
-		{
-			if (CurrentWindow->Name == WindowName)
-			{
-				return CurrentWindow;
-			}
-		}
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 		for (auto CurrentWindow : GetInstance()->Windows)
+#endif
 		{
-			if (CurrentWindow->Name == WindowName)
+			if (!strcmp(CurrentWindow->Name, WindowName))
 			{
 				return CurrentWindow;
 			}
 		}
-#endif
 		PrintErrorMessage(ERROR_WINDOWNOTFOUND);
 		return nullptr;
 	}
@@ -135,25 +120,18 @@ FWindow* WindowManager::GetWindowByIndex(GLuint WindowIndex)
 {
 	if (DoesExist(WindowIndex))
 	{
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_MSC_VER)
 		for each (auto CurrentWindow in GetInstance()->Windows)
-		{
-			if (CurrentWindow->ID == WindowIndex)
-			{
-				return CurrentWindow;
-			}
-		}
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 		for (auto CurrentWindow : GetInstance()->Windows)
+#endif
 		{
 			if(CurrentWindow->ID == WindowIndex)
 			{
 				return CurrentWindow;
 			}
 		}
-#endif
+
 		PrintErrorMessage(ERROR_WINDOWNOTFOUND);
 		return nullptr;
 	}
@@ -236,25 +214,17 @@ GLboolean WindowManager::DoesExist(const char* WindowName)
 	{
 		if (IsValidString(WindowName))
 		{
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_MSC_VER)
 			for each(auto iter in GetInstance()->Windows)
-			{
-				if (iter->Name == WindowName)
-				{
-					return GL_TRUE;
-				}
-			}
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 			for (auto iter : GetInstance()->Windows)
+#endif
 			{
 				if (iter->Name == WindowName)
 				{
 					return GL_TRUE;
 				}
 			}
-#endif
 		}
 		PrintErrorMessage(ERROR_INVALIDWINDOWNAME);
 		return GL_FALSE;
@@ -323,14 +293,11 @@ GLuint WindowManager::GetNumWindows()
 
 void WindowManager::ShutDown()
 {	
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_MSC_VER)
 	for each(auto CurrentWindow in GetInstance()->Windows)
 	{
 		delete CurrentWindow;
 	}
-
-	GetInstance()->Windows.clear();
-
 #endif
 
 #if defined(CURRENT_OS_LINUX)
@@ -338,11 +305,10 @@ void WindowManager::ShutDown()
 	{
 		delete CurrentWindow;
 	}
-
-	GetInstance()->Windows.clear();
-
 	XCloseDisplay(GetInstance()->m_Display);
 #endif
+
+	GetInstance()->Windows.clear();
 
 	delete Instance;
 }
@@ -411,11 +377,9 @@ GLboolean WindowManager::SetMousePositionInScreen(GLuint X, GLuint Y)
 {
 	GetInstance()->ScreenMousePosition[0] = X;
 	GetInstance()->ScreenMousePosition[1] = Y;
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 	return Windows_SetMousePositionInScreen(X, Y);
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 	return Linux_SetMousePositionInScreen(X, Y);
 #endif
 }
@@ -436,7 +400,7 @@ GLuint* WindowManager::GetScreenResolution()
 {
 	if (GetInstance()->IsInitialized())
 	{
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 		RECT l_Screen;
 		HWND m_Desktop = GetDesktopWindow();
 		GetWindowRect(m_Desktop, &l_Screen);
@@ -444,10 +408,9 @@ GLuint* WindowManager::GetScreenResolution()
 		GetInstance()->ScreenResolution[0] = l_Screen.right;
 		GetInstance()->ScreenResolution[1] = l_Screen.bottom;
 		return GetInstance()->ScreenResolution;
-
 #endif
 
-#if defined(CURRENT_OS_LINUX)
+#if defined(__linux__)
 		GetInstance()->ScreenResolution[0] = WidthOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
 		GetInstance()->ScreenResolution[1] = HeightOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
 
@@ -472,13 +435,26 @@ GLboolean WindowManager::PollForEvents()
 {
 	if (GetInstance()->IsInitialized())
 	{
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 		return GetInstance()->Windows_PollForEvents();
-#endif
-
-#if defined (CURRENT_OS_LINUX)
+#else
 		return GetInstance()->Linux_PollForEvents();
 #endif	
+	}
+
+	PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return FOUNDATION_ERROR;
+}
+
+GLboolean WindowManager::WaitForEvents()
+{
+	if (GetInstance()->IsInitialized())
+	{
+#if defined(_WIN32) || defined(_WIN64)
+		return GetInstance()->Windows_WaitForEvents();
+#else
+		return GetInstance()->Linux_WaitForEvents();
+#endif
 	}
 
 	PrintErrorMessage(ERROR_NOTINITIALIZED);
@@ -501,7 +477,7 @@ GLboolean WindowManager::GetScreenResolution(GLuint& Width, GLuint& Height)
 {
 	if (GetInstance()->IsInitialized())
 	{
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 
 		RECT l_Screen;
 		HWND m_Desktop = GetDesktopWindow();
@@ -510,7 +486,7 @@ GLboolean WindowManager::GetScreenResolution(GLuint& Width, GLuint& Height)
 		Height = l_Screen.bottom;
 #endif
 
-#if defined(CURRENT_OS_LINUX)
+#if defined(__linux__)
 
 		Width = WidthOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
 		Height = HeightOfScreen(XDefaultScreenOfDisplay(GetInstance()->m_Display));
@@ -1704,7 +1680,7 @@ GLboolean WindowManager::DisableWindowDecorator(GLuint WindowIndex, GLbitfield D
  * @date	29/11/2014
  *
  * @param	WindowName	Name of the window.
- * @param	OnKey	  	The on key event.
+ * @param	OnKey	  	The on key event callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnKeyEvent(const char* WindowName, OnKeyEvent OnKey)
@@ -1726,7 +1702,7 @@ GLboolean WindowManager::SetWindowOnKeyEvent(const char* WindowName, OnKeyEvent 
  * @date	29/11/2014
  *
  * @param	WindowIndex	Zero-based index of the window.
- * @param	OnKey	   	The on key event.
+ * @param	OnKey	   	The on key event callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnKeyEvent(GLuint WindowIndex, OnKeyEvent OnKey)
@@ -1748,7 +1724,7 @@ GLboolean WindowManager::SetWindowOnKeyEvent(GLuint WindowIndex, OnKeyEvent OnKe
  * @date	29/11/2014
  *
  * @param	WindowName   	Name of the window.
- * @param	OnMouseButton	The on mouse button event.
+ * @param	OnMouseButton	The on mouse button event callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnMouseButtonEvent(const char* WindowName, OnMouseButtonEvent OnMouseButton)
@@ -1770,7 +1746,7 @@ GLboolean WindowManager::SetWindowOnMouseButtonEvent(const char* WindowName, OnM
  * @date	29/11/2014
  *
  * @param	WindowIndex  	Zero-based index of the window.
- * @param	OnMouseButton	The on mouse button event.
+ * @param	OnMouseButton	The on mouse button event callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnMouseButtonEvent(GLuint WindowIndex, OnMouseButtonEvent OnMouseButton)
@@ -1792,7 +1768,7 @@ GLboolean WindowManager::SetWindowOnMouseButtonEvent(GLuint WindowIndex, OnMouse
  * @date	29/11/2014
  *
  * @param	WindowName  	Name of the window.
- * @param	OnMouseWheel	The on mouse wheel event.
+ * @param	OnMouseWheel	The on mouse wheel event callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnMouseWheelEvent(const char* WindowName, OnMouseWheelEvent OnMouseWheel)
@@ -1814,7 +1790,7 @@ GLboolean WindowManager::SetWindowOnMouseWheelEvent(const char* WindowName, OnMo
  * @date	29/11/2014
  *
  * @param	WindowIndex 	Zero-based index of the window.
- * @param	OnMouseWheel	The on mouse wheel event.
+ * @param	OnMouseWheel	The on mouse wheel event callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnMouseWheelEvent(GLuint WindowIndex, OnMouseWheelEvent OnMouseWheel)
@@ -1836,7 +1812,7 @@ GLboolean WindowManager::SetWindowOnMouseWheelEvent(GLuint WindowIndex, OnMouseW
  * @date	29/11/2014
  *
  * @param	WindowName 	Name of the window.
- * @param	OnDestroyed	The on destroyed.
+ * @param	OnDestroyed	The on destroyed callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnDestroyed(const char* WindowName, OnDestroyedEvent OnDestroyed)
@@ -1858,7 +1834,7 @@ GLboolean WindowManager::SetWindowOnDestroyed(const char* WindowName, OnDestroye
  * @date	29/11/2014
  *
  * @param	WindowIndex	Zero-based index of the window.
- * @param	OnDestroyed	The on destroyed.
+ * @param	OnDestroyed	The on destroyed callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnDestroyed(GLuint WindowIndex, OnDestroyedEvent OnDestroyed)
@@ -1880,7 +1856,7 @@ GLboolean WindowManager::SetWindowOnDestroyed(GLuint WindowIndex, OnDestroyedEve
  * @date	29/11/2014
  *
  * @param	WindowName 	Name of the window.
- * @param	OnMaximized	The on maximized.
+ * @param	OnMaximized	The on maximized callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnMaximized(const char* WindowName, OnMaximizedEvent OnMaximized)
@@ -1902,7 +1878,7 @@ GLboolean WindowManager::SetWindowOnMaximized(const char* WindowName, OnMaximize
  * @date	29/11/2014
  *
  * @param	WindowIndex	Zero-based index of the window.
- * @param	OnMaximized	The on maximized.
+ * @param	OnMaximized	The on maximized callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnMaximized(GLuint WindowIndex, OnMaximizedEvent OnMaximized)
@@ -1924,7 +1900,7 @@ GLboolean WindowManager::SetWindowOnMaximized(GLuint WindowIndex, OnMaximizedEve
  * @date	29/11/2014
  *
  * @param	WindowName 	Name of the window.
- * @param	OnMinimized	The on minimized.
+ * @param	OnMinimized	The on minimized callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnMinimized(const char* WindowName, OnMinimizedEvent OnMinimized)
@@ -1946,7 +1922,7 @@ GLboolean WindowManager::SetWindowOnMinimized(const char* WindowName, OnMinimize
  * @date	29/11/2014
  *
  * @param	WindowIndex	Zero-based index of the window.
- * @param	OnMinimized	The on minimized.
+ * @param	OnMinimized	The on minimized callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnMinimized(GLuint WindowIndex, OnMinimizedEvent OnMinimized)
@@ -1984,7 +1960,7 @@ void WindowManager::SetWindowOnRestored(GLuint WindowIndex, OnRestoredEvent OnRe
  * @date	29/11/2014
  *
  * @param	WindowName	Name of the window.
- * @param	OnFocus   	The on focus.
+ * @param	OnFocus   	The on focus callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnFocus(const char* WindowName, OnFocusEvent OnFocus)
@@ -2007,7 +1983,7 @@ GLboolean WindowManager::SetWindowOnFocus(const char* WindowName, OnFocusEvent O
  * @date	29/11/2014
  *
  * @param	WindowIndex	Zero-based index of the window.
- * @param	OnFocus	   	The on focus.
+ * @param	OnFocus	   	The on focus callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnFocus(GLuint WindowIndex, OnFocusEvent OnFocus)
@@ -2030,7 +2006,7 @@ GLboolean WindowManager::SetWindowOnFocus(GLuint WindowIndex, OnFocusEvent OnFoc
  * @date	29/11/2014
  *
  * @param	WindowName	Name of the window.
- * @param	OnMoved   	The on moved.
+ * @param	OnMoved   	The on moved callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnMoved(const char* WindowName, OnMovedEvent OnMoved)
@@ -2052,7 +2028,7 @@ GLboolean WindowManager::SetWindowOnMoved(const char* WindowName, OnMovedEvent O
  * @date	29/11/2014
  *
  * @param	WindowIndex	Zero-based index of the window.
- * @param	OnMoved	   	The on moved.
+ * @param	OnMoved	   	The on moved callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnMoved(GLuint WindowIndex, OnMovedEvent OnMoved)
@@ -2074,7 +2050,7 @@ GLboolean WindowManager::SetWindowOnMoved(GLuint WindowIndex, OnMovedEvent OnMov
  * @date	29/11/2014
  *
  * @param	WindowName	Name of the window.
- * @param	OnResize  	The on resize.
+ * @param	OnResize  	The on resize callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnResize(const char* WindowName, OnResizeEvent OnResize)
@@ -2096,7 +2072,7 @@ GLboolean WindowManager::SetWindowOnResize(const char* WindowName, OnResizeEvent
  * @date	29/11/2014
  *
  * @param	WindowIndex	Zero-based index of the window.
- * @param	OnResize   	The on resize.
+ * @param	OnResize   	The on resize callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnResize(GLuint WindowIndex, OnResizeEvent OnResize)
@@ -2118,7 +2094,7 @@ GLboolean WindowManager::SetWindowOnResize(GLuint WindowIndex, OnResizeEvent OnR
  * @date	29/11/2014
  *
  * @param	WindowName 	Name of the window.
- * @param	OnMouseMove	The on mouse move.
+ * @param	OnMouseMove	The on mouse move callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnMouseMove(const char* WindowName, OnMouseMoveEvent OnMouseMove)
@@ -2140,7 +2116,7 @@ GLboolean WindowManager::SetWindowOnMouseMove(const char* WindowName, OnMouseMov
  * @date	29/11/2014
  *
  * @param	WindowIndex	Zero-based index of the window.
- * @param	OnMouseMove	The on mouse move.
+ * @param	OnMouseMove	The on mouse move callback.
  **************************************************************************************************/
 
 GLboolean WindowManager::SetWindowOnMouseMove(GLuint WindowIndex, OnMouseMoveEvent OnMouseMove)

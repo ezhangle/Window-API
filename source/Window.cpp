@@ -8,7 +8,7 @@
 #include "Window.h"
 #include "WindowManager.h"
 
-#if defined(CURRENT_OS_LINUX)
+#if defined(__linux__)
 #include <cstring>
 #endif
 
@@ -91,11 +91,9 @@ GLboolean FWindow::Shutdown()
 	if(ContextCreated)
 	{
 		
-#if defined (CURRENT_OS_WINDOWS)
+#if defined (_WIN32) || defined(_WIN64)
 		Windows_Shutdown();
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 		Linux_Shutdown();
 #endif
 		ContextCreated = GL_FALSE;
@@ -119,11 +117,9 @@ GLboolean FWindow::Shutdown()
 
 GLboolean FWindow::Initialize()
 {
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 	return Windows_Initialize();
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 	return Linux_Initialize();
 #endif
 }
@@ -197,11 +193,9 @@ GLboolean FWindow::GetKeyState(GLuint Key)
 
 GLboolean FWindow::InitializeGL()
 {
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || (_WIN64)
 	return Windows_InitializeGL();
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 	return Linux_InitializeGL();
 #endif
 }
@@ -221,14 +215,11 @@ GLboolean FWindow::SwapDrawBuffers()
 {
 	if(ContextCreated)
 	{
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || (_WIN64)
 		SwapBuffers(DeviceContextHandle);
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 		glXSwapBuffers(WindowManager::GetDisplay(), WindowHandle);
 #endif
-
 		return FOUNDATION_OKAY;
 	}
 
@@ -254,11 +245,9 @@ GLboolean FWindow::SetSwapInterval(GLint SwapSetting)
 	if(ContextCreated)
 	{
 	CurrentSwapInterval = SwapSetting;
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 	Windows_VerticalSync(SwapSetting);
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 	Linux_VerticalSync(SwapSetting);
 #endif
 
@@ -389,12 +378,10 @@ GLboolean FWindow::FullScreen(GLboolean ShouldBeFullscreen)
 			CurrentState = WINDOWSTATE_NORMAL;
 		}
 
-#if defined(CURRENT_OS_LINUX)
-		Linux_FullScreen(ShouldBeFullscreen);
-#endif
-
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 		Windows_FullScreen();
+#else
+		Linux_FullScreen(ShouldBeFullscreen);
 #endif
 
 		return FOUNDATION_OKAY;
@@ -447,11 +434,9 @@ GLboolean FWindow::Minimize(GLboolean NewState)
 			CurrentState = WINDOWSTATE_NORMAL;
 		}
 
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 	 	Windows_Minimize();
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 	 	Linux_Minimize(NewState);
 #endif
 
@@ -504,11 +489,9 @@ GLboolean FWindow::Maximize(GLboolean NewState)
 			CurrentState = WINDOWSTATE_NORMAL;
 		}
 
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 		 Windows_Maximize();
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 	 	Linux_Maximize(NewState);
 #endif
 		 return FOUNDATION_OKAY;
@@ -548,11 +531,9 @@ GLboolean FWindow::Restore()
 		}
 
 		CurrentState = WINDOWSTATE_NORMAL;
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 		Windows_Restore();
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 		Linux_Restore();
 #endif
 
@@ -628,14 +609,11 @@ GLboolean FWindow::SetResolution(GLuint Width, GLuint Height)
 			Resolution[0] = Width;
 			Resolution[1] = Height;
 
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 			Windows_SetResolution(Resolution[0], Resolution[1]);
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 			Linux_SetResolution(Width, Height);	
 #endif
-
 			glViewport(0, 0, Resolution[0], Resolution[1]);
 
 			return FOUNDATION_OKAY;
@@ -646,7 +624,7 @@ GLboolean FWindow::SetResolution(GLuint Width, GLuint Height)
 			PrintErrorMessage(ERROR_INVALIDRESOLUTION);
 			return FOUNDATION_ERROR;
 		}
-	}   /**< . */
+	}  
 
 		PrintErrorMessage(ERROR_NOCONTEXT);
 		return FOUNDATION_ERROR;
@@ -718,14 +696,11 @@ GLboolean FWindow::SetMousePosition(GLuint X, GLuint Y)
 	{ 
 		MousePosition[0] = X;
 		MousePosition[1] = Y;
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 		Windows_SetMousePosition(X, Y);
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 		Linux_SetMousePosition(X, Y);
 #endif
-
 		return FOUNDATION_OKAY;
 	}
 
@@ -795,11 +770,9 @@ GLboolean FWindow::SetPosition(GLuint X, GLuint Y)
 	{
 		Position[0] = X;
 		Position[1] = Y;
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 		Windows_SetPosition(Position[0], Position[1]);
-#endif
-	
-#if defined(CURRENT_OS_LINUX)
+#else
 		Linux_SetPosition(X, Y);
 #endif
 	}
@@ -847,12 +820,10 @@ GLboolean FWindow::SetTitleBar(const char* NewTitle)
 	{
 		if(NewTitle != nullptr)
 		{
-#if defined(CURRENT_OS_LINUX)
-			Linux_SetTitleBar(NewTitle);
-#endif
-
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 			Windows_SetTitleBar(NewTitle);
+#else
+			Linux_SetTitleBar(NewTitle);
 #endif
 			return FOUNDATION_OKAY;
 		}
@@ -872,17 +843,13 @@ GLboolean FWindow::SetIcon(const char* Icon, GLuint Width, GLuint Height)
 {
 	if (ContextCreated)
 	{
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 		Windows_SetIcon(Icon, Width, Height);
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 		Linux_SetIcon(Icon, Width, Height);
 #endif
-
 		return FOUNDATION_OKAY;
 	}
-
 	return FOUNDATION_ERROR;
 }
 
@@ -890,14 +857,11 @@ GLboolean FWindow::SetStyle(GLuint WindowType)
 {
 	if (ContextCreated)
 	{
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 		Windows_SetStyle(WindowType);
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 		Linux_SetStyle(WindowType);
 #endif
-
 		PrintErrorMessage(ERROR_NOCONTEXT);
 		return FOUNDATION_OKAY;
 	}
@@ -922,11 +886,9 @@ GLboolean FWindow::MakeCurrentContext()
 	if(ContextCreated)
 	{
 		IsCurrentContext = true;
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 		wglMakeCurrent(DeviceContextHandle, GLRenderingContextHandle);
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 		glXMakeCurrent(WindowManager::GetDisplay(), WindowHandle, Context);
 #endif
 		return FOUNDATION_OKAY;
@@ -984,11 +946,9 @@ GLboolean FWindow::GetContextHasBeenCreated()
 
 void FWindow::InitGLExtensions()
 {
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 	Windows_InitGLExtensions();
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 	Linux_InitGLExtensions();
 #endif
 }
@@ -1096,14 +1056,11 @@ GLboolean FWindow::Focus(GLboolean ShouldBeInFocus)
 	{
 		InFocus = ShouldBeInFocus;
 
-#if defined(CURRENT_OS_LINUX)
-		Linux_Focus(ShouldBeInFocus);	
+#if defined(_WIN32) || defined(_WIN64)
+		Windows_Focus();	
+#else
+		Linux_Focus(ShouldBeInFocus);
 #endif
-
-#if defined(CURRENT_OS_WINDOWS)
-		Windows_Focus();
-#endif
-
 		return FOUNDATION_OKAY;
 	}
 
@@ -1365,11 +1322,9 @@ GLboolean FWindow::EnableDecorator(GLbitfield Decorator)
 {
 	if (ContextCreated)
 	{
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 		Windows_EnableDecorator(Decorator);
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 		Linux_EnableDecorator(Decorator);
 #endif
 
@@ -1383,11 +1338,9 @@ GLboolean FWindow::DisableDecorator(GLbitfield Decorator)
 {
 	if (ContextCreated)
 	{
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 		Windows_DisableDecorator(Decorator);
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 		Linux_DisableDecorator(Decorator);
 #endif
 		return FOUNDATION_OKAY;

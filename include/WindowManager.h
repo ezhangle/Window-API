@@ -133,6 +133,7 @@ class WindowManager
 
 		//ask the window to poll for window events
 		static GLboolean PollForEvents();
+		static GLboolean WaitForEvents();
 
 		//NOTE: moved to TinyClock API
 		//static GLdouble GetTotalTime();
@@ -209,7 +210,7 @@ class WindowManager
 		//GLdouble PreviousTime; /**the previous amount of time between cycles. used to calculate Delta time */
 		//GLdouble DeltaTime; /** How much time (in ms) between CPU cycles*/
 
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 		LRESULT CALLBACK WindowProcedure(HWND WindowHandle, GLuint Message, WPARAM WordParam, LPARAM LongParam);
 	
 		static LRESULT CALLBACK StaticWindowProcedure(HWND WindowHandle, UINT Message, WPARAM WordParam, LPARAM LongParam);
@@ -217,6 +218,7 @@ class WindowManager
 		static FWindow* GetWindowByHandle(HWND WindowHandle);
 
 		static GLboolean Windows_PollForEvents();
+		static GLboolean Windows_WaitForEvents();
 		static GLboolean Windows_Initialize();
 		static GLboolean Windows_Shutdown();
 		static GLboolean Windows_SetMousePositionInScreen(GLuint X, GLuint Y);
@@ -226,9 +228,7 @@ class WindowManager
 
 		HDC DeviceContextHandle; /**< the device context handle for the window*/
 		MSG Message; /**< the Win32 message that contains event information */
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 		static FWindow* GetWindowByHandle(Window WindowHandle);
 		static FWindow* GetWindowByEvent(XEvent Event);
 
@@ -236,6 +236,8 @@ class WindowManager
 		static void Linux_Shutdown();
 
 		static GLboolean Linux_PollForEvents();
+		static GLboolean Linux_WaitForEvents();
+		static GLvoid Linux_ProcessEvents(XEvent CurrentEvent);
 		static GLboolean Linux_SetMousePositionInScreen(GLuint X, GLuint Y);
 		static Display* GetDisplay();
 

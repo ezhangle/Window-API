@@ -6,7 +6,7 @@
 
 #include "WindowManager.h"
 
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 
 /**********************************************************************************************//**
  * @fn	void WindowManager::Windows_Initialize()
@@ -57,32 +57,22 @@ FWindow* WindowManager::GetWindowByHandle(HWND WindowHandle)
 {
 	if(GetInstance()->IsInitialized())
 	{
-#if defined(CURRENT_OS_WINDOWS)
-
+#if defined(_MSC_VER)
 	for each(auto CurrentWindow in GetInstance()->Windows)
-	{
-		if (CurrentWindow->WindowHandle == WindowHandle)
-		{
-			return CurrentWindow;
-		}
-	}
-
-#endif
-
-#if defined(CURRENT_OS_LINUX)
+#else
 	for (auto CurrentWindow : GetInstance()->Windows)
+#endif
 	{
 		if (CurrentWindow->WindowHandle == WindowHandle)
 		{
 			return CurrentWindow;
 		}
 	}
-
-#endif
 
 	return nullptr;
 	}
 
+	PrintErrorMessage(ERROR_NOTINITIALIZED);
 	return nullptr;
 }
 
@@ -491,9 +481,14 @@ GLboolean WindowManager::Windows_PollForEvents()
 {
 	if (GetInstance()->IsInitialized())
 	{
-		GetMessage(&GetInstance()->Message, 0, 0, 0);
-		TranslateMessage(&GetInstance()->Message);
-		DispatchMessage(&GetInstance()->Message);
+		if (PeekMessage(&GetInstance()->Message, 0, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&GetInstance()->Message);
+			DispatchMessage(&GetInstance()->Message);
+			return FOUNDATION_OKAY;
+		}
+
+		//if there is no event just return.
 		return FOUNDATION_OKAY;
 	}
 
@@ -503,6 +498,19 @@ GLboolean WindowManager::Windows_PollForEvents()
 		PrintErrorMessage(ERROR_NOTINITIALIZED);
 		return FOUNDATION_ERROR;
 	}
+}
+
+GLboolean WindowManager::Windows_WaitForEvents()
+{
+	if (GetInstance()->IsInitialized())
+	{
+			GetMessage(&GetInstance()->Message, 0, 0, 0);
+			TranslateMessage(&GetInstance()->Message);
+			DispatchMessage(&GetInstance()->Message);
+			return FOUNDATION_OKAY;
+	}
+	PrintErrorMessage(ERROR_NOTINITIALIZED);
+	return FOUNDATION_ERROR;
 }
 
 void WindowManager::CreateTerminal()

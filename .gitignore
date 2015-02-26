@@ -38,3 +38,4 @@ WindowAPI/Release/WindowAPI.tlog/link.read.1.tlog
 WindowAPI/Release/WindowAPI.tlog/link.write.1.tlog
 WindowAPI/WindowAPI.vcxproj
 WindowAPI/WindowAPI.vcxproj.filters
+*.tlog

@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include "WindowAPI_Defs.h"
 
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 #include <io.h>
 
 LRESULT CALLBACK FWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -177,7 +177,7 @@ private:
 	GLuint CurrentSwapInterval; /**< The current swap interval of the window(V-Sync). a value of -1 enables adaptive V-Sync on supported systems */
 	GLbitfield CurrentWindowStyle; /**< the current window style */
 
-//set all the Events to null 
+	//set all the Events to null 
 	void InitializeEvents();
 	//Initializes OpenGL extensions
 	void InitGLExtensions();
@@ -199,7 +199,7 @@ private:
 	GLboolean MESASwapControlSupported; /**< Whether the MESA_Swap_Control(Mesa) GL extension is supported on this machine*/
 
 	//this section is for the windows side of the Window API
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 	
 private:
 
@@ -265,9 +265,8 @@ private:
 	PFNWGLSWAPINTERVALEXTPROC SwapIntervalEXT; /**< OpenGL extension callback for setting the swap interval(V-Sync)*/
 	PFNWGLSWAPBUFFERSMSCOMLPROC SwapIntervalMSCOM; // what the holy fuck is MSCOM?
 	PFNWGLGETEXTENSIONSSTRINGEXTPROC GetExtensionsStringEXT; /**< OpenGL extension for revealing available extensions*/
-#endif
 
-#if defined(CURRENT_OS_LINUX)
+#else
 	//uses the X11 system to initialize the window
 	GLboolean Linux_Initialize();
 	//uses the X11 system to set the size/resolution of the window

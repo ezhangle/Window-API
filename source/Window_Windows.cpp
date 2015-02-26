@@ -7,7 +7,7 @@
 #include "Window.h"
 #include "WindowManager.h"
 
-#if defined(CURRENT_OS_WINDOWS)
+#if defined(_WIN32) || defined(_WIN64)
 
 /**********************************************************************************************//**
  * @fn	HWND FWindow::GetWindowHandle()
@@ -48,9 +48,6 @@ GLboolean FWindow::Windows_InitializeGL()
 
 		if (ContextCreated)
 		{
-#ifndef CONTEXT_CREATED
-#define CONTEXT_CREATED
-#endif
 			Windows_InitGLExtensions();
 			return FOUNDATION_OKAY;
 		}

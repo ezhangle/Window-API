@@ -40,15 +40,14 @@ void OnWindowKeyPressed(GLuint KeySym, GLboolean KeyState)
 int main()
 {
 	WindowManager::Initialize();
-	WindowManager::AddWindow(new FWindow("Example"));//->AddWindow(new FWindow("Example2"));
+	WindowManager::AddWindow(new FWindow("Example"));
+	WindowManager::GetWindowByName("Example")->PrintOpenGLVersion();
 	WindowManager::SetWindowOnKeyEvent("Example", &OnWindowKeyPressed);
-	WindowManager::SetWindowStyle("Example", WINDOWSTYLE_BARE);
-	WindowManager::EnableWindowDecorator("Example", DECORATOR_MINIMIZEBUTTON);
+
 	while (!WindowManager::GetWindowShouldClose("Example"))
 	{
-		WindowManager::PollForEvents();
-		
-		for (GLuint i = 0; i < WindowManager::GetNumWindows(); i++)
+		WindowManager::PollForEvents(); // or waitForEvents
+		for (GLuint i = 0; i < WindowManager::GetNumWindows(); i++,)
 		{
 			WindowManager::GetWindowByIndex(i)->MakeCurrentContext();
 			glClearColor(0.25f, 0.25f, 0.25f, 0.25f);
